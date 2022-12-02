@@ -1,0 +1,19 @@
+input.register {
+  margin-top: 22px;
+}
+
+input.register:last-of-type {
+  margin-bottom: 20px;
+}
+
+footer {
+}
+
+button#submit {
+  margin-top: 20px;
+}
+
+form {
+  width: 340px;
+}
+

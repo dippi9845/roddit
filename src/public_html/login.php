@@ -28,6 +28,7 @@
                             <form class="text-center" method="post">
                                 <div class="mb-3"><input class="form-control" type="email" name="email" placeholder="Email"></div>
                                 <div class="mb-3"><input class="form-control" type="password" name="password" placeholder="Password"></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-1"><label class="form-check-label d-xxl-flex justify-content-xxl-start" for="formCheck-1">Remeber me</label></div>
                                 <div class="mb-3"><button class="btn btn-primary d-block w-100" type="submit">Login</button></div>
                                 <p class="text-muted">Forgot your password?</p>
                             </form>

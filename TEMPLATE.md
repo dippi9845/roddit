@@ -6,8 +6,14 @@
 
 ### Login
 
+![image](./mockup/login.png)
+
 ### Register
+
+![image](./mockup/new%20account.png)
 
 ### Profile page
 
 ### Post creation
+
+![image](./mockup/new%20post.png)

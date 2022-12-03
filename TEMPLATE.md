@@ -1,3 +1,5 @@
+<link rel="stylesheet" type="text/css" media="all" href="./mockup/markdown.css" />
+
 # Mockup
 
 ### Main page

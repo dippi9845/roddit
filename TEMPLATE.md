@@ -4,6 +4,8 @@
 
 ### Main page
 
+![image](./mockup/main%20page.png)
+
 ### Login
 
 ![image](./mockup/login.png)
@@ -13,6 +15,8 @@
 ![image](./mockup/new%20account.png)
 
 ### Profile page
+
+![image](./mockup/profile%20page.png)
 
 ### Post creation
 

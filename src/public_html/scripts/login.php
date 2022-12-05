@@ -5,7 +5,6 @@
     }
 
     function main() {
-
         if (!isFormValid()) {
             echo("Invalid form");
             return false;

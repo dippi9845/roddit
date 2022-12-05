@@ -34,7 +34,6 @@
         }
 
         return true;
-
     }
 
     if (main()) {

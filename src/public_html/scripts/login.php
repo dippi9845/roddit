@@ -40,7 +40,7 @@
     $data = json_decode($file, false);
     
     if (main()) {
-        header('Location: /');
+        header('Location: /index.php');
     } else {
         header('Location: /login.php');
     }

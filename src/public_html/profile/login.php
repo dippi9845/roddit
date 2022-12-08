@@ -10,7 +10,7 @@
             return false;
         }
 
-        $conn = new mysqli("localhost", $data->dbName, $data->dbUserName, $data->dbPassword);
+        $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserName);
 
         if (!areUserCredsCorrect($conn, $_POST['email'], $_POST['password'])) {
             echo("<br/>Invalid credentials");

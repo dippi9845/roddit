@@ -25,7 +25,7 @@
             return false;
         }
 
-        $hashedPassword = $userPassword + $salt;
+        $hashedPassword = realPass($userPassword, $salt);
 
         $connDbPass = $result->fetch_assoc()['Password'];
 

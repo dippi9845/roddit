@@ -39,6 +39,7 @@
     $data = json_decode($file, false);
     
         header('Location: /index.php');
+    if (main($data)) {
     } else {
         header('Location: /login.php');
     }

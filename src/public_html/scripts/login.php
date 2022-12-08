@@ -36,6 +36,9 @@
         return true;
     }
 
+    $file = file_get_contents($_SERVER['DOCUMENT_ROOT'].'/setup.json');
+    $data = json_decode($file, false);
+    
     if (main()) {
         header('Location: /');
     } else {

@@ -33,7 +33,8 @@
     }
 
     function createSession($email) {
-        //TODO: Create a session for the user
+        session_start();
+        $_SESSION['email'] = $email;
     }
 
     function createCookie($email) {

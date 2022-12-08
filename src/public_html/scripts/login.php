@@ -64,8 +64,8 @@
     $file = file_get_contents($_SERVER['DOCUMENT_ROOT'].'/setup.json');
     $data = json_decode($file, false);
     
-        header('Location: /index.php');
     if (main($data)) {
+        header('Location: /index.php');
     } else {
         header('Location: /login.php');
     }

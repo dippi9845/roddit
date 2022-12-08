@@ -1,7 +1,6 @@
 <?php
 
-function areUserCredsCorrect($dbName, $dbUserName, $dbPassword, $userEmail, $userPassword) {
-    $conn = new mysqli("localhost", $dbUserName, $dbPassword, $dbName);
+function areUserCredsCorrect($conn, $userEmail, $userPassword) {
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
     }

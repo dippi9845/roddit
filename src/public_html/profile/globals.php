@@ -20,11 +20,12 @@ function areUserCredsCorrect($conn, $userEmail, $userPassword) {
         return false;
     }
 
-    $hashedPassword = realPass($userPassword, $salt);
+    $saltedPass = saltPass($userPassword, $salt);
 
     $connDbPass = $result->fetch_assoc()['Password'];
 
     return password_verify($hashedPassword, $connDbPass);
+    return password_verify($saltedPass, $connDbPass);
 }
 
 function createSession($email) {

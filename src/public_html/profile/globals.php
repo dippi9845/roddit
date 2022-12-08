@@ -24,7 +24,6 @@ function areUserCredsCorrect($conn, $userEmail, $userPassword) {
 
     $connDbPass = $result->fetch_assoc()['Password'];
 
-    return password_verify($hashedPassword, $connDbPass);
     return password_verify($saltedPass, $connDbPass);
 }
 

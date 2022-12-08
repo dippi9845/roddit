@@ -37,7 +37,7 @@ function createCookie($email) {
 }
 
 function realPass($pass, $salt) {
-    return password_hash($pass . "Sono Bello" . $salt);
+    return password_hash($pass . "Sono Bello" . $salt, PASSWORD_DEFAULT);
 }
 
 ?>

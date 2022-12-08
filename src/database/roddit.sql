@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Creato il: Dic 07, 2022 alle 16:57
+-- Creato il: Dic 08, 2022 alle 17:54
 -- Versione del server: 10.4.20-MariaDB
 -- Versione PHP: 7.3.29
 
@@ -114,19 +114,22 @@ ALTER TABLE `comments` ADD FULLTEXT KEY `Text` (`Text`);
 -- Indici per le tabelle `cookies`
 --
 ALTER TABLE `cookies`
-  ADD PRIMARY KEY (`Token`);
+  ADD PRIMARY KEY (`Token`),
+  ADD KEY `UserID` (`UserID`);
 
 --
 -- Indici per le tabelle `follow`
 --
 ALTER TABLE `follow`
-  ADD UNIQUE KEY `Follower` (`Follower`,`Following`);
+  ADD UNIQUE KEY `Follower` (`Follower`,`Following`),
+  ADD KEY `Following` (`Following`);
 
 --
 -- Indici per le tabelle `likes`
 --
 ALTER TABLE `likes`
-  ADD UNIQUE KEY `User` (`User`,`Post`);
+  ADD UNIQUE KEY `User` (`User`,`Post`),
+  ADD KEY `Post` (`Post`);
 
 --
 -- Indici per le tabelle `post`
@@ -159,6 +162,37 @@ ALTER TABLE `post`
 --
 ALTER TABLE `users`
   MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- Limiti per le tabelle scaricate
+--
+
+--
+-- Limiti per la tabella `comments`
+--
+ALTER TABLE `comments`
+  ADD CONSTRAINT `comments_ibfk_1` FOREIGN KEY (`User`) REFERENCES `users` (`Nickname`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `comments_ibfk_2` FOREIGN KEY (`Post`) REFERENCES `post` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Limiti per la tabella `cookies`
+--
+ALTER TABLE `cookies`
+  ADD CONSTRAINT `cookies_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `users` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Limiti per la tabella `follow`
+--
+ALTER TABLE `follow`
+  ADD CONSTRAINT `follow_ibfk_1` FOREIGN KEY (`Follower`) REFERENCES `users` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `follow_ibfk_2` FOREIGN KEY (`Following`) REFERENCES `users` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Limiti per la tabella `likes`
+--
+ALTER TABLE `likes`
+  ADD CONSTRAINT `likes_ibfk_1` FOREIGN KEY (`Post`) REFERENCES `post` (`ID`),
+  ADD CONSTRAINT `likes_ibfk_2` FOREIGN KEY (`User`) REFERENCES `users` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 DELIMITER $$
 --

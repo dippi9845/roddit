@@ -21,8 +21,7 @@
             return false;
         }
 
-        if (!areUserCredsCorrect($data['dbName'], $data['dbUserName'], $data['dbPassword'], $_POST['email'], $_POST['password'])) {
-            echo("Invalid credentials");
+        if (!areUserCredsCorrect($data->dbName, $data->dbUserName, $data->dbPassword, $_POST['email'], $_POST['password'])) {
             echo("<br/>Invalid credentials");
             return false;
         }

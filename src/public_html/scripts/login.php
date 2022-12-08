@@ -4,8 +4,7 @@
         return isset($_POST['email']) && isset($_POST['password']);
     }
 
-    function areUserCredsCorrect($email, $password) {
-        //TODO: Check if the user and password are correct
+    function areUserCredsCorrect($dbName, $dbUserName, $dbPassword, $userEmail, $userPassword) {
     }
 
     function createSession($email) {
@@ -16,13 +15,13 @@
         //TODO: Create a cookie for the user
     }
 
-    function main() {
+    function main($data) {
         if (!isFormValid()) {
             echo("Invalid form");
             return false;
         }
 
-        if (!areUserCredsCorrect($_POST['email'], $_POST['password'])) {
+        if (!areUserCredsCorrect($data['dbName'], $data['dbUserName'], $data['dbPassword'], $_POST['email'], $_POST['password'])) {
             echo("Invalid credentials");
             return false;
         }
@@ -39,7 +38,6 @@
     $file = file_get_contents($_SERVER['DOCUMENT_ROOT'].'/setup.json');
     $data = json_decode($file, false);
     
-    if (main()) {
         header('Location: /index.php');
     } else {
         header('Location: /login.php');

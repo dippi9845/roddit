@@ -37,4 +37,8 @@ function createCookie($email) {
     //TODO: Create a cookie for the user
 }
 
+function realPass($pass, $salt) {
+    return password_hash($pass . "Sono Bello" . $salt);
+}
+
 ?>

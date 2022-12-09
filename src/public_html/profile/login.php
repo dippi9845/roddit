@@ -20,7 +20,7 @@
         createSession($userID);
 
         if (isset($_POST['remember'])) {
-            createCookie($_POST['email']);
+            createCookie($conn, $userID);
         }
 
         $conn->close();

@@ -31,8 +31,24 @@ function createSession($userID) {
     $_SESSION['userID'] = $userID;
 }
 
-function createCookie($email) {
-    //TODO: Create a cookie for the user
+function createCookie($conn, $userID) {
+    $selector = base64_encode(random_bytes(9));
+    $authenticator = random_bytes(33);
+    $expirationTime = time() + 3600 * 24 * 15;  // the cookie will expire in 15 days
+    $myHash = hash('sha256', $authenticator);
+    $myDate = date('Y-m-d\TH:i:s', $expirationTime);
+
+    # creating the cookie client side
+    setcookie("roddit", $selector, intval($expirationTime), "/");
+
+    # creating the cookie server side
+    $sql = "INSERT INTO cookies (UserID, token, HashToken, ExpireDate) VALUES ('{$userID}', '{$selector}', '{$myHash}', '{$myDate}')";
+    if (mysqli_query($conn, $sql)) {
+        echo "Cookie created successfully on server side<br>";
+    } else {
+        echo "Error: " . $sql . "<br>" . mysqli_error($conn);
+    }
+
 }
 
 function saltPass($pass, $salt) {

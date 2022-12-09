@@ -12,11 +12,7 @@
 
         $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserName);
 
-        $userID = getUserID($conn, $_POST['email'], $_POST['password']);
-
-        $conn->close();
-
-        if (!$userID) {
+        if (!$userID = getUserID($conn, $_POST['email'], $_POST['password'])) {
             echo("<br/>Invalid credentials");
             return false;
         }
@@ -26,6 +22,8 @@
         if (isset($_POST['remember'])) {
             createCookie($_POST['email']);
         }
+
+        $conn->close();
 
         return true;
     }

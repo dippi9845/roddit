@@ -38,8 +38,15 @@ function createCookie($conn, $userID) {
     $myHash = hash('sha256', $authenticator);
     $myDate = date('Y-m-d\TH:i:s', $expirationTime);
 
+    $cookieArray = [$selector, base64_encode($authenticator), $expirationTime, "/"];
+    $cookieContent = "{
+        \"selector\" : \"{$cookieArray[0]}\",
+        \"authenticator\" : \"{$cookieArray[1]}\",
+        \"expirationTime\" : \"{$cookieArray[2]}\",
+        \"path\" : \"{$cookieArray[3]}\"}";
+
     # creating the cookie client side
-    setcookie("roddit", $selector, intval($expirationTime), "/");
+    setcookie("roddit", $cookieContent, intval($expirationTime), "/");
 
     # creating the cookie server side
     $sql = "INSERT INTO cookies (UserID, token, HashToken, ExpireDate) VALUES ('{$userID}', '{$selector}', '{$myHash}', '{$myDate}')";

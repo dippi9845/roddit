@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Creato il: Dic 08, 2022 alle 17:54
+-- Creato il: Dic 09, 2022 alle 17:02
 -- Versione del server: 10.4.20-MariaDB
 -- Versione PHP: 7.3.29
 
@@ -42,7 +42,8 @@ CREATE TABLE `comments` (
 CREATE TABLE `cookies` (
   `UserID` int(10) UNSIGNED NOT NULL,
   `Token` varchar(255) NOT NULL,
-  `ExpireDate` date NOT NULL
+  `ExpireDate` date NOT NULL,
+  `HashToken` varchar(256) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -115,6 +116,7 @@ ALTER TABLE `comments` ADD FULLTEXT KEY `Text` (`Text`);
 --
 ALTER TABLE `cookies`
   ADD PRIMARY KEY (`Token`),
+  ADD UNIQUE KEY `HashToken` (`HashToken`),
   ADD KEY `UserID` (`UserID`);
 
 --

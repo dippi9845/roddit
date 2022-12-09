@@ -12,7 +12,11 @@
 
         $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserName);
 
-        if (!areUserCredsCorrect($conn, $_POST['email'], $_POST['password'])) {
+        $userID = getUserID($conn, $_POST['email'], $_POST['password']);
+
+        $conn->close();
+
+        if (!$userID) {
             echo("<br/>Invalid credentials");
             return false;
         }

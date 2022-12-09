@@ -58,6 +58,40 @@ function createCookie($conn, $userID) {
 
 }
 
+function tryLoginCookie($conn) {
+    if (!isset($_COOKIE["roddit"])) {
+        return false;
+    }
+
+    $dumpedCookie = json_decode($_COOKIE['roddit']);
+    $selector = $dumpedCookie->selector;
+    $authenticator = $dumpedCookie->authenticator;
+
+    $sql = "SELECT * FROM cookies WHERE Token = ?";
+
+    $stmt =  $conn->prepare($sql);
+
+    $stmt->bind_param("s", $selector);
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+    if ($result->num_rows == 0) {
+        return false;   // the cookie exists only on this machine
+    }
+
+    $row = $result->fetch_assoc();
+    $userID = $row['UserID'];
+    $hashedToken = $row['HashToken'];
+
+    if (hash_equals($hashedToken, hash('sha256', base64_decode($authenticator)))) {
+        createSession($userID);
+    } else {
+        return false;
+    }
+
+    return true;
+}
+
 function saltPass($pass, $salt) {
     return $pass . "Sono Bello" . $salt;
 }

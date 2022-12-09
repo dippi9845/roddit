@@ -21,7 +21,7 @@
             return false;
         }
 
-        createSession($_POST['email']);
+        createSession($userID);
 
         if (isset($_POST['remember'])) {
             createCookie($_POST['email']);

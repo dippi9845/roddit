@@ -26,9 +26,9 @@ function getUserID($conn, $userEmail, $userPassword) {
     }
 }
 
-function createSession($email) {
+function createSession($userID) {
     session_start();
-    $_SESSION['email'] = $email;
+    $_SESSION['userID'] = $userID;
 }
 
 function createCookie($email) {

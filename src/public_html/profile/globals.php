@@ -1,17 +1,11 @@
 <?php
 
-function areUserCredsCorrect($conn, $userEmail, $userPassword) {
+function getUserID($conn, $userEmail, $userPassword) {
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
     }
 
-    $stmt = $conn->prepare("SELECT Salt FROM users WHERE Email = ?");
-    $stmt->bind_param("s", $userEmail);
-
-    $stmt->execute();
-    $salt = $stmt->get_result()->fetch_assoc()['Salt'];
-
-    $stmt = $conn->prepare("SELECT ID, Email, Password FROM users WHERE Email = ?");
+    $stmt = $conn->prepare("SELECT ID, Password, Salt FROM users WHERE Email = ?");
     $stmt->bind_param("s", $userEmail);
     $stmt->execute();
 
@@ -20,11 +14,16 @@ function areUserCredsCorrect($conn, $userEmail, $userPassword) {
         return false;
     }
 
-    $saltedPass = saltPass($userPassword, $salt);
+    $row = $result->fetch_assoc();
+    $userID = $row['ID'];
+    $salt = $row['Salt'];
+    $hashedPassword = $row['Password'];
 
-    $connDbPass = $result->fetch_assoc()['Password'];
-
-    return password_verify($saltedPass, $connDbPass);
+    if (password_verify(saltPass($userPassword, $salt), $hashedPassword)) {
+        return $userID;
+    } else {
+        return false;
+    }
 }
 
 function createSession($email) {

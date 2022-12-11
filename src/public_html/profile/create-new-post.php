@@ -4,6 +4,15 @@ function isFormValid() {
     return isset($_POST['title']) && isset($_POST['text']);
 }
 
+function saveImage($image) {
+    $image = str_replace('data:image/png;base64,', '', $image);
+    $image = str_replace(' ', '+', $image);
+    $data = base64_decode($image);
+    $file = $_SERVER['DOCUMENT_ROOT'].'/profile/images/'.uniqid().'.png';
+    $success = file_put_contents($file, $data);
+    return $success;
+}
+
 function createPost($conn, $title, $text, $image=null) {
     if (!is_null($image)) {
         $sql = "INSERT INTO posts (Creator, Title, Text, PathToImage) VALUES (?, ?, ?, ?)";

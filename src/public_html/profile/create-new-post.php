@@ -43,6 +43,7 @@ function main($data) {
 
     $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserName);
     if (!createPost($conn, $_POST['title'], $_POST['text'], $_POST['image'])) {
+        echo("<br/>Post not created");
         return false;
     }
     $conn->close();
@@ -52,6 +53,7 @@ function main($data) {
     }
 
     if (!saveImage($_POST['image'])) {
+        echo("<br/>Image not saved");
         return false;
     }
 

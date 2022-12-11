@@ -37,6 +37,10 @@ include_once($_SERVER['DOCUMENT_ROOT'].'/profile/globals.php');
 $file = file_get_contents($_SERVER['DOCUMENT_ROOT'].'/setup.json');
 $data = json_decode($file, false);
 
-main($data);
+if (main($data)) {
+    echo("<br/>Post created");
+} else {
+    echo("<br/>Something went wrong");
+}
 
 ?>

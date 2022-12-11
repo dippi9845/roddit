@@ -24,7 +24,7 @@ if (!isUserLoggedIn(true)) {
             <div class="col">
                 <h1 class="text-center">Create new post</h1>
                 <form class="mx-auto">
-                    <input class="form-control form-element" type="text" placeholder="Post Title" />
+                    <input class="form-control form-element font-weight-bold bold-input" type="text" placeholder="Post Title" />
                     <textarea class="form-control form-element" placeholder="Post Text"></textarea>
                     <input class="form-control form-element" type="file" accept="image/*" />
                     <button class="btn btn-primary form-element" type="button">Button</button>

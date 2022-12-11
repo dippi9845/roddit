@@ -4,10 +4,20 @@ function isFormValid() {
     return isset($_POST['title']) && isset($_POST['text']);
 }
 
+function createImageFileIfNotExists() {
+    $path = $_SERVER['DOCUMENT_ROOT'].'/profile/images/';
+    if (!file_exists($path)) {
+        mkdir($path, 0777, true);
+    }
+}
+
 function saveImage($image) {
     $image = str_replace('data:image/png;base64,', '', $image);
     $image = str_replace(' ', '+', $image);
     $data = base64_decode($image);
+
+    createImageFileIfNotExists();
+
     $file = $_SERVER['DOCUMENT_ROOT'].'/profile/images/'.uniqid().'.png';
     $success = file_put_contents($file, $data);
     return $success;

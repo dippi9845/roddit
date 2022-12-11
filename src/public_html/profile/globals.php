@@ -52,7 +52,9 @@ function getUserID($conn, $userEmail, $userPassword) {
 }
 
 function createSession($userID) {
-    session_start();
+    if (session_status() == PHP_SESSION_NONE) {
+        session_start();
+    }
     $_SESSION['userID'] = $userID;
 }
 

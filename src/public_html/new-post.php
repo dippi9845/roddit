@@ -18,7 +18,7 @@
                 <form class="mx-auto">
                     <input class="form-control form-element" type="text" placeholder="Post Title" />
                     <textarea class="form-control form-element" placeholder="Post Text"></textarea>
-                    <input class="form-control form-element" type="file" accept="image/png, image/gif, image/jpeg" />
+                    <input class="form-control form-element" type="file" accept="image/*" />
                     <button class="btn btn-primary form-element" type="button">Button</button>
                 </form>
             </div>

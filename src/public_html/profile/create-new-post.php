@@ -8,15 +8,22 @@ function createPost($conn, $title, $text, $image=null) {
     if (!is_null($image)) {
         $sql = "INSERT INTO posts (Creator, Title, Text, PathToImage) VALUES (?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("sss", $_SESSION['userId'], $title, $text, $image);
+        if (!$stmt->bind_param("sss", $_SESSION['userId'], $title, $text, $image)) {
+            return false;
+        }
     } else {
         $sql = "INSERT INTO posts (Creator, Title, Text) VALUES (?, ?, ?)";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("sss", $_SESSION['userId'], $title, $text);
+        if (!$stmt->bind_param("sss", $_SESSION['userId'], $title, $text)) {
+            return false;
+        }
     }
 
-    $stmt->execute();
+    if (!$stmt->execute()) {
+        return false;
+    }
     $stmt->close();
+    return true;
 }
 
 function main($data) {
@@ -26,7 +33,9 @@ function main($data) {
     }
 
     $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserName);
-    createPost($conn, $_POST['title'], $_POST['text'], $_POST['image']);
+    if (!createPost($conn, $_POST['title'], $_POST['text'], $_POST['image'])) {
+        return false;
+    }
     $conn->close();
 
     return true;

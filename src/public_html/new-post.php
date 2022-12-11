@@ -15,7 +15,12 @@
         <div class="row">
             <div class="col">
                 <h1 class="text-center">Create new post</h1>
-                <form class="mx-auto"><input class="form-control form-element" type="text" placeholder="Post Title"><textarea class="form-control form-element" placeholder="Post Text"></textarea><input class="form-control form-element" type="file"><button class="btn btn-primary form-element" type="button">Button</button></form>
+                <form class="mx-auto">
+                    <input class="form-control form-element" type="text" placeholder="Post Title" />
+                    <textarea class="form-control form-element" placeholder="Post Text"></textarea>
+                    <input class="form-control form-element" type="file" />
+                    <button class="btn btn-primary form-element" type="button">Button</button>
+                </form>
             </div>
         </div>
     </div>

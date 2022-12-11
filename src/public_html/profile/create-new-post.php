@@ -24,7 +24,14 @@ function main($data) {
         echo("<br/>Invalid form");
         return false;
     }
+
+    $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserName);
+    createPost($conn, $_POST['title'], $_POST['text'], $_POST['image']);
+    $conn->close();
+
+    return true;
 }
+
 include_once($_SERVER['DOCUMENT_ROOT'].'/profile/globals.php');
 
 $file = file_get_contents($_SERVER['DOCUMENT_ROOT'].'/setup.json');

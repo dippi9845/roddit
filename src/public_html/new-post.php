@@ -27,7 +27,7 @@ if (!isUserLoggedIn(true)) {
                     <input class="form-control form-element font-weight-bold bold-input" type="text" placeholder="Post Title" required />
                     <textarea class="form-control form-element" placeholder="Post Text"></textarea>
                     <input class="form-control form-element" type="file" accept="image/*" />
-                    <button class="btn btn-primary form-element" type="button">Button</button>
+                    <button class="btn btn-primary form-element" type="submit">Button</button>
                 </form>
             </div>
         </div>

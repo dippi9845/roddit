@@ -23,7 +23,7 @@ if (!isUserLoggedIn(true)) {
         <div class="row">
             <div class="col">
                 <h1 class="text-center">Create new post</h1>
-                <form class="mx-auto">
+                <form class="mx-auto" action="/profile/create-new-post.php" method="post">
                     <input class="form-control form-element font-weight-bold bold-input" type="text" placeholder="Post Title" required />
                     <textarea class="form-control form-element" placeholder="Post Text"></textarea>
                     <input class="form-control form-element" type="file" accept="image/*" />

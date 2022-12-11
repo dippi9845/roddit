@@ -1,7 +1,7 @@
 <?php
 
 function isFormValid() {
-    return isset($_POST['title']);
+    return isset($_POST['title']) && isset($_POST['text']);
 }
 function main($data) {
     if (!isFormValid()) {

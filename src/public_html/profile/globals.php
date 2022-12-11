@@ -1,5 +1,26 @@
 <?php
 
+/**
+ * Checks if user is logged in
+ * @param bool $loginIfCookieExists If true, the function will try to login the user using the cookie
+ */
+function isUserLoggedIn($loginIfCookieExists = false) {
+    if (isset($_SESSION['userID'])) {
+        return true;
+    }
+
+    if ($loginIfCookieExists) {
+        $file = file_get_contents($_SERVER['DOCUMENT_ROOT'].'/setup.json');
+        $data = json_decode($file, false);
+        $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserName);
+        if (tryLoginCookie($conn)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 function getUserID($conn, $userEmail, $userPassword) {
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);

@@ -47,6 +47,14 @@ function main($data) {
     }
     $conn->close();
 
+    if (!isset($_POST['image'])) {
+        return true;
+    }
+
+    if (!saveImage($_POST['image'])) {
+        return false;
+    }
+
     return true;
 }
 

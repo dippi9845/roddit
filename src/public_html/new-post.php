@@ -3,7 +3,6 @@
 
 <?php
 include_once($_SERVER['DOCUMENT_ROOT'].'/profile/globals.php');
-session_start();
 
 if (!isUserLoggedIn(true)) {
     header('Location: /login.php');

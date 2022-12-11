@@ -5,6 +5,10 @@
  * @param bool $loginIfCookieExists If true, the function will try to login the user using the cookie
  */
 function isUserLoggedIn($loginIfCookieExists = false) {
+    if (session_status() == PHP_SESSION_NONE) {
+        session_start();
+    }
+
     if (isset($_SESSION['userID'])) {
         return true;
     }

@@ -20,9 +20,6 @@ function saveImage($image) {
     return $path;
 }
 
-    $file = $_SERVER['DOCUMENT_ROOT'].'/profile/images/'.uniqid().'.png';
-    $success = file_put_contents($file, $data);
-    return $success;
 }
 
 function createPost($conn, $title, $text, $image=null) {

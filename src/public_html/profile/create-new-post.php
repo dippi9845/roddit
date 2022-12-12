@@ -4,8 +4,8 @@ function isFormValid() {
     return isset($_POST['title']) && isset($_POST['text']);
 }
 
-function createImageFileIfNotExists() {
-    $path = $_SERVER['DOCUMENT_ROOT'].'/profile/images/';
+function createImageFolderIfNotExists() {
+    $path = $_SERVER['DOCUMENT_ROOT'].'/uploads/images/';
     if (!file_exists($path)) {
         mkdir($path, 0777, true);
     }

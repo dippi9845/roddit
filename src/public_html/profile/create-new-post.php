@@ -54,25 +54,32 @@ function main($data) {
     }
 
     $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserName);
-    if (!createPost($conn, $_POST['title'], $_POST['text'], $_POST['image'])) {
-        echo("<br/>Post not created");
-        return false;
+
+    if (!file_exists($_FILES['file']['tmp_name']) || !is_uploaded_file($_FILES['file']['tmp_name'])) {
+        if (!createPost($conn, $_POST['title'], $_POST['text'])) {
+            echo("<br/>Post not created");
+            return false;
+        }
+    
+    } else {
+        if (! $path = saveImage($_FILES['file'])) {
+            echo("<br/>Image not saved");
+            return false;
+        }
+
+        if (!createPostWithFile($conn, $_POST['title'], $_POST['text'], $path, $_FILES['file']['type'])) {
+            echo("<br/>Post not created");
+            return false;
+        }
     }
+
     $conn->close();
-
-    if (!isset($_POST['image'])) {
-        return true;
-    }
-
-    if (!saveImage($_POST['image'])) {
-        echo("<br/>Image not saved");
-        return false;
-    }
 
     return true;
 }
 
 include_once($_SERVER['DOCUMENT_ROOT'].'/profile/globals.php');
+session_start();
 
 $file = file_get_contents($_SERVER['DOCUMENT_ROOT'].'/setup.json');
 $data = json_decode($file, false);

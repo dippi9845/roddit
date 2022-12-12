@@ -25,9 +25,9 @@ function saveImage($image) {
 
 function createPost($conn, $title, $text, $image=null) {
     if (!is_null($image)) {
-        $sql = "INSERT INTO posts (Creator, Title, Text, PathToImage) VALUES (?, ?, ?, ?)";
+        $sql = "INSERT INTO posts (Creator, Title, Text, PathToImage, MediaType) VALUES (?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
-        if (!$stmt->bind_param("sss", $_SESSION['userId'], $title, $text, $image)) {
+        if (!$stmt->bind_param("sss", $_SESSION['userId'], $title, $text, $image, $image['type'])) {
             return false;
         }
     } else {

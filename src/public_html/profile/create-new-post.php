@@ -12,11 +12,13 @@ function createImageFolderIfNotExists() {
 }
 
 function saveImage($image) {
-    $image = str_replace('data:image/png;base64,', '', $image);
-    $image = str_replace(' ', '+', $image);
-    $data = base64_decode($image);
-
-    createImageFileIfNotExists();
+    createImageFolderIfNotExists();
+    $path = $_SERVER['DOCUMENT_ROOT'].'/uploads/images/'.uniqid().basename($image['name']);
+    if (!move_uploaded_file($image['tmp_name'], $path)) {
+        return false;
+    }
+    return $path;
+}
 
     $file = $_SERVER['DOCUMENT_ROOT'].'/profile/images/'.uniqid().'.png';
     $success = file_put_contents($file, $data);

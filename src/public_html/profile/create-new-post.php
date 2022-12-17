@@ -13,8 +13,8 @@ function createImageFolderIfNotExists() {
 
 function saveImage($image) {
     createImageFolderIfNotExists();
-    $path = $_SERVER['DOCUMENT_ROOT'].'/uploads/images/'.uniqid().basename($image['name']);
-    if (!move_uploaded_file($image['tmp_name'], $path)) {
+    $path = '/uploads/images/'.uniqid().basename($image['name']);
+    if (!move_uploaded_file($image['tmp_name'], $_SERVER['DOCUMENT_ROOT'] . $path)) {
         return false;
     }
     return $path;

@@ -14,7 +14,7 @@ function isUserLoggedIn($loginIfCookieExists = false) {
     }
 
     if ($loginIfCookieExists) {
-        $file = file_get_contents($_SERVER['DOCUMENT_ROOT'].'/setup.json');
+        $file = file_get_contents($_SERVER['DOCUMENT_ROOT'].'/../setup.json');
         $data = json_decode($file, false);
         $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserName);
         if (tryLoginCookie($conn)) {

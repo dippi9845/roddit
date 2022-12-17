@@ -81,7 +81,7 @@ function main($data) {
 include_once($_SERVER['DOCUMENT_ROOT'].'/profile/globals.php');
 session_start();
 
-$file = file_get_contents($_SERVER['DOCUMENT_ROOT'].'/setup.json');
+$file = file_get_contents($_SERVER['DOCUMENT_ROOT'].'/../setup.json');
 $data = json_decode($file, false);
 
 if (main($data)) {

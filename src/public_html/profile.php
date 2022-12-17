@@ -61,8 +61,6 @@ if (isset($_GET['user'])) {
         $posts = getUsersPosts($conn, $visitedUser);
 
         foreach ($posts as $post) {
-            print_r($post);
-            echo("<br>");
         ?>
         <div class="row">
             <div class="col">
@@ -70,7 +68,14 @@ if (isset($_GET['user'])) {
                     <div class="card-body" style="margin-top: 0px;">
                         <h4 class="card-title"><?php echo($post['Title']) ?></h4>
                         <p class="card-text"> <?php echo($post['Text']); ?> </p>
-                        <a class="card-link" href="#">Link</a> <a class="card-link" href="#">Link</a>
+                        <?php
+                        if ($post['PathToImage']) {
+                        ?>
+                            <img src=' <?php echo($post['PathToImage']); ?> ' class='card-img-top' alt='...'>
+                        <?php
+                        }
+                        ?>
+                        <a class="card-link" href="#"> <?php echo($post['Likes']); ?> Likes</a> <a class="card-link" href="#">Comments</a>
                     </div>
                 </div>
             </div>

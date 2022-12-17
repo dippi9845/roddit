@@ -68,9 +68,9 @@ if (isset($_GET['user'])) {
             <div class="col">
                 <div class="card" style="margin-top: 25px;">
                     <div class="card-body" style="margin-top: 0px;">
-                        <h4 class="card-title">Post 1</h4>
-                        <h6 class="text-muted card-subtitle mb-2">Subtitle</h6>
-                        <p class="card-text">Nullam id dolor id nibh ultricies vehicula ut id elit. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus.</p><a class="card-link" href="#">Link</a><a class="card-link" href="#">Link</a>
+                        <h4 class="card-title"><?php echo($post['Title']) ?></h4>
+                        <p class="card-text"> <?php echo($post['Text']); ?> </p>
+                        <a class="card-link" href="#">Link</a> <a class="card-link" href="#">Link</a>
                     </div>
                 </div>
             </div>

@@ -27,4 +27,19 @@ function createPost($conn, $title, $text) {
     return true;
 }
 
+function getUsersPosts($conn, $userID) {
+    $sql = "SELECT *
+            FROM post
+            WHERE Creator = '$userID';";
+    $result = $conn->query($sql);
+    if (!$result) {
+        return false;
+    }
+    $posts = array();
+    while ($row = $result->fetch_assoc()) {
+        $posts[] = $row;
+    }
+    return $posts;
+}
+
 ?>

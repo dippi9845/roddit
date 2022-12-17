@@ -7,6 +7,16 @@ include_once($_SERVER['DOCUMENT_ROOT'].'/profile/globals.php');
 if (!isUserLoggedIn(true)) {
     header('Location: /login.php');
 }
+
+$file = file_get_contents($_SERVER['DOCUMENT_ROOT'].'/../setup.json');
+$data = json_decode($file, false);
+
+if (isset($_GET['user'])) {
+    $visitedUser = $_GET['user'];
+} else {
+    $visitedUser = $_SESSION['userID'];
+}
+
 ?>
 
 <head>
@@ -42,6 +52,18 @@ if (!isUserLoggedIn(true)) {
                 <p>Paragraph</p>
             </div>
         </div>
+
+        <?php
+        include_once($_SERVER['DOCUMENT_ROOT'] . '/profile/post-handling.php');
+
+        $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserName);
+
+        $posts = getUsersPosts($conn, $visitedUser);
+
+        foreach ($posts as $post) {
+            print_r($post);
+            echo("<br>");
+        ?>
         <div class="row">
             <div class="col">
                 <div class="card" style="margin-top: 25px;">
@@ -51,43 +73,11 @@ if (!isUserLoggedIn(true)) {
                         <p class="card-text">Nullam id dolor id nibh ultricies vehicula ut id elit. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus.</p><a class="card-link" href="#">Link</a><a class="card-link" href="#">Link</a>
                     </div>
                 </div>
-                <div class="card" style="margin-top: 25px;">
-                    <div class="card-body" style="margin-top: 0px;">
-                        <h4 class="card-title">Post 2</h4>
-                        <h6 class="text-muted card-subtitle mb-2">Subtitle</h6>
-                        <p class="card-text">Nullam id dolor id nibh ultricies vehicula ut id elit. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus.</p><a class="card-link" href="#">Link</a><a class="card-link" href="#">Link</a>
-                    </div>
-                </div>
-                <div class="card" style="margin-top: 25px;">
-                    <div class="card-body" style="margin-top: 0px;">
-                        <h4 class="card-title">Post 3</h4>
-                        <h6 class="text-muted card-subtitle mb-2">Subtitle</h6>
-                        <p class="card-text">Nullam id dolor id nibh ultricies vehicula ut id elit. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus.</p><a class="card-link" href="#">Link</a><a class="card-link" href="#">Link</a>
-                    </div>
-                </div>
-                <div class="card" style="margin-top: 25px;">
-                    <div class="card-body" style="margin-top: 0px;">
-                        <h4 class="card-title">Title</h4>
-                        <h6 class="text-muted card-subtitle mb-2">Subtitle</h6>
-                        <p class="card-text">Nullam id dolor id nibh ultricies vehicula ut id elit. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus.</p><a class="card-link" href="#">Link</a><a class="card-link" href="#">Link</a>
-                    </div>
-                </div>
-                <div class="card" style="margin-top: 25px;">
-                    <div class="card-body" style="margin-top: 0px;">
-                        <h4 class="card-title">Title</h4>
-                        <h6 class="text-muted card-subtitle mb-2">Subtitle</h6>
-                        <p class="card-text">Nullam id dolor id nibh ultricies vehicula ut id elit. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus.</p><a class="card-link" href="#">Link</a><a class="card-link" href="#">Link</a>
-                    </div>
-                </div>
-                <div class="card" style="margin-top: 25px;">
-                    <div class="card-body" style="margin-top: 0px;">
-                        <h4 class="card-title">Title</h4>
-                        <h6 class="text-muted card-subtitle mb-2">Subtitle</h6>
-                        <p class="card-text">Nullam id dolor id nibh ultricies vehicula ut id elit. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus.</p><a class="card-link" href="#">Link</a><a class="card-link" href="#">Link</a>
-                    </div>
-                </div>
             </div>
         </div>
+        <?php
+        }
+        ?>
     </div>
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
 </body>

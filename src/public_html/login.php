@@ -2,16 +2,11 @@
 <html lang="en">
 
 <?php
-
 include_once($_SERVER['DOCUMENT_ROOT'].'/profile/globals.php');
 
-$file = file_get_contents($_SERVER['DOCUMENT_ROOT'].'/setup.json');
-$data = json_decode($file, false);
-
-if (isset($_SESSION['userID']) || tryLoginCookie(new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserName))) {
+if (isUserLoggedIn(true)) {
     header('Location: /index.php');
 }
-
 ?>
 
 <head>

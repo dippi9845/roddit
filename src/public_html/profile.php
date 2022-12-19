@@ -50,10 +50,15 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
         </div>
     </nav>
     <div class="container">
-        <div class="row">
-            <div class="col-2"><img></div>
+        <div class="row text-center">
             <div class="col">
                 <p><?php echo(getUserNameByID($conn, $visitedUser)); ?></p>
+            </div>
+            <div class="col">
+                <p><?php echo(getUserFollowerCount($conn, $visitedUser)); ?><br/>Followers</p>
+            </div>
+            <div class="col">
+                <p><?php echo(getUserFollowingCount($conn, $visitedUser)); ?><br/>Following</p>
             </div>
         </div>
 

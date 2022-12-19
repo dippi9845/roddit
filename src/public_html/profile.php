@@ -4,6 +4,7 @@
 <?php
 include_once($_SERVER['DOCUMENT_ROOT'].'/profile/globals.php');
 include_once($_SERVER['DOCUMENT_ROOT'] . '/profile/post-handling.php');
+include_once($_SERVER['DOCUMENT_ROOT'] . '/profile/user-getters.php');
 
 if (!isUserLoggedIn(true)) {
     header('Location: /login.php');

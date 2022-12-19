@@ -119,13 +119,6 @@ function tryLoginCookie($conn) {
     return true;
 }
 
-function getUserNameByID($conn, $userID) {
-    $sql = "SELECT Nickname FROM users WHERE ID = {$userID}";
-    $result = mysqli_query($conn, $sql);
-    $row = mysqli_fetch_assoc($result);
-    return $row['Nickname'];
-}
-
 function saltPass($pass, $salt) {
     return $pass . "Sono Bello" . $salt;
 }

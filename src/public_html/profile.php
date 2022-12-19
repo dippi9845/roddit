@@ -52,7 +52,7 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
         <div class="row">
             <div class="col-2"><img></div>
             <div class="col">
-                <p>Paragraph</p>
+                <p><?php echo(getUserNameByID($conn, $visitedUser)); ?></p>
             </div>
         </div>
 

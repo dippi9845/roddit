@@ -3,6 +3,7 @@
 
 <?php
 include_once($_SERVER['DOCUMENT_ROOT'].'/profile/globals.php');
+include_once($_SERVER['DOCUMENT_ROOT'] . '/profile/post-handling.php');
 
 if (!isUserLoggedIn(true)) {
     header('Location: /login.php');
@@ -16,6 +17,8 @@ if (isset($_GET['user'])) {
 } else {
     $visitedUser = $_SESSION['userID'];
 }
+
+$conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserName);
 
 ?>
 
@@ -54,10 +57,6 @@ if (isset($_GET['user'])) {
         </div>
 
         <?php
-        include_once($_SERVER['DOCUMENT_ROOT'] . '/profile/post-handling.php');
-
-        $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserName);
-
         $posts = getUsersPosts($conn, $visitedUser);
 
         foreach ($posts as $post) {

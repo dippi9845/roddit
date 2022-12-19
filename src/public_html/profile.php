@@ -82,6 +82,9 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
         </div>
         <?php
         }
+        
+        $conn->close();
+
         ?>
     </div>
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>

@@ -81,7 +81,7 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
                         <?php
                         if ($post['PathToImage']) {
                         ?>
-                            <img src=' <?php echo($post['PathToImage']); ?> ' class='card-img-top post-img' alt='...'>
+                            <img src=' <?php echo($post['PathToImage']); ?> ' class='card-img-top post-img img-fluid' alt='...'>
                         <?php
                         }
                         ?>

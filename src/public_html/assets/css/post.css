@@ -1,8 +1,7 @@
-.post-img{
+.post-img {
     display: block;
     max-height: 400px;
     width: auto;
-    height: auto;
     margin-left: auto;
     margin-right: auto;
 }

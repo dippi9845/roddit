@@ -30,7 +30,7 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
     <link rel="stylesheet" href="assets/css/Navbar-Centered-Brand-icons.css">
-    <link rel="stylesheet" href="assets/css/profile.css">
+    <link rel="stylesheet" href="assets/css/post.css">
 </head>
 
 <body>
@@ -81,7 +81,7 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
                         <?php
                         if ($post['PathToImage']) {
                         ?>
-                            <img src=' <?php echo($post['PathToImage']); ?> ' class='card-img-top' alt='...'>
+                            <img src=' <?php echo($post['PathToImage']); ?> ' class='card-img-top post-img' alt='...'>
                         <?php
                         }
                         ?>

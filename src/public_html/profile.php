@@ -52,6 +52,11 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
     <div class="container">
         <div class="row text-center">
             <div class="col">
+                <p>Biografia</p>
+            </div>
+        </div>
+        <div class="row text-center">
+            <div class="col">
                 <p><?php echo(getUserNameByID($conn, $visitedUser)); ?></p>
             </div>
             <div class="col">

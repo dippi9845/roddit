@@ -62,12 +62,12 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
             <div class="col">
             <?php if ($visitedUser == $_SESSION['userID']) {
             } elseif (isFollowing($conn, $visitedUser, $_SESSION['userID'])) { ?>
-                <form action="profile/unfollow.php" method="post">
+                <form id="unfollow-form" action="profile/unfollow.php" method="post">
                     <input type="hidden" name="unfollowedUser" value="<?php echo($visitedUser); ?>">
                     <button type="submit" name="unfollow-submit" class="btn btn-primary">Unfollow</button>
                 </form>
             <?php } else { ?>
-                <form action="profile/follow.php" method="post">
+                <form id="follow-form" action="profile/follow.php" method="post">
                     <input type="hidden" name="followedUser" value="<?php echo($visitedUser); ?>">
                     <button type="submit" name="follow-submit" class="btn btn-primary">Follow</button>
                 </form>

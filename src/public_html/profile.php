@@ -60,6 +60,25 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
                 <p><?php echo(getUserNameByID($conn, $visitedUser)); ?></p>
             </div>
             <div class="col">
+            <?php if ($visitedUser == $_SESSION['userID']) {
+            } elseif (isFollowing($conn, $visitedUser, $_SESSION['userID'])) { ?>
+                <form action="profile/unfollow.php" method="post">
+                    <input type="hidden" name="unfollowedUser" value="<?php echo($visitedUser); ?>">
+                    <button type="submit" name="unfollow-submit" class="btn btn-primary">Unfollow</button>
+                </form>
+            <?php } else { ?>
+                <form action="profile/follow.php" method="post">
+                    <input type="hidden" name="followedUser" value="<?php echo($visitedUser); ?>">
+                    <button type="submit" name="follow-submit" class="btn btn-primary">Follow</button>
+                </form>
+            <?php } ?>
+            </div>
+        </div>
+        <div class="row text-center">
+            <div class="col">
+                <p>Profile pic</p>
+            </div>
+            <div class="col">
                 <p><?php echo(getUserFollowerCount($conn, $visitedUser)); ?><br/>Followers</p>
             </div>
             <div class="col">

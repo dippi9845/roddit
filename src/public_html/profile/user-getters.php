@@ -33,7 +33,7 @@ function isFollowing($conn, $visitedUser, $user) {
 }
 
 function getUserFollowers($conn, $userID) {
-    $sql = "SELECT follow.Follower, users.Nickname
+    $sql = "SELECT follow.Follower AS ID, users.Nickname
             FROM follow
             INNER JOIN users ON follow.Follower = users.ID
             WHERE Following = {$userID};";

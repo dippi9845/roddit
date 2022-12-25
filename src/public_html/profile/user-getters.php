@@ -45,4 +45,17 @@ function getUserFollowers($conn, $userID) {
     return $followers;
 }
 
+function getFollowingUsers($conn, $userID) {
+    $sql = "SELECT follow.Following AS ID, users.Nickname
+            FROM follow
+            INNER JOIN users ON follow.Follower = users.ID
+            WHERE Follower = {$userID};";
+    $result = mysqli_query($conn, $sql);
+    $following = array();
+    while ($row = mysqli_fetch_assoc($result)) {
+        array_push($following, $row);
+    }
+    return $following;
+}
+
 ?>

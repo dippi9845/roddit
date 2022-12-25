@@ -32,4 +32,17 @@ function isFollowing($conn, $visitedUser, $user) {
     }
 }
 
+function getUserFollowers($conn, $userID) {
+    $sql = "SELECT follow.Follower, users.Nickname
+            FROM follow
+            INNER JOIN users ON follow.Follower = users.ID
+            WHERE Following = {$userID};";
+    $result = mysqli_query($conn, $sql);
+    $followers = array();
+    while ($row = mysqli_fetch_assoc($result)) {
+        array_push($followers, $row);
+    }
+    return $followers;
+}
+
 ?>

@@ -6,6 +6,7 @@ include_once($_SERVER['DOCUMENT_ROOT'].'/profile/globals.php');
 include_once($_SERVER['DOCUMENT_ROOT'] . '/profile/post-handling.php');
 include_once($_SERVER['DOCUMENT_ROOT'] . '/profile/user-getters.php');
 include_once($_SERVER['DOCUMENT_ROOT'] . '/html-snippets/post.php');
+include_once($_SERVER['DOCUMENT_ROOT'] . '/html-snippets/user-list.php');
 
 if (!isUserLoggedIn(true)) {
     header('Location: /login.php');
@@ -80,7 +81,8 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
                 <p>Profile pic</p>
             </div>
             <div class="col">
-                <p><?php echo(getUserFollowerCount($conn, $visitedUser)); ?><br/>Followers</p>
+                <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#exampleModalLong"><?php echo(getUserFollowerCount($conn, $visitedUser)); ?><br/>Followers</button>
+                <?php drawUserList("Followers") ?>
             </div>
             <div class="col">
                 <p><?php echo(getUserFollowingCount($conn, $visitedUser)); ?><br/>Following</p>

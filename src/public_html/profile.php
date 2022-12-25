@@ -5,6 +5,7 @@
 include_once($_SERVER['DOCUMENT_ROOT'].'/profile/globals.php');
 include_once($_SERVER['DOCUMENT_ROOT'] . '/profile/post-handling.php');
 include_once($_SERVER['DOCUMENT_ROOT'] . '/profile/user-getters.php');
+include_once($_SERVER['DOCUMENT_ROOT'] . '/html-snippets/post.php');
 
 if (!isUserLoggedIn(true)) {
     header('Location: /login.php');
@@ -90,26 +91,7 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
         $posts = getUsersPosts($conn, $visitedUser);
 
         foreach ($posts as $post) {
-        ?>
-        <div class="row">
-            <div class="col">
-                <div class="card" style="margin-top: 25px;">
-                    <div class="card-body" style="margin-top: 0px;">
-                        <h4 class="card-title"><?php echo($post['Title']) ?></h4>
-                        <p class="card-text"> <?php echo($post['Text']); ?> </p>
-                        <?php
-                        if ($post['PathToImage']) {
-                        ?>
-                            <img src=' <?php echo($post['PathToImage']); ?> ' class='card-img-top post-img img-fluid' alt='...'>
-                        <?php
-                        }
-                        ?>
-                        <a class="card-link" href="#"> <?php echo($post['Likes']); ?> Likes</a> <a class="card-link" href="#">Comments</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <?php
+            drawPost($post['Title'], $post['Text'], $post['Likes'], null, $post['PathToImage']);
         }
         
         $conn->close();

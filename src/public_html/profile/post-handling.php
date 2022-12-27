@@ -42,4 +42,19 @@ function getUsersPosts($conn, $userID) {
     return $posts;
 }
 
+function isLiked($conn, $postID, $userID) {
+    $sql = "SELECT *
+            FROM likes
+            WHERE Post = '$postID' AND User = '$userID';";
+    
+    $result = $conn->query($sql);
+    if (!$result) {
+        return false;
+    }
+    if ($result->num_rows > 0) {
+        return true;
+    }
+    return false;
+}
+
 ?>

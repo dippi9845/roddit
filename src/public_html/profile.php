@@ -81,11 +81,11 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
                 <p>Profile pic</p>
             </div>
             <div class="col">
-                <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#Followers"><?php echo(getUserFollowerCount($conn, $visitedUser)); ?><br/>Followers</button>
+                <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#Followers"><?= getUserFollowerCount($conn, $visitedUser); ?><br/>Followers</button>
                 <?php drawUserList("Followers", getUserFollowers($conn, $visitedUser)) ?>
             </div>
             <div class="col">
-                <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#Following"><?php echo(getUserFollowingCount($conn, $visitedUser)); ?><br/>Following</button>
+                <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#Following"><?= getUserFollowingCount($conn, $visitedUser); ?><br/>Following</button>
                 <?php drawUserList("Following", getFollowingUsers($conn, $visitedUser)) ?>
             </div>
         </div>

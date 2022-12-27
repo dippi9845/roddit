@@ -15,6 +15,7 @@ function drawPost($postID, $title, $text, $likes, $isLikedByMe, $comments, $path
                 ?>
                     <img src=' <?= $pathToImage ?> ' class='card-img-top post-img img-fluid' alt='...'>
                 <?php } ?>
+                
                 <div class="d-flex p-2">
                     <?php if ($isLikedByMe) {?>
                         <form id="post-dislike-form" action="profile/dislike-post.php" method="post">

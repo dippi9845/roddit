@@ -33,6 +33,7 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
     <link rel="stylesheet" href="assets/css/Navbar-Centered-Brand-icons.css">
     <link rel="stylesheet" href="assets/css/post.css">
+    <link rel="stylesheet" href="assets/css/icon-colors.css">
 </head>
 
 <body>
@@ -113,6 +114,12 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
             location.reload();
         }});
         $("#unfollow-form").ajaxForm({success: function() {
+            location.reload();
+        }});
+        $("#post-dislike-form").ajaxForm({success: function() {
+        location.reload();
+        }});
+        $("#post-like-form").ajaxForm({success: function() {
             location.reload();
         }});
     </script>

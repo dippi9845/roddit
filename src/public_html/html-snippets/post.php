@@ -1,7 +1,4 @@
-<link rel="stylesheet" href="assets/css/icon-colors.css">
-
 <?php
-
 function drawPost($postID, $title, $text, $likes, $isLikedByMe, $comments, $pathToImage = null) {
 ?>
 <div class="row">
@@ -44,5 +41,4 @@ function drawPost($postID, $title, $text, $likes, $isLikedByMe, $comments, $path
 </div>
 <?php
 }
-
 ?>

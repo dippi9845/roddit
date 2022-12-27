@@ -94,7 +94,7 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
         $posts = getUsersPosts($conn, $visitedUser);
 
         foreach ($posts as $post) {
-            drawPost($post['Title'], $post['Text'], $post['Likes'], isLiked($conn, $post['ID'], $_SESSION['userID']), null, $post['PathToImage']);
+            drawPost($post['ID'], $post['Title'], $post['Text'], $post['Likes'], isLiked($conn, $post['ID'], $_SESSION['userID']), null, $post['PathToImage']);
         }
         
         $conn->close();

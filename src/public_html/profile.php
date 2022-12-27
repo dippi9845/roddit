@@ -59,18 +59,18 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
         </div>
         <div class="row text-center">
             <div class="col">
-                <p><?php echo(getUserNameByID($conn, $visitedUser)); ?></p>
+                <p><?= getUserNameByID($conn, $visitedUser) ?></p>
             </div>
             <div class="col">
             <?php if ($visitedUser == $_SESSION['userID']) {
             } elseif (isFollowing($conn, $visitedUser, $_SESSION['userID'])) { ?>
                 <form id="unfollow-form" action="profile/unfollow.php" method="post">
-                    <input type="hidden" name="unfollowedUser" value="<?php echo($visitedUser); ?>">
+                    <input type="hidden" name="unfollowedUser" value="<?= $visitedUser ?>">
                     <button type="submit" name="unfollow-submit" class="btn btn-primary">Unfollow</button>
                 </form>
             <?php } else { ?>
                 <form id="follow-form" action="profile/follow.php" method="post">
-                    <input type="hidden" name="followedUser" value="<?php echo($visitedUser); ?>">
+                    <input type="hidden" name="followedUser" value="<?= $visitedUser ?>">
                     <button type="submit" name="follow-submit" class="btn btn-primary">Follow</button>
                 </form>
             <?php } ?>
@@ -81,11 +81,11 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
                 <p>Profile pic</p>
             </div>
             <div class="col">
-                <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#Followers"><?= getUserFollowerCount($conn, $visitedUser); ?><br/>Followers</button>
+                <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#Followers"><?= getUserFollowerCount($conn, $visitedUser) ?><br/>Followers</button>
                 <?php drawUserList("Followers", getUserFollowers($conn, $visitedUser)) ?>
             </div>
             <div class="col">
-                <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#Following"><?= getUserFollowingCount($conn, $visitedUser); ?><br/>Following</button>
+                <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#Following"><?= getUserFollowingCount($conn, $visitedUser) ?><br/>Following</button>
                 <?php drawUserList("Following", getFollowingUsers($conn, $visitedUser)) ?>
             </div>
         </div>

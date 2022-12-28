@@ -100,7 +100,6 @@ if (!userExists($conn, $visitedUser)) {
         foreach ($posts as $post) {
             drawPost($post['ID'], $post['Title'], $post['Text'], $post['Likes'], isLiked($conn, $post['ID'], $_SESSION['userID']), null, $post['PathToImage']);
         }
-        
         $conn->close();
         ?>
     </div>
@@ -119,12 +118,12 @@ if (!userExists($conn, $visitedUser)) {
         $("#unfollow-form").ajaxForm({success: function() {
             location.reload();
         }});
-        $("#post-dislike-form").ajaxForm({success: function() {
-        location.reload();
-        }});
-        $("#post-like-form").ajaxForm({success: function() {
-            location.reload();
-        }});
+
+        $(".btn-like-dislike").click(function() {
+            $("#" + $(this).closest("form").attr('id')).ajaxForm({success: function() {
+                location.reload();
+            }});
+        });
     </script>
 </body>
 

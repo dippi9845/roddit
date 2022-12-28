@@ -30,11 +30,15 @@ function createPost($conn, $title, $text) {
 function getUsersPosts($conn, $userID) {
     $sql = "SELECT *
             FROM post
-            WHERE Creator = '$userID';";
-    $result = $conn->query($sql);
-    if (!$result) {
+            WHERE Creator = ?;";
+    $stmt = $conn->prepare($sql);
+    if (!$stmt->bind_param("s", $userID)) {
         return false;
     }
+    if (!$stmt->execute()) {
+        return false;
+    }
+    $result = $stmt->get_result();
     $posts = array();
     while ($row = $result->fetch_assoc()) {
         $posts[] = $row;
@@ -45,12 +49,15 @@ function getUsersPosts($conn, $userID) {
 function isLiked($conn, $postID, $userID) {
     $sql = "SELECT *
             FROM likes
-            WHERE Post = '$postID' AND User = '$userID';";
-    
-    $result = $conn->query($sql);
-    if (!$result) {
+            WHERE Post = ? AND User = ?;";
+    $stmt = $conn->prepare($sql);
+    if (!$stmt->bind_param("ss", $postID, $userID)) {
         return false;
     }
+    if (!$stmt->execute()) {
+        return false;
+    }
+    $result = $stmt->get_result();
     if ($result->num_rows > 0) {
         return true;
     }

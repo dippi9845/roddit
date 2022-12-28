@@ -70,12 +70,12 @@ if (!userExists($conn, $visitedUser)) {
             } elseif (isFollowing($conn, $visitedUser, $_SESSION['userID'])) { ?>
                 <form id="unfollow-form" action="profile/unfollow.php" method="post">
                     <input type="hidden" name="unfollowedUser" value="<?= $visitedUser ?>">
-                    <button type="submit" name="unfollow-submit" class="btn btn-primary">Unfollow</button>
+                    <button type="submit" name="unfollow-submit" class="btn btn-primary btn-ajax-form">Unfollow</button>
                 </form>
             <?php } else { ?>
                 <form id="follow-form" action="profile/follow.php" method="post">
                     <input type="hidden" name="followedUser" value="<?= $visitedUser ?>">
-                    <button type="submit" name="follow-submit" class="btn btn-primary">Follow</button>
+                    <button type="submit" name="follow-submit" class="btn btn-primary btn-ajax-form">Follow</button>
                 </form>
             <?php } ?>
             </div>
@@ -110,21 +110,7 @@ if (!userExists($conn, $visitedUser)) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.3.0/jquery.form.min.js" integrity="sha384-qlmct0AOBiA2VPZkMY3+2WqkHtIQ9lSdAsAn5RUJD/3vA5MKDgSGcdmIv4ycVxyn" crossorigin="anonymous"></script>
-
-    <script>
-        $("#follow-form").ajaxForm({success: function() {
-            location.reload();
-        }});
-        $("#unfollow-form").ajaxForm({success: function() {
-            location.reload();
-        }});
-
-        $(".btn-like-dislike").click(function() {
-            $("#" + $(this).closest("form").attr('id')).ajaxForm({success: function() {
-                location.reload();
-            }});
-        });
-    </script>
+    <script src="assets/js/btn-ajax-form.js"></script>
 </body>
 
 </html>

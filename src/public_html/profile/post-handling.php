@@ -28,8 +28,9 @@ function createPost($conn, $title, $text) {
 }
 
 function getUsersPosts($conn, $userID) {
-    $sql = "SELECT *
+    $sql = "SELECT post.*, users.Nickname
             FROM post
+            INNER JOIN users ON post.Creator = users.ID
             WHERE Creator = ?;";
     $stmt = $conn->prepare($sql);
     if (!$stmt->bind_param("s", $userID)) {
@@ -65,8 +66,9 @@ function isLiked($conn, $postID, $userID) {
 }
 
 function getPostOfFollowedUsers($conn, $userID) {
-    $sql = "SELECT *
+    $sql = "SELECT post.*, users.Nickname
             FROM post
+            INNER JOIN users ON post.Creator = users.ID
             WHERE Creator IN (SELECT Following FROM follow WHERE Follower = ?);";
     $stmt = $conn->prepare($sql);
     if (!$stmt->bind_param("s", $userID)) {

@@ -60,7 +60,7 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
             $posts = getPostOfFollowedUsers($conn, $_SESSION['userID']);
 
             foreach ($posts as $post) {
-                drawPost($post['ID'], $post['Title'], $post['Text'], $post['Likes'], isLiked($conn, $post['ID'], $_SESSION['userID']), null, $post['PathToImage']);
+                drawPost($post['ID'], $post['Nickname'], $post['Title'], $post['Text'], $post['Likes'], isLiked($conn, $post['ID'], $_SESSION['userID']), null, $post['PathToImage']);
             }
             $conn->close();
             ?>

@@ -109,6 +109,11 @@ function tryLoginCookie($conn) {
     $row = $result->fetch_assoc();
     $userID = $row['UserID'];
     $hashedToken = $row['HashToken'];
+    $expirationDate = $row['ExpireDate'];
+
+    if (time() > strtotime($expirationDate)) {
+        return false;
+    }
 
     if (hash_equals($hashedToken, hash('sha256', base64_decode($authenticator)))) {
         createSession($userID);

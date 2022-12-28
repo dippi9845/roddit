@@ -1,10 +1,16 @@
 <?php
-function drawPost($postID, $title, $text, $likes, $isLikedByMe, $comments, $pathToImage = null) {
+function drawPost($postID, $creatorName, $title, $text, $likes, $isLikedByMe, $comments, $pathToImage = null) {
 ?>
 <div class="row">
     <div class="col">
         <div class="card" style="margin-top: 25px;">
             <div class="card-body" style="margin-top: 0px;">
+            
+                <div class="d-flex flex-row">
+                    <div class="p-2">Profile Image</div>
+                    <div class="p-2"><?= $creatorName ?></div>
+                </div>
+                
                 <h4 class="card-title"><?= $title ?></h4>
                 <p class="card-text"> <?= $text ?> </p>
                 <?php

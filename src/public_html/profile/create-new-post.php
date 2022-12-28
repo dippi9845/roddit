@@ -64,4 +64,6 @@ if (main($data)) {
     echo("<br/>Something went wrong");
 }
 
+header("Location: /profile/profile.php");
+
 ?>

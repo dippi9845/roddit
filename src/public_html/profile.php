@@ -52,7 +52,7 @@ if (!userExists($conn, $visitedUser)) {
                 </ul>
                 <div class="d-md-none my-2"><button class="btn btn-light me-2" type="button">Button</button><button class="btn btn-primary" type="button">Button</button></div>
             </div>
-            <div class="d-none d-md-block"><button class="btn btn-light me-2" type="button">Button</button><a class="btn btn-primary" role="button" href="#">Button</a></div>
+            <div class="d-none d-md-block"><button onclick="window.location='new-post.php';" class="btn btn-light me-2" type="button">New Post</button><a class="btn btn-primary" role="button" href="#">Button</a></div>
         </div>
     </nav>
     <div class="container">

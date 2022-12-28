@@ -57,4 +57,23 @@ function isLiked($conn, $postID, $userID) {
     return false;
 }
 
+function getPostOfFollowedUsers($conn, $userID) {
+    $sql = "SELECT *
+            FROM post
+            WHERE Creator IN (SELECT Following FROM follow WHERE Follower = ?);";
+    $stmt = $conn->prepare($sql);
+    if (!$stmt->bind_param("s", $userID)) {
+        return false;
+    }
+    if (!$stmt->execute()) {
+        return false;
+    }
+    $result = $stmt->get_result();
+    $posts = array();
+    while ($row = $result->fetch_assoc()) {
+        $posts[] = $row;
+    }
+    return $posts;
+}
+
 ?>

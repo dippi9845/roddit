@@ -23,8 +23,10 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
     <title>Roddit</title>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
-    <link rel="stylesheet" href="assets/css/index.css">
     <link rel="stylesheet" href="assets/css/Navbar-Centered-Brand-icons.css">
+    <link rel="stylesheet" href="assets/css/index.css">
+    <link rel="stylesheet" href="assets/css/post.css">
+    <link rel="stylesheet" href="assets/css/icon-colors.css">
 </head>
 
 <body>

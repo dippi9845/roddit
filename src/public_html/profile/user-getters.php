@@ -1,5 +1,21 @@
 <?php 
 
+function userExists($conn, $userID) {
+    // use prepare statement
+    $sql = "SELECT * FROM users WHERE ID = ?";
+    $stmt = mysqli_stmt_init($conn);
+    if (mysqli_stmt_prepare($stmt, $sql)) {
+        mysqli_stmt_bind_param($stmt, "i", $userID);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+        if ($row = mysqli_fetch_assoc($result)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
 function getUserNameByID($conn, $userID) {
     $sql = "SELECT Nickname FROM users WHERE ID = {$userID}";
     $result = mysqli_query($conn, $sql);

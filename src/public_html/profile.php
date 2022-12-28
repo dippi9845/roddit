@@ -23,6 +23,9 @@ if (isset($_GET['user'])) {
 
 $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserName);
 
+if (!userExists($conn, $visitedUser)) {
+    header('Location: /404.html');
+}
 ?>
 
 <head>

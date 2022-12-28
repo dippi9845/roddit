@@ -6,7 +6,6 @@ include_once($_SERVER['DOCUMENT_ROOT'].'/profile/globals.php');
 include_once($_SERVER['DOCUMENT_ROOT'] . '/profile/post-handling.php');
 include_once($_SERVER['DOCUMENT_ROOT'] . '/profile/user-getters.php');
 include_once($_SERVER['DOCUMENT_ROOT'] . '/html-snippets/post.php');
-include_once($_SERVER['DOCUMENT_ROOT'] . '/html-snippets/user-list.php');
 
 if (!isUserLoggedIn(true)) {
     header('Location: /login.php');
@@ -15,17 +14,7 @@ if (!isUserLoggedIn(true)) {
 $file = file_get_contents($_SERVER['DOCUMENT_ROOT'].'/../setup.json');
 $data = json_decode($file, false);
 
-if (isset($_GET['user'])) {
-    $visitedUser = $_GET['user'];
-} else {
-    $visitedUser = $_SESSION['userID'];
-}
-
 $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserName);
-
-if (!userExists($conn, $visitedUser)) {
-    header('Location: /404.html');
-}
 ?>
 
 <head>
@@ -35,6 +24,7 @@ if (!userExists($conn, $visitedUser)) {
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
     <link rel="stylesheet" href="assets/css/Navbar-Centered-Brand-icons.css">
+    <link rel="stylesheet" href="assets/css/index.css">
     <link rel="stylesheet" href="assets/css/post.css">
     <link rel="stylesheet" href="assets/css/icon-colors.css">
 </head>
@@ -47,67 +37,37 @@ if (!userExists($conn, $visitedUser)) {
                     </svg></span><span onclick="window.location='/';">Roddit</span></a><button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-4"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
             <div class="collapse navbar-collapse flex-grow-0 order-md-first" id="navcol-4">
                 <ul class="navbar-nav me-auto">
-                    <li class="nav-item"><a class="nav-link active" href="#">First Item</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Second Item</a></li>
+                    <li class="nav-item">
+                        <form><input class="form-control" type="search" id="search" placeholder="Search" autocomplete="off"></form>
+                    </li>
                 </ul>
                 <div class="d-md-none my-2"><button class="btn btn-light me-2" type="button">Button</button><button class="btn btn-primary" type="button">Button</button></div>
             </div>
-            <div class="d-none d-md-block"><button onclick="window.location='new-post.php';" class="btn btn-light me-2" type="button">New Post</button><a class="btn btn-primary" role="button" href="#">Button</a></div>
+            <div>
+                <div class="dropdown" style="width: fit-content;">
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-item">Item 1</li>
+                        <li class="dropdown-item">Item 2</li>
+                        <li class="dropdown-item">Item 3</li>
+                        <li class="dropdown-item">Item 4</li>
+                    </ul>
+                </div><button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Notifications</button><button class="btn btn-light me-2" type="button">Log out</button><a class="btn btn-primary" onclick="window.location='profile.php';" role="button" href="#">My Profile</a>
+            </div>
         </div>
     </nav>
     <div class="container">
-        <div class="row text-center">
-            <div class="col">
-                <p>Biografia</p>
-            </div>
-        </div>
-        <div class="row text-center">
-            <div class="col">
-                <p><?= getUserNameByID($conn, $visitedUser) ?></p>
-            </div>
-            <div class="col">
-            <?php if ($visitedUser == $_SESSION['userID']) {
-            } elseif (isFollowing($conn, $visitedUser, $_SESSION['userID'])) { ?>
-                <form id="unfollow-form" action="profile/unfollow.php" method="post">
-                    <input type="hidden" name="unfollowedUser" value="<?= $visitedUser ?>">
-                    <button type="submit" name="unfollow-submit" class="btn btn-primary btn-ajax-form">Unfollow</button>
-                </form>
-            <?php } else { ?>
-                <form id="follow-form" action="profile/follow.php" method="post">
-                    <input type="hidden" name="followedUser" value="<?= $visitedUser ?>">
-                    <button type="submit" name="follow-submit" class="btn btn-primary btn-ajax-form">Follow</button>
-                </form>
-            <?php } ?>
-            </div>
-        </div>
-        <div class="row text-center">
-            <div class="col">
-                <p>Profile pic</p>
-            </div>
-            <div class="col">
-                <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#Followers"><?= getUserFollowerCount($conn, $visitedUser) ?><br/>Followers</button>
-                <?php drawUserList("Followers", getUserFollowers($conn, $visitedUser)) ?>
-            </div>
-            <div class="col">
-                <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#Following"><?= getUserFollowingCount($conn, $visitedUser) ?><br/>Following</button>
-                <?php drawUserList("Following", getFollowingUsers($conn, $visitedUser)) ?>
-            </div>
-        </div>
-
         <?php
-        $posts = getUsersPosts($conn, $visitedUser);
+            $posts = getPostOfFollowedUsers($conn, $_SESSION['userID']);
 
-        foreach ($posts as $post) {
-            drawPost($post['ID'], $post['Nickname'], $post['Title'], $post['Text'], $post['Likes'], isLiked($conn, $post['ID'], $_SESSION['userID']), null, $post['PathToImage']);
-        }
-        $conn->close();
-        ?>
+            foreach ($posts as $post) {
+                drawPost($post['ID'], $post['Nickname'], $post['Title'], $post['Text'], $post['Likes'], isLiked($conn, $post['ID'], $_SESSION['userID']), null, $post['PathToImage']);
+            }
+            $conn->close();
+            ?>
     </div>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
 
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.3.0/jquery.form.min.js" integrity="sha384-qlmct0AOBiA2VPZkMY3+2WqkHtIQ9lSdAsAn5RUJD/3vA5MKDgSGcdmIv4ycVxyn" crossorigin="anonymous"></script>
     <script src="assets/js/btn-ajax-form.js"></script>

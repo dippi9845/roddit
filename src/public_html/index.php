@@ -49,55 +49,26 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
                         <li class="dropdown-item">Item 3</li>
                         <li class="dropdown-item">Item 4</li>
                     </ul>
-                </div><button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Notifications</button><button class="btn btn-light me-2" type="button">Log out</button><a class="btn btn-primary" role="button" href="#">My Profile</a>
+                </div><button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Notifications</button><button class="btn btn-light me-2" type="button">Log out</button><a class="btn btn-primary" onclick="window.location='profile.php';" role="button" href="#">My Profile</a>
             </div>
         </div>
     </nav>
     <div class="container">
-        <div class="card" style="margin-top: 25px;">
-            <div class="card-body" style="margin-top: 0px;">
-                <h4 class="card-title">Post 1</h4>
-                <h6 class="text-muted card-subtitle mb-2">Subtitle</h6>
-                <p class="card-text">Nullam id dolor id nibh ultricies vehicula ut id elit. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus.</p><a class="card-link" href="#">Link</a><a class="card-link" href="#">Link</a>
-            </div>
-        </div>
-        <div class="card" style="margin-top: 25px;">
-            <div class="card-body" style="margin-top: 0px;">
-                <h4 class="card-title">Post 2</h4>
-                <h6 class="text-muted card-subtitle mb-2">Subtitle</h6>
-                <p class="card-text">Nullam id dolor id nibh ultricies vehicula ut id elit. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus.</p><a class="card-link" href="#">Link</a><a class="card-link" href="#">Link</a>
-            </div>
-        </div>
-        <div class="card" style="margin-top: 25px;">
-            <div class="card-body" style="margin-top: 0px;">
-                <h4 class="card-title">Post 3</h4>
-                <h6 class="text-muted card-subtitle mb-2">Subtitle</h6>
-                <p class="card-text">Nullam id dolor id nibh ultricies vehicula ut id elit. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus.</p><a class="card-link" href="#">Link</a><a class="card-link" href="#">Link</a>
-            </div>
-        </div>
-        <div class="card" style="margin-top: 25px;">
-            <div class="card-body" style="margin-top: 0px;">
-                <h4 class="card-title">Title</h4>
-                <h6 class="text-muted card-subtitle mb-2">Subtitle</h6>
-                <p class="card-text">Nullam id dolor id nibh ultricies vehicula ut id elit. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus.</p><a class="card-link" href="#">Link</a><a class="card-link" href="#">Link</a>
-            </div>
-        </div>
-        <div class="card" style="margin-top: 25px;">
-            <div class="card-body" style="margin-top: 0px;">
-                <h4 class="card-title">Title</h4>
-                <h6 class="text-muted card-subtitle mb-2">Subtitle</h6>
-                <p class="card-text">Nullam id dolor id nibh ultricies vehicula ut id elit. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus.</p><a class="card-link" href="#">Link</a><a class="card-link" href="#">Link</a>
-            </div>
-        </div>
-        <div class="card" style="margin-top: 25px;">
-            <div class="card-body" style="margin-top: 0px;">
-                <h4 class="card-title">Title</h4>
-                <h6 class="text-muted card-subtitle mb-2">Subtitle</h6>
-                <p class="card-text">Nullam id dolor id nibh ultricies vehicula ut id elit. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus.</p><a class="card-link" href="#">Link</a><a class="card-link" href="#">Link</a>
-            </div>
-        </div>
+        <?php
+            $posts = getPostOfFollowedUsers($conn, $_SESSION['userID']);
+
+            foreach ($posts as $post) {
+                drawPost($post['ID'], $post['Title'], $post['Text'], $post['Likes'], isLiked($conn, $post['ID'], $_SESSION['userID']), null, $post['PathToImage']);
+            }
+            $conn->close();
+            ?>
     </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.3.0/jquery.form.min.js" integrity="sha384-qlmct0AOBiA2VPZkMY3+2WqkHtIQ9lSdAsAn5RUJD/3vA5MKDgSGcdmIv4ycVxyn" crossorigin="anonymous"></script>
+    <script src="assets/js/btn-ajax-form.js"></script>
 </body>
 
 </html>

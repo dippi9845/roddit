@@ -38,7 +38,7 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
             <div class="collapse navbar-collapse flex-grow-0 order-md-first" id="navcol-4">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <form><input class="form-control" type="search" id="search" placeholder="Search"></form>
+                        <form><input class="form-control" type="search" id="search" placeholder="Search" autocomplete="off"></form>
                     </li>
                 </ul>
                 <div class="d-md-none my-2"><button class="btn btn-light me-2" type="button">Button</button><button class="btn btn-primary" type="button">Button</button></div>

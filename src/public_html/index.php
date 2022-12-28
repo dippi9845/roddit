@@ -1,6 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 
+<?php
+include_once($_SERVER['DOCUMENT_ROOT'].'/profile/globals.php');
+include_once($_SERVER['DOCUMENT_ROOT'] . '/profile/post-handling.php');
+include_once($_SERVER['DOCUMENT_ROOT'] . '/profile/user-getters.php');
+include_once($_SERVER['DOCUMENT_ROOT'] . '/html-snippets/post.php');
+
+if (!isUserLoggedIn(true)) {
+    header('Location: /login.php');
+}
+
+$file = file_get_contents($_SERVER['DOCUMENT_ROOT'].'/../setup.json');
+$data = json_decode($file, false);
+
+$conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserName);
+?>
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">

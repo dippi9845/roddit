@@ -69,7 +69,8 @@ function getPostOfFollowedUsers($conn, $userID) {
     $sql = "SELECT post.*, users.Nickname
             FROM post
             INNER JOIN users ON post.Creator = users.ID
-            WHERE Creator IN (SELECT Following FROM follow WHERE Follower = ?);";
+            WHERE Creator IN (SELECT Following FROM follow WHERE Follower = ?)
+            ORDER BY ID;";
     $stmt = $conn->prepare($sql);
     if (!$stmt->bind_param("s", $userID)) {
         return false;

@@ -51,7 +51,7 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
                         <li class="dropdown-item">Item 3</li>
                         <li class="dropdown-item">Item 4</li>
                     </ul>
-                </div><button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Notifications</button><button class="btn btn-light me-2" type="button">Log out</button><a class="btn btn-primary" onclick="window.location='profile.php';" role="button" href="#">My Profile</a>
+                </div><button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Notifications</button><button class="btn btn-light me-2" type="button" onclick="window.location='profile/logout.php';">Log out</button><a class="btn btn-primary" onclick="window.location='profile.php';" role="button" href="#">My Profile</a>
             </div>
         </div>
     </nav>

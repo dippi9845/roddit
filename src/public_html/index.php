@@ -65,11 +65,18 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
             if ($_GET["query"] == "") {
                 $posts = getPostOfFollowedUsers($conn, $_SESSION['userID']);
             } else {
+                //
                 $posts = getPostByContent($conn, $_GET["query"]);
             }
 
+            $noContent = $posts == null || count($posts) == 0;
+
             foreach ($posts as $post) {
                 drawPost($post['ID'], $post['Nickname'], $post['Title'], $post['Text'], $post['Likes'], isLiked($conn, $post['ID'], $_SESSION['userID']), null, $post['PathToImage']);
+            }
+
+            if ($noContent) {
+                echo "<h1>No content found</h1>";
             }
             $conn->close();
             ?>

@@ -1,4 +1,5 @@
 <?php
+    include_once $_SERVER['DOCUMENT_ROOT'].'/notify.php';
 
     function followUser($conn, $userID, $followedUserID) {
         $sql = "INSERT INTO follow (Follower, Following) VALUES ('{$userID}', '{$followedUserID}')";
@@ -15,7 +16,9 @@
 
     $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserName);
 
-    followUser($conn, $_SESSION['userID'], $_POST['followedUser']);
+    followUser($conn, $_SESSION['userID'], $_POST['followedUser']); // TODO: fare un escape di $_POST['followedUser']
+
+    notify_user($conn, $_POST['followedUser'], "New follower", "You have a new follower!");
 
     $conn->close();
 

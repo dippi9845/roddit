@@ -12,65 +12,67 @@ if (!isset($_POST['terms-conditions']) || $_POST['terms-conditions'] != "accept"
     $text_err = "You must accept the terms and conditions";
 }
 
-if (!$err && isset($_POST['nickname']) && isset($_POST['email']) && isset($_POST['password']) && isset($_POST['pass_conf'])) {
+if ( ! $err ) {
+    if (isset($_POST['nickname']) && isset($_POST['email']) && isset($_POST['password']) && isset($_POST['pass_conf'])) {
 
-    $nickname = $_POST['nickname'];
-    $email = $_POST['email'];
-    $password = $_POST['password'];
-    $pass_conf = $_POST['pass_conf'];
-    
-    $salt = uniqid();
-    $passw = password_hash($_POST['password']."Sono Bello".$salt, PASSWORD_DEFAULT);
-    $conf = password_hash($_POST['pass_conf']."Sono Bello".$salt, PASSWORD_DEFAULT);
-
-    if ( $passw != $conf) {
-        $err = true;
-        $text_err = "Two passwords are different";
-    }
-
-    if (!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
-        $err = true;
-        $text_err = "Email provided is not a valid email";
-    }
-
-    if (strlen($_POST['nickname']) > 64) {
-        $err = true;
-        $text_err = "Nickname provided is too long, (more than 64 characters)";
-    }
-
-    if (!preg_match("/[0-9a-z_]/", $_POST['nickname'])) {
-        $err = true;
-        $text_err = "Nickname provided is not valid, (only numbers, letters and underscore)";
-    }
-
-    if ( !$err ) {
-        include_once($_SERVER['DOCUMENT_ROOT'].'/profile/globals.php');
-        $data = json_decode(file_get_contents($_SERVER['DOCUMENT_ROOT'].'/../setup.json'));
-        
-        $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserName);
-    
-        $nickname = htmlspecialchars($_POST['nickname'], ENT_QUOTES, 'UTF-8');
-        $email = htmlspecialchars($_POST['email'], ENT_QUOTES, 'UTF-8');
-        $password = htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8');
+        $nickname = $_POST['nickname'];
+        $email = $_POST['email'];
+        $password = $_POST['password'];
+        $pass_conf = $_POST['pass_conf'];
         
         $salt = uniqid();
-        $passw = saltPass($_POST['password'], $salt);
-        
-        $stmt = $conn->prepare("INSERT INTO `users` (`Nickname`, `Email`, `Password`, `Salt`) VALUE (?, ?, ?, ?)");
-        $stmt->bind_param("ssss", $nickname, $email, $password, $salt);
-        $stmt->execute();
+        $passw = password_hash($_POST['password']."Sono Bello".$salt, PASSWORD_DEFAULT);
+        $conf = password_hash($_POST['pass_conf']."Sono Bello".$salt, PASSWORD_DEFAULT);
 
-        $stmt->close();
-        $conn->close();
-        
-        header("Location: /login.php");
+        if ( $passw != $conf) {
+            $err = true;
+            $text_err = "Two passwords are different";
+        }
 
+        if (!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
+            $err = true;
+            $text_err = "Email provided is not a valid email";
+        }
+
+        if (strlen($_POST['nickname']) > 64) {
+            $err = true;
+            $text_err = "Nickname provided is too long, (more than 64 characters)";
+        }
+
+        if (!preg_match("/[0-9a-z_]/", $_POST['nickname'])) {
+            $err = true;
+            $text_err = "Nickname provided is not valid, (only numbers, letters and underscore)";
+        }
+
+        if ( !$err ) {
+            include_once($_SERVER['DOCUMENT_ROOT'].'/profile/globals.php');
+            $data = json_decode(file_get_contents($_SERVER['DOCUMENT_ROOT'].'/../setup.json'));
+            
+            $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserName);
+        
+            $nickname = htmlspecialchars($_POST['nickname'], ENT_QUOTES, 'UTF-8');
+            $email = htmlspecialchars($_POST['email'], ENT_QUOTES, 'UTF-8');
+            $password = htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8');
+            
+            $salt = uniqid();
+            $passw = saltPass($_POST['password'], $salt);
+            
+            $stmt = $conn->prepare("INSERT INTO `users` (`Nickname`, `Email`, `Password`, `Salt`) VALUE (?, ?, ?, ?)");
+            $stmt->bind_param("ssss", $nickname, $email, $password, $salt);
+            $stmt->execute();
+
+            $stmt->close();
+            $conn->close();
+            
+            header("Location: /login.php");
+
+        }
     }
-}
 
-else {
-    $err = true;
-    $text_err = "You must fill all the fields";
+    else {
+        $err = true;
+        $text_err = "You must fill all the fields";
+    }
 }
 
 if (!isset($_POST['nickname'])){
@@ -118,7 +120,7 @@ if (!isset($_POST['pass_conf'])){
         <?php if ($err) { ?>
             <div class="row">
                 <div class="col">
-                    <div class="alert alert-danger text-center" role="alert" style="display: none;">
+                    <div class="alert alert-danger text-center" role="alert">
                     <span><?= $text_err ?></span>
                 </div>
             </div>
@@ -132,10 +134,10 @@ if (!isset($_POST['pass_conf'])){
         <div class="row d-xxl-flex">
             <div class="col d-md-flex d-lg-flex d-xl-flex d-xxl-flex justify-content-md-center justify-content-lg-center justify-content-xl-center justify-content-xxl-center">
                 <form method="post">
-                    <input class="form-control register" type="text" placeholder="Nickname" value="<?= $_POST['nickname']?>">
-                    <input class="form-control register" type="email" placeholder="Email" value="<?= $_POST['email']?>">
-                    <input class="form-control register" type="password" placeholder="Password" value="<?= $_POST['password']?>">
-                    <input class="form-control register" type="password" placeholder="Confirm Password" value="<?= $_POST['pass_conf']?>">
+                    <input class="form-control register" type="text" name="nickname" placeholder="Nickname" value="<?= $_POST['nickname']?>">
+                    <input class="form-control register" type="email" name="email" placeholder="Email" value="<?= $_POST['email']?>">
+                    <input class="form-control register" type="password" name="password" placeholder="Password" value="<?= $_POST['password']?>">
+                    <input class="form-control register" type="password" name="pass_conf" placeholder="Confirm Password" value="<?= $_POST['pass_conf']?>">
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" id="privacy-policy" name="privacy-policy" value="accept">
                         <label class="form-check-label" for="formCheck-2">Accept privacy policy</label>
@@ -143,7 +145,7 @@ if (!isset($_POST['pass_conf'])){
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" id="terms-conditions" name="terms-conditions" value="accept">
                         <label class="form-check-label" for="formCheck-1">Accept terms and conditions</label>
-                    </div><button class="btn btn-danger" id="submit" type="button">Register</button>
+                    </div><button class="btn btn-danger" id="submit" type="submit">Register</button>
                 </form>
             </div>
         </div>
@@ -175,6 +177,3 @@ if (!isset($_POST['pass_conf'])){
 </body>
 
 </html>
-
-
-?>

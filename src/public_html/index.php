@@ -11,10 +11,15 @@ if (!isUserLoggedIn(true)) {
     header('Location: /login.php');
 }
 
+if (!isset($_GET['query'])) {
+    $_GET['query'] = "";
+}
+
 $file = file_get_contents($_SERVER['DOCUMENT_ROOT'].'/../setup.json');
 $data = json_decode($file, false);
 
 $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserName);
+
 ?>
 
 <head>
@@ -38,7 +43,7 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
             <div class="collapse navbar-collapse flex-grow-0 order-md-first" id="navcol-4">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <form><input class="form-control" type="search" id="search" placeholder="Search" autocomplete="off"></form>
+                        <form method="get"><input value="<?= $_GET['query'] ?>" class="form-control" type="search" id="search" name="query" placeholder="Search" autocomplete="off"></form>
                     </li>
                 </ul>
                 <div class="d-md-none my-2"><button class="btn btn-light me-2" type="button">Button</button><button class="btn btn-primary" type="button">Button</button></div>
@@ -51,16 +56,27 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
                         <li class="dropdown-item">Item 3</li>
                         <li class="dropdown-item">Item 4</li>
                     </ul>
-                </div><button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Notifications</button><button class="btn btn-light me-2" type="button">Log out</button><a class="btn btn-primary" onclick="window.location='profile.php';" role="button" href="#">My Profile</a>
+                </div><button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Notifications</button><button class="btn btn-light me-2" type="button" onclick="window.location='profile/logout.php';">Log out</button><a class="btn btn-primary" onclick="window.location='profile.php';" role="button" href="#">My Profile</a>
             </div>
         </div>
     </nav>
     <div class="container">
         <?php
-            $posts = getPostOfFollowedUsers($conn, $_SESSION['userID']);
+            if ($_GET["query"] == "") {
+                $posts = getPostOfFollowedUsers($conn, $_SESSION['userID']);
+            } else {
+                //
+                $posts = getPostByContent($conn, $_GET["query"]);
+            }
+
+            $noContent = $posts == null || count($posts) == 0;
 
             foreach ($posts as $post) {
                 drawPost($post['ID'], $post['Nickname'], $post['Title'], $post['Text'], $post['Likes'], isLiked($conn, $post['ID'], $_SESSION['userID']), null, $post['PathToImage']);
+            }
+
+            if ($noContent) {
+                echo "<h1>No content found</h1>";
             }
             $conn->close();
             ?>

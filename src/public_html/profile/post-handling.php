@@ -69,9 +69,39 @@ function getPostOfFollowedUsers($conn, $userID) {
     $sql = "SELECT post.*, users.Nickname
             FROM post
             INNER JOIN users ON post.Creator = users.ID
-            WHERE Creator IN (SELECT Following FROM follow WHERE Follower = ?);";
+            WHERE Creator IN (SELECT Following FROM follow WHERE Follower = ?)
+            ORDER BY ID;";
     $stmt = $conn->prepare($sql);
     if (!$stmt->bind_param("s", $userID)) {
+        return false;
+    }
+    if (!$stmt->execute()) {
+        return false;
+    }
+    $result = $stmt->get_result();
+    $posts = array();
+    while ($row = $result->fetch_assoc()) {
+        $posts[] = $row;
+    }
+    return $posts;
+}
+
+function getPostByContent($conn, $content) {
+    $sql = "SELECT post.*, users.Nickname
+            FROM post
+            INNER JOIN users ON post.Creator = users.ID
+            WHERE MATCH(Title, Text) AGAINST(?)
+            ORDER BY ID DESC;";
+
+    $stmt = $conn->prepare($sql);
+
+    $content = explode(' ',$content);
+    foreach($content as $key => $value) {
+        $content[$key] = '%'.$value.'%';
+    }
+    $content = implode(', ', $content);
+
+    if (!$stmt->bind_param("s", $content)) {
         return false;
     }
     if (!$stmt->execute()) {

@@ -92,7 +92,7 @@ CREATE TABLE `post` (
 --
 
 CREATE TABLE `users` (
-  `ID` int(10) UNSIGNED NOT NULL,
+  `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `Nickname` varchar(255) NOT NULL,
   `Email` varchar(255) NOT NULL,
   `Password` varchar(255) NOT NULL,

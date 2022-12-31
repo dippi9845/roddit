@@ -1,4 +1,6 @@
 <?php
+include_once $_SERVER['DOCUMENT_ROOT'].'/notify.php';
+
 function likePost($conn, $userID, $postID) {
     $sql = "INSERT INTO likes (User, Post) VALUES ('{$userID}', '{$postID}')";
     if (mysqli_query($conn, $sql)) {
@@ -22,6 +24,7 @@ $data = json_decode($file, false);
 $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserName);
 
 likePost($conn, $_SESSION['userID'], $_POST['postID']);
+notify_user($conn, $_POST['userID'], "New like", "You have a new like!");
 
 $conn->close();
 

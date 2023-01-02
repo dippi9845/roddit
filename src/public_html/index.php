@@ -65,7 +65,6 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
             if ($_GET["query"] == "") {
                 $posts = getPostOfFollowedUsers($conn, $_SESSION['userID']);
             } else {
-                //
                 $posts = getPostByContent($conn, $_GET["query"]);
             }
 

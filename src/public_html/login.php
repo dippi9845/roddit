@@ -39,7 +39,7 @@ if (isUserLoggedIn(true)) {
                                 <div class="mb-3"><input class="form-control" type="password" name="password" placeholder="Password" required /></div>
                                 <div class="form-check"><input class="form-check-input" type="checkbox" name="remember" id="formCheck-1" /><label class="form-check-label d-xxl-flex justify-content-xxl-start" for="formCheck-1">Remeber me</label></div>
                                 <div class="mb-3"><button class="btn btn-primary d-block w-100" type="submit">Login</button></div>
-                                <p class="text-muted">Forgot your password?</p>
+                                <div class="mb-3"><a class="link-dark" href="/registration.php">New here? Register</a></div>
                             </form>
                         </div>
                     </div>

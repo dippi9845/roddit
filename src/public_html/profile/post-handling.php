@@ -1,7 +1,7 @@
 <?php
 
 function createPostWithFile($conn, $title, $text, $path, $type) {
-    $sql = "INSERT INTO post (Creator, Title, Text, PathToImage, MediaType) VALUES (?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO post (Creator, Title, Text, PathToFile, MediaType) VALUES (?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
     if (!$stmt->bind_param("sssss", $_SESSION['userID'], $title, $text, $path, $type)) {
         return false;

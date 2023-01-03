@@ -9,6 +9,8 @@ function comment_post($conn, $userID, $postID, $comment) {
         echo "Error: " . $sql . "<br>" . mysqli_error($conn);
     }
 
+    notify_user($conn, $_POST['userID'], "New comment", "You have a new comment to a post!");
+
     $sql = "UPDATE post SET Comments = Comments + 1 WHERE ID = '{$postID}'";
     if (mysqli_query($conn, $sql)) {
         echo "Updated successfully<br>";
@@ -24,6 +26,8 @@ function comment_comment($conn, $userID, $postID, $commentID, $comment) {
     } else {
         echo "Error: " . $sql . "<br>" . mysqli_error($conn);
     }
+
+    notify_user($conn, $_POST['userID'], "New comment", "You have a new comment to your comment!");
 
     $sql = "UPDATE post SET Comments = Comments + 1 WHERE ID = '{$postID}'";
     if (mysqli_query($conn, $sql)) {

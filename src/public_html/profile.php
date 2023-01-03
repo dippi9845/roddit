@@ -52,7 +52,7 @@ if (!userExists($conn, $visitedUser)) {
                 </ul>
                 <div class="d-md-none my-2"><button class="btn btn-light me-2" type="button">Button</button><button class="btn btn-primary" type="button">Button</button></div>
             </div>
-            <div class="d-none d-md-block"><button onclick="window.location='new-post.php';" class="btn btn-light me-2" type="button">New Post</button><a class="btn btn-primary" role="button" href="#">Button</a></div>
+            <div class="d-none d-md-block"><button onclick="window.location='new-post.php';" class="btn btn-light me-2" type="button">New Post</button><button class="btn btn-light me-2" type="button" onclick="window.location='profile/logout.php';">Log out</button></div>
         </div>
     </nav>
     <div class="container">
@@ -98,7 +98,7 @@ if (!userExists($conn, $visitedUser)) {
         $posts = getUsersPosts($conn, $visitedUser);
 
         foreach ($posts as $post) {
-            drawPost($post['ID'], $post['Nickname'], $post['Title'], $post['Text'], $post['Likes'], isLiked($conn, $post['ID'], $_SESSION['userID']), null, $post['PathToImage']);
+            drawPost($post['ID'], $post['Nickname'], $post['Title'], $post['Text'], $post['Likes'], isLiked($conn, $post['ID'], $_SESSION['userID']), null, $post['PathToFile']);
         }
         $conn->close();
         ?>

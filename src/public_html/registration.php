@@ -3,13 +3,11 @@ $err = false;
 $text_err = "";
 
 if ( isset($_POST['first']) && (!isset($_POST['privacy-policy']) || $_POST['privacy-policy'] != "accept")) {
-//if (!isset($_POST['privacy-policy']) || $_POST['privacy-policy'] != "accept"){
     $err = true;
     $text_err = "You must accept the privacy policy";
 }
 
 if ( isset($_POST['first']) && (!isset($_POST['terms-conditions']) || $_POST['terms-conditions'] != "accept")){
-//if ( !isset($_POST['terms-conditions']) || $_POST['terms-conditions'] != "accept"){
     $err = true;
     $text_err = "You must accept the terms and conditions";
 }

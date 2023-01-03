@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Creato il: Dic 09, 2022 alle 17:02
+-- Creato il: Gen 03, 2023 alle 16:23
 -- Versione del server: 10.4.20-MariaDB
 -- Versione PHP: 7.3.29
 
@@ -24,13 +24,15 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Struttura della tabella `comments`
+-- Struttura della tabella `comment`
 --
 
-CREATE TABLE `comments` (
+CREATE TABLE `comment` (
+  `ID` bigint(20) UNSIGNED NOT NULL,
   `User` varchar(256) NOT NULL,
   `Text` varchar(1000) NOT NULL,
-  `Post` bigint(20) UNSIGNED NOT NULL
+  `entityType` enum('Post','Commento') NOT NULL,
+  `entityID` bigint(20) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -71,6 +73,19 @@ CREATE TABLE `likes` (
 -- --------------------------------------------------------
 
 --
+-- Struttura della tabella `notification`
+--
+
+CREATE TABLE `notification` (
+  `UserID` bigint(20) UNSIGNED NOT NULL,
+  `Title` varchar(256) NOT NULL,
+  `Message` varchar(256) NOT NULL,
+  `Inserimento` date NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Struttura della tabella `post`
 --
 
@@ -81,8 +96,8 @@ CREATE TABLE `post` (
   `Title` varchar(500) NOT NULL,
   `Likes` int(11) NOT NULL DEFAULT 0,
   `Comments` int(11) NOT NULL DEFAULT 0,
-  `Media` longblob DEFAULT NULL,
-  `MediaType` varchar(256) DEFAULT NULL
+  `PathToFile` varchar(500) DEFAULT NULL,
+  `MediaType` enum('Imamgine','Video') DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -92,24 +107,33 @@ CREATE TABLE `post` (
 --
 
 CREATE TABLE `users` (
-  `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `ID` int(10) UNSIGNED NOT NULL,
   `Nickname` varchar(255) NOT NULL,
   `Email` varchar(255) NOT NULL,
   `Password` varchar(255) NOT NULL,
-  `Salt` varchar(255) NOT NULL
+  `Salt` varchar(255) NOT NULL,
+  `ProfileImagePath` varchar(256) NOT NULL DEFAULT '/uploads/images/default_profile_picture.jpg'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dump dei dati per la tabella `users`
+--
+
+INSERT INTO `users` (`ID`, `Nickname`, `Email`, `Password`, `Salt`, `ProfileImagePath`) VALUES
+(6, 'Gianni', 'giannimorandi@sonoio.com', '$2y$10$swX0OetT5eHOjzvXiIZHROrlKmmIwAT9h1pXPDnU/1GUT5uFNtHWe', '63b0664cf1aa1', '/uploads/images/default_profile_picture.jpg');
 
 --
 -- Indici per le tabelle scaricate
 --
 
 --
--- Indici per le tabelle `comments`
+-- Indici per le tabelle `comment`
 --
-ALTER TABLE `comments`
-  ADD KEY `User` (`User`),
-  ADD KEY `Post` (`Post`);
-ALTER TABLE `comments` ADD FULLTEXT KEY `Text` (`Text`);
+ALTER TABLE `comment`
+  ADD PRIMARY KEY (`ID`),
+  ADD UNIQUE KEY `ricerca` (`entityID`,`entityType`),
+  ADD KEY `User` (`User`);
+ALTER TABLE `comment` ADD FULLTEXT KEY `Text` (`Text`);
 
 --
 -- Indici per le tabelle `cookies`
@@ -134,6 +158,12 @@ ALTER TABLE `likes`
   ADD KEY `Post` (`Post`);
 
 --
+-- Indici per le tabelle `notification`
+--
+ALTER TABLE `notification`
+  ADD KEY `UserID` (`UserID`,`Inserimento`) USING BTREE;
+
+--
 -- Indici per le tabelle `post`
 --
 ALTER TABLE `post`
@@ -154,6 +184,12 @@ ALTER TABLE `users`
 --
 
 --
+-- AUTO_INCREMENT per la tabella `comment`
+--
+ALTER TABLE `comment`
+  MODIFY `ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT per la tabella `post`
 --
 ALTER TABLE `post`
@@ -163,18 +199,17 @@ ALTER TABLE `post`
 -- AUTO_INCREMENT per la tabella `users`
 --
 ALTER TABLE `users`
-  MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- Limiti per le tabelle scaricate
 --
 
 --
--- Limiti per la tabella `comments`
+-- Limiti per la tabella `comment`
 --
-ALTER TABLE `comments`
-  ADD CONSTRAINT `comments_ibfk_1` FOREIGN KEY (`User`) REFERENCES `users` (`Nickname`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `comments_ibfk_2` FOREIGN KEY (`Post`) REFERENCES `post` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `comment`
+  ADD CONSTRAINT `comment_ibfk_1` FOREIGN KEY (`User`) REFERENCES `users` (`Nickname`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Limiti per la tabella `cookies`

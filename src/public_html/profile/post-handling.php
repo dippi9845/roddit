@@ -90,18 +90,16 @@ function getPostByContent($conn, $content) {
     $sql = "SELECT post.*, users.Nickname, users.ProfileImagePath, users.ID AS UserID
             FROM post
             INNER JOIN users ON post.Creator = users.ID
-            WHERE MATCH(Title, Text) AGAINST(?)
+            WHERE Title REGEXP ?
+            OR Text REGEXP ?
             ORDER BY ID DESC;";
 
     $stmt = $conn->prepare($sql);
 
     $content = explode(' ',$content);
-    foreach($content as $key => $value) {
-        $content[$key] = '%'.$value.'%';
-    }
-    $content = implode(', ', $content);
+    $content = implode('|', $content);
 
-    if (!$stmt->bind_param("s", $content)) {
+    if (!$stmt->bind_param("ss", $content, $content)) {
         return false;
     }
     if (!$stmt->execute()) {

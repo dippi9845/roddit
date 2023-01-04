@@ -66,7 +66,7 @@ function isLiked($conn, $postID, $userID) {
 }
 
 function getPostOfFollowedUsers($conn, $userID) {
-    $sql = "SELECT post.*, users.Nickname
+    $sql = "SELECT post.*, users.Nickname, users.ProfileImagePath, users.ID AS UserID
             FROM post
             INNER JOIN users ON post.Creator = users.ID
             WHERE Creator IN (SELECT Following FROM follow WHERE Follower = ?)
@@ -87,7 +87,7 @@ function getPostOfFollowedUsers($conn, $userID) {
 }
 
 function getPostByContent($conn, $content) {
-    $sql = "SELECT post.*, users.Nickname
+    $sql = "SELECT post.*, users.Nickname, users.ProfileImagePath, users.ID AS UserID
             FROM post
             INNER JOIN users ON post.Creator = users.ID
             WHERE MATCH(Title, Text) AGAINST(?)

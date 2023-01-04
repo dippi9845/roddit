@@ -1,5 +1,14 @@
 <?php
 
+function saveImage($image) {
+    createImageFolderIfNotExists();
+    $path = '/uploads/images/'.uniqid().basename($image['name']);
+    if (!move_uploaded_file($image['tmp_name'], $_SERVER['DOCUMENT_ROOT'] . $path)) {
+        return false;
+    }
+    return $path;
+}
+
 /**
  * Checks if user is logged in
  * @param bool $loginIfCookieExists If true, the function will try to login the user using the cookie

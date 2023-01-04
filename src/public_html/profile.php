@@ -83,7 +83,7 @@ if (!userExists($conn, $visitedUser)) {
         </div>
         <div class="row text-center">
             <div class="col">
-                <p>Profile pic</p>
+                <img src="<?= getUserProfilePicture($conn, $visitedUser) ?>" alt="..." class="img-thumbnail profile-picutre" >
             </div>
             <div class="col">
                 <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#Followers"><?= getUserFollowerCount($conn, $visitedUser) ?><br/>Followers</button>

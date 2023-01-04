@@ -99,7 +99,7 @@ if (!userExists($conn, $visitedUser)) {
         $posts = getUsersPosts($conn, $visitedUser);
         
         foreach ($posts as $post) {
-            drawPost($post['ID'], $post['Nickname'], $post['Title'], $post['Text'], $post['Likes'], isLiked($conn, $post['ID'], $_SESSION['userID']), null, $post['PathToFile']);
+            drawPost($post['ID'], $post['Nickname'], getUserProfilePicture($conn, $visitedUser), $post['Title'], $post['Text'], $post['Likes'], isLiked($conn, $post['ID'], $_SESSION['userID']), null, $post['PathToFile']);
         }
         $conn->close();
         ?>

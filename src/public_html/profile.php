@@ -56,48 +56,48 @@ if (!userExists($conn, $visitedUser)) {
             <div class="d-none d-md-block"><button onclick="window.location='new-post.php';" class="btn btn-light me-2" type="button">New Post</button><button class="btn btn-light me-2" type="button" onclick="window.location='profile/logout.php';">Log out</button></div>
         </div>
     </nav>
+    
     <div class="container">
-        <div class="row text-center">
-            <div class="col">
-                <p>Biografia</p>
-            </div>
-        </div>
-        <div class="row text-center">
-            <div class="col">
-                <p><?= getUserNameByID($conn, $visitedUser) ?></p>
-            </div>
-            <div class="col">
-            <?php if ($visitedUser == $_SESSION['userID']) {
-            } elseif (isFollowing($conn, $visitedUser, $_SESSION['userID'])) { ?>
-                <form id="unfollow-form" action="profile/unfollow.php" method="post">
-                    <input type="hidden" name="unfollowedUser" value="<?= $visitedUser ?>">
-                    <button type="submit" name="unfollow-submit" class="btn btn-primary btn-ajax-form">Unfollow</button>
-                </form>
-            <?php } else { ?>
-                <form id="follow-form" action="profile/follow.php" method="post">
-                    <input type="hidden" name="followedUser" value="<?= $visitedUser ?>">
-                    <button type="submit" name="follow-submit" class="btn btn-primary btn-ajax-form">Follow</button>
-                </form>
-            <?php } ?>
-            </div>
-        </div>
-        <div class="row text-center">
-            <div class="col">
+        <div class="row">
+            <div class="col-4">
                 <img src="<?= getUserProfilePicture($conn, $visitedUser) ?>" alt="..." class="img-thumbnail profile-picutre" >
             </div>
-            <div class="col">
-                <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#Followers"><?= getUserFollowerCount($conn, $visitedUser) ?><br/>Followers</button>
-                <?php drawUserList("Followers", getUserFollowers($conn, $visitedUser)) ?>
-            </div>
-            <div class="col">
-                <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#Following"><?= getUserFollowingCount($conn, $visitedUser) ?><br/>Following</button>
-                <?php drawUserList("Following", getFollowingUsers($conn, $visitedUser)) ?>
+            <div class="col-8">
+                <div class="row ms-auto">
+                    <div class="col"><p><?= getUserNameByID($conn, $visitedUser) ?></p></div>
+                    <div class="col">
+                        <?php if ($visitedUser == $_SESSION['userID']) {
+                        } elseif (isFollowing($conn, $visitedUser, $_SESSION['userID'])) { ?>
+                            <form id="unfollow-form" action="profile/unfollow.php" method="post">
+                                <input type="hidden" name="unfollowedUser" value="<?= $visitedUser ?>">
+                                <button type="submit" name="unfollow-submit" class="btn btn-primary btn-ajax-form">Unfollow</button>
+                            </form>
+                        <?php } else { ?>
+                            <form id="follow-form" action="profile/follow.php" method="post">
+                                <input type="hidden" name="followedUser" value="<?= $visitedUser ?>">
+                                <button type="submit" name="follow-submit" class="btn btn-primary btn-ajax-form">Follow</button>
+                            </form>
+                        <?php } ?>
+                    </div>
+                </div>
+                <div class="row ms-auto my-1">
+                    <div class="col">
+                        <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#Followers"><b><?= getUserFollowerCount($conn, $visitedUser) ?></b> followers</button>
+                        <?php drawUserList("Followers", getUserFollowers($conn, $visitedUser)) ?>
+                    </div>
+                    <div class="col">
+                        <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#Following"><b><?= getUserFollowingCount($conn, $visitedUser) ?></b> following</button>
+                        <?php drawUserList("Following", getFollowingUsers($conn, $visitedUser)) ?>
+                    </div>
+                </div>
+                <div class="row ms-auto my-1">
+                    <div class="col">Biografia</div>
+                </div>
             </div>
         </div>
-
         <?php
         $posts = getUsersPosts($conn, $visitedUser);
-
+        
         foreach ($posts as $post) {
             drawPost($post['ID'], $post['Nickname'], $post['Title'], $post['Text'], $post['Likes'], isLiked($conn, $post['ID'], $_SESSION['userID']), null, $post['PathToFile']);
         }
@@ -105,11 +105,11 @@ if (!userExists($conn, $visitedUser)) {
         ?>
     </div>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
-
+    
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.3.0/jquery.form.min.js" integrity="sha384-qlmct0AOBiA2VPZkMY3+2WqkHtIQ9lSdAsAn5RUJD/3vA5MKDgSGcdmIv4ycVxyn" crossorigin="anonymous"></script>
     <script src="assets/js/btn-ajax-form.js"></script>
 </body>

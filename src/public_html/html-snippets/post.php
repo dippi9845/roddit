@@ -1,5 +1,5 @@
 <?php
-function drawPost($postID, $creatorName, $creatorProfilePicture, $title, $text, $likes, $isLikedByMe, $comments, $pathToImage = null) {
+function drawPost($postID, $creatorID, $creatorName, $creatorProfilePicture, $title, $text, $likes, $isLikedByMe, $comments, $pathToImage = null) {
 ?>
 <div class="row">
     <div class="col">
@@ -7,8 +7,8 @@ function drawPost($postID, $creatorName, $creatorProfilePicture, $title, $text, 
             <div class="card-body" style="margin-top: 0px;">
             
                 <div class="d-flex flex-row">
-                    <div class="p-2"><img src="<?= $creatorProfilePicture ?>" alt="..." class="img-thumbnail post-profile-picutre"></div>
-                    <div class="p-2"><?= $creatorName ?></div>
+                    <div class="p-2"><a href="<?= "/profile.php?user=$creatorID" ?>"><img src="<?= $creatorProfilePicture ?>" alt="..." class="img-thumbnail post-profile-picutre"></a></div>
+                    <div class="p-2"><a href="<?= "/profile.php?user=$creatorID" ?>" class="link-dark text-decoration-none"><?= $creatorName ?></a></div>
                 </div>
                 
                 <h4 class="card-title"><?= $title ?></h4>

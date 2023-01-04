@@ -36,6 +36,7 @@ if (!userExists($conn, $visitedUser)) {
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
     <link rel="stylesheet" href="assets/css/Navbar-Centered-Brand-icons.css">
     <link rel="stylesheet" href="assets/css/post.css">
+    <link rel="stylesheet" href="assets/css/profile.css">
     <link rel="stylesheet" href="assets/css/icon-colors.css">
 </head>
 

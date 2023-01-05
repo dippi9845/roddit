@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Saves an image to the server.
+ * @param array $image The image array from $_FILES
+ * @return string|false The path to the image or false if the image could not be saved
+ */
 function saveImage($image) {
     createImageFolderIfNotExists();
     $path = '/uploads/images/'.uniqid().basename($image['name']);
@@ -60,6 +65,10 @@ function getUserID($conn, $userEmail, $userPassword) {
     }
 }
 
+/**
+ * Creates a session for the user.
+ * @param string $userID The user id
+ */
 function createSession($userID) {
     if (session_status() == PHP_SESSION_NONE) {
         session_start();
@@ -67,6 +76,11 @@ function createSession($userID) {
     $_SESSION['userID'] = $userID;
 }
 
+/**
+ * Creates a cookie for the user.
+ * @param object $conn mysqli connection
+ * @param string $userID The user id
+ */
 function createCookie($conn, $userID) {
     $selector = base64_encode(random_bytes(9));
     $authenticator = random_bytes(33);
@@ -94,6 +108,11 @@ function createCookie($conn, $userID) {
 
 }
 
+/**
+ * Tries to login the user using the cookie.
+ * @param object $conn mysqli connection
+ * @return bool true if the user is logged in, false otherwise
+ */
 function tryLoginCookie($conn) {
     if (!isset($_COOKIE["roddit"])) {
         return false;

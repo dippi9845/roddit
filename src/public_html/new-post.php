@@ -24,10 +24,10 @@ if (!isUserLoggedIn(true)) {
             <div class="col">
                 <h1 class="text-center">Create new post</h1>
                 <form class="mx-auto" action="/profile/create-new-post.php" method="post" enctype="multipart/form-data">
-                    <input class="form-control form-element font-weight-bold bold-input" type="text" name="title" placeholder="Post Title" required />
-                    <textarea class="form-control form-element" name="text" placeholder="Post Text" required></textarea>
-                    <input class="form-control form-element" name="file" type="file" accept="image/*" />
-                    <button class="btn btn-primary form-element" type="submit">Create post</button>
+                    <input class="form-control form-element font-weight-bold bold-input my-2" type="text" name="title" placeholder="Post Title" required />
+                    <textarea class="form-control form-element my-2" name="text" placeholder="Post Text" required></textarea>
+                    <input class="form-control form-element my-2" name="file" type="file" accept="image/*" />
+                    <button class="btn btn-primary form-element my-2" type="submit">Create post</button>
                 </form>
             </div>
         </div>

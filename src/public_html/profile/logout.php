@@ -1,4 +1,7 @@
 <?php
+/**
+ * Empty the cookie.
+ */
 function destroy_cookie($conn) {
     $sql = "DELETE FROM cookies WHERE Token = ?";
     $stmt =  $conn->prepare($sql);

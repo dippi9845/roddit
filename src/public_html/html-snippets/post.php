@@ -1,5 +1,18 @@
 <?php
-function drawPost($postID, $creatorName, $title, $text, $likes, $isLikedByMe, $comments, $pathToImage = null) {
+/**
+ * Draws a post
+ * @param int $postID ID of the post
+ * @param int $creatorID ID of the post creator
+ * @param string $creatorName Name of the post creator
+ * @param string $creatorProfilePicture Path to the profile picture of the post creator
+ * @param string $title Title of the post
+ * @param string $text Text of the post
+ * @param int $likes Number of likes
+ * @param bool $isLikedByMe If true, the post is liked by the current user
+ * @param array $comments Array of comments
+ * @param string $pathToImage Path to the image of the post
+ */
+function drawPost($postID, $creatorID, $creatorName, $creatorProfilePicture, $title, $text, $likes, $isLikedByMe, $comments, $pathToImage = null) {
 ?>
 <div class="row">
     <div class="col">
@@ -7,8 +20,8 @@ function drawPost($postID, $creatorName, $title, $text, $likes, $isLikedByMe, $c
             <div class="card-body" style="margin-top: 0px;">
             
                 <div class="d-flex flex-row">
-                    <div class="p-2">Profile Image</div>
-                    <div class="p-2"><?= $creatorName ?></div>
+                    <div class="p-2"><a href="<?= "/profile.php?user=$creatorID" ?>"><img src="<?= $creatorProfilePicture ?>" alt="..." class="img-thumbnail post-profile-picutre"></a></div>
+                    <div class="p-2"><a href="<?= "/profile.php?user=$creatorID" ?>" class="link-dark text-decoration-none"><?= $creatorName ?></a></div>
                 </div>
                 
                 <h4 class="card-title"><?= $title ?></h4>

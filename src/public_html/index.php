@@ -3,9 +3,7 @@
 
 <?php
 include_once($_SERVER['DOCUMENT_ROOT'].'/profile/globals.php');
-include_once($_SERVER['DOCUMENT_ROOT'] . '/profile/post-handling.php');
 include_once($_SERVER['DOCUMENT_ROOT'] . '/profile/user-getters.php');
-include_once($_SERVER['DOCUMENT_ROOT'] . '/html-snippets/post.php');
 
 if (!isUserLoggedIn(true)) {
     header('Location: /login.php');
@@ -60,25 +58,8 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
             </div>
         </div>
     </nav>
-    <div class="container">
-        <?php
-            if ($_GET["query"] == "") {
-                $posts = getPostOfFollowedUsers($conn, $_SESSION['userID']);
-            } else {
-                $posts = getPostByContent($conn, $_GET["query"]);
-            }
-
-            $noContent = $posts == null || count($posts) == 0;
-
-            foreach ($posts as $post) {
-                drawPost($post['ID'], $post['UserID'], $post['Nickname'], $post['ProfileImagePath'], $post['Title'], $post['Text'], $post['Likes'], isLiked($conn, $post['ID'], $_SESSION['userID']), null, $post['PathToFile']);
-            }
-
-            if ($noContent) {
-                echo "<h1>No content found</h1>";
-            }
-            $conn->close();
-            ?>
+    <div class="container" id="posts-container">
+        
     </div>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
 
@@ -86,6 +67,7 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.3.0/jquery.form.min.js" integrity="sha384-qlmct0AOBiA2VPZkMY3+2WqkHtIQ9lSdAsAn5RUJD/3vA5MKDgSGcdmIv4ycVxyn" crossorigin="anonymous"></script>
     <script src="assets/js/btn-ajax-form.js"></script>
+    <script src="assets/js/post-loader.js"></script>
 </body>
 
 </html>

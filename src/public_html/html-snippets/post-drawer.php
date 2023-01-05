@@ -20,7 +20,7 @@ if (!isset($_POST['query'])) {
 if ($_POST["query"] == "") {
     $posts = getPostOfFollowedUsers($conn, $_SESSION['userID']);
 } else {
-    $posts = getPostByContent($conn, $_GET["query"]);
+    $posts = getPostByContent($conn, $_POST["query"]);
 }
 
 $noContent = $posts == null || count($posts) == 0;

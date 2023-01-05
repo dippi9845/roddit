@@ -87,12 +87,12 @@ function getPostOfFollowedUsers($conn, $userID, $offset, $perPage) {
     return $posts;
 }
 
-function getAllPostOfFollowedUsers($conn, $userID) {
-    $sql = "SELECT post.ID
+function getAllPostOfFollowedUsersCount($conn, $userID) {
+    $sql = "SELECT COUNT(DISTINCT post.ID) AS 'Total'
             FROM post
             INNER JOIN users ON post.Creator = users.ID
             WHERE Creator IN (SELECT Following FROM follow WHERE Follower = ?)
-            ORDER BY ID";
+            ORDER BY post.ID";
     $stmt = $conn->prepare($sql);
     if (!$stmt->bind_param("s", $userID)) {
         return false;
@@ -100,12 +100,10 @@ function getAllPostOfFollowedUsers($conn, $userID) {
     if (!$stmt->execute()) {
         return false;
     }
+
     $result = $stmt->get_result();
-    $posts = array();
-    while ($row = $result->fetch_assoc()) {
-        $posts[] = $row;
-    }
-    return $posts;
+    $row = $result->fetch_assoc();
+    return $row['Total'];
 }
 
 function getPostByContent($conn, $content, $offset, $perPage) {
@@ -136,13 +134,13 @@ function getPostByContent($conn, $content, $offset, $perPage) {
     return $posts;
 }
 
-function getAllPostByContent($conn, $content) {
-    $sql = "SELECT post.ID
-    FROM post
-    INNER JOIN users ON post.Creator = users.ID
-    WHERE Title REGEXP ?
-    OR Text REGEXP ?
-    ORDER BY ID DESC";
+function getAllPostByContentCount($conn, $content) {
+    $sql = "SELECT COUNT(DISTINCT post.ID) AS 'Total'
+            FROM post
+            INNER JOIN users ON post.Creator = users.ID
+            WHERE Title REGEXP ?
+            OR Text REGEXP ?
+            ORDER BY post.ID DESC;";
 
     $stmt = $conn->prepare($sql);
 
@@ -150,17 +148,16 @@ function getAllPostByContent($conn, $content) {
     $content = implode('|', $content);
 
     if (!$stmt->bind_param("ss", $content, $content)) {
-    return false;
+        return false;
     }
+
     if (!$stmt->execute()) {
-    return false;
+        return false;
     }
+
     $result = $stmt->get_result();
-    $posts = array();
-    while ($row = $result->fetch_assoc()) {
-    $posts[] = $row;
-    }
-    return $posts;
-    }
+    $row = $result->fetch_assoc();
+    return $row['Total'];
+}
 
 ?>

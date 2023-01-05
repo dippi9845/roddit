@@ -18,19 +18,12 @@ if (!isset($_POST['query'])) {
 }
 
 if ($_POST["query"] == "") {
-    $posts = getAllPostOfFollowedUsers($conn, $_SESSION['userID']);
+    $postCount = getAllPostOfFollowedUsersCount($conn, $_SESSION['userID']);
 } else {
-    $posts = getAllPostByContent($conn, $_POST["query"]);
+    $postCount = getAllPostByContentCount($conn, $_POST["query"]);
 }
 
-$noContent = $posts == null || count($posts) == 0;
-
-$postsID = array();
-foreach ($posts as $post) {
-    array_push($postsID, $post['ID']);
-}
-
-echo(implode(", ", $postsID));
+echo $postCount;
 
 $conn->close();
 ?>

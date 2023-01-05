@@ -48,7 +48,6 @@ if ( ! $err && isset($_POST['first'])) {
         
             $nickname = htmlspecialchars($nickname, ENT_QUOTES, 'UTF-8');
             $email = htmlspecialchars($email, ENT_QUOTES, 'UTF-8');
-            $password = htmlspecialchars($password, ENT_QUOTES, 'UTF-8');
             
             $salt = uniqid();
             $password = password_hash(saltPass($password, $salt), PASSWORD_DEFAULT);

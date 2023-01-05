@@ -65,14 +65,15 @@ function isLiked($conn, $postID, $userID) {
     return false;
 }
 
-function getPostOfFollowedUsers($conn, $userID) {
+function getPostOfFollowedUsers($conn, $userID, $offset, $perPage) {
     $sql = "SELECT post.*, users.Nickname, users.ProfileImagePath, users.ID AS UserID
             FROM post
             INNER JOIN users ON post.Creator = users.ID
             WHERE Creator IN (SELECT Following FROM follow WHERE Follower = ?)
-            ORDER BY ID;";
+            ORDER BY ID
+            LIMIT ?, ?;";
     $stmt = $conn->prepare($sql);
-    if (!$stmt->bind_param("s", $userID)) {
+    if (!$stmt->bind_param("sss", $userID, $offset, $perPage)) {
         return false;
     }
     if (!$stmt->execute()) {
@@ -86,20 +87,21 @@ function getPostOfFollowedUsers($conn, $userID) {
     return $posts;
 }
 
-function getPostByContent($conn, $content) {
+function getPostByContent($conn, $content, $offset, $perPage) {
     $sql = "SELECT post.*, users.Nickname, users.ProfileImagePath, users.ID AS UserID
             FROM post
             INNER JOIN users ON post.Creator = users.ID
             WHERE Title REGEXP ?
             OR Text REGEXP ?
-            ORDER BY ID DESC;";
+            ORDER BY ID DESC
+            LIMIT ?, ?;";
 
     $stmt = $conn->prepare($sql);
 
     $content = explode(' ',$content);
     $content = implode('|', $content);
 
-    if (!$stmt->bind_param("ss", $content, $content)) {
+    if (!$stmt->bind_param("ssss", $content, $content, $offset, $perPage)) {
         return false;
     }
     if (!$stmt->execute()) {

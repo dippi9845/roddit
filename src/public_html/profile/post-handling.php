@@ -87,6 +87,27 @@ function getPostOfFollowedUsers($conn, $userID, $offset, $perPage) {
     return $posts;
 }
 
+function getAllPostOfFollowedUsers($conn, $userID) {
+    $sql = "SELECT post.ID
+            FROM post
+            INNER JOIN users ON post.Creator = users.ID
+            WHERE Creator IN (SELECT Following FROM follow WHERE Follower = ?)
+            ORDER BY ID";
+    $stmt = $conn->prepare($sql);
+    if (!$stmt->bind_param("s", $userID)) {
+        return false;
+    }
+    if (!$stmt->execute()) {
+        return false;
+    }
+    $result = $stmt->get_result();
+    $posts = array();
+    while ($row = $result->fetch_assoc()) {
+        $posts[] = $row;
+    }
+    return $posts;
+}
+
 function getPostByContent($conn, $content, $offset, $perPage) {
     $sql = "SELECT post.*, users.Nickname, users.ProfileImagePath, users.ID AS UserID
             FROM post
@@ -114,5 +135,32 @@ function getPostByContent($conn, $content, $offset, $perPage) {
     }
     return $posts;
 }
+
+function getAllPostByContent($conn, $content) {
+    $sql = "SELECT post.ID
+    FROM post
+    INNER JOIN users ON post.Creator = users.ID
+    WHERE Title REGEXP ?
+    OR Text REGEXP ?
+    ORDER BY ID DESC";
+
+    $stmt = $conn->prepare($sql);
+
+    $content = explode(' ',$content);
+    $content = implode('|', $content);
+
+    if (!$stmt->bind_param("ss", $content, $content)) {
+    return false;
+    }
+    if (!$stmt->execute()) {
+    return false;
+    }
+    $result = $stmt->get_result();
+    $posts = array();
+    while ($row = $result->fetch_assoc()) {
+    $posts[] = $row;
+    }
+    return $posts;
+    }
 
 ?>

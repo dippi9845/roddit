@@ -1,35 +1,53 @@
-let lastPostVisualized = 0;
-const postsPerRequest = 5;
-
+/**
+ * This function is called when the page is loaded.
+ * It loads the first few posts and then it waits for the user to scroll down to load more posts.
+ */
 $(document).ready( function() {
+    window.lastPostVisualized = 0;
+    window.postsPerRequest = 5;
+
     let query = getUrlVars()['query'];
 
-    posts = ajaxLoadPosts("/html-snippets/post-drawer.php", query, lastPostVisualized, postsPerRequest);
+    posts = ajaxLoadPosts("/html-snippets/post-drawer.php", query, window.lastPostVisualized, window.postsPerRequest);
 
-    lastPostVisualized += postsPerRequest;
+    window.lastPostVisualized += window.postsPerRequest;
 
     $("#posts-container").append(posts);
 });
 
+/**
+ * This function is called when the user scrolls to the bottom of the page.
+ * It loads more posts if the user has reached the bottom of the page.
+ */
 $(window).scroll(function() {
     if($(window).scrollTop() + $(window).height() != $(document).height()) {
         return;
     }
     let query = getUrlVars()['query'];
     const postsID = ajaxGetPostsCount("/profile/get-posts-count.php", query);
-    if (lastPostVisualized >= postsID) {
+    if (window.lastPostVisualized >= postsID) {
         return;
     }
-    posts = ajaxLoadPosts("/html-snippets/post-drawer.php", query, lastPostVisualized, postsPerRequest);
+    posts = ajaxLoadPosts("/html-snippets/post-drawer.php", query, window.lastPostVisualized, window.postsPerRequest);
     $("#posts-container").append(posts);
 
-    lastPostVisualized += postsPerRequest;
+    window.lastPostVisualized += window.postsPerRequest;
  });
 
+ /**
+  * This function is called when the page is loaded.
+  * It scrolls the page to the top.
+  */
  $(document).ready(function(){
     $(this).scrollTop(0);
 });
 
+/**
+ * This function returns the number of posts that will be loaded.
+ * @param {string} phpUrl the url of the php file that will be called
+ * @param {string} queryData the query data that will be sent to the php file
+ * @returns the number of posts that will be loaded
+ */
 function ajaxGetPostsCount(phpUrl, queryData) {
     return $.ajax({
         url: phpUrl,
@@ -39,6 +57,14 @@ function ajaxGetPostsCount(phpUrl, queryData) {
     }).responseText;
 }
 
+/**
+ * This function creates the posts
+ * @param {string} phpUrl the url of the php file that will be called
+ * @param {string} queryData the query data that will be sent to the php file
+ * @param {int} offset the last post that was loaded
+ * @param {int} perPage the number of posts that will be loaded
+ * @returns a string containing the posts
+ */
 function ajaxLoadPosts(phpUrl, queryData, offset, perPage) {
     return $.ajax({
         url: phpUrl,
@@ -48,6 +74,10 @@ function ajaxLoadPosts(phpUrl, queryData, offset, perPage) {
     }).responseText;
 }
 
+/**
+ * This function returns an array containing all the get variables.
+ * @returns an array containing all the get variables
+ */
 function getUrlVars() {
     let vars = [], hash;
     let hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');

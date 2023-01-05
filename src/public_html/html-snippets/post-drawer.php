@@ -17,10 +17,15 @@ if (!isset($_POST['query'])) {
     $_POST['query'] = "";
 }
 
+if (!isset($_POST['offset']) || !isset($_POST['limit'])) {
+    $_POST['offset'] = 0;
+    $_POST['limit'] = 5;
+}
+
 if ($_POST["query"] == "") {
-    $posts = getPostOfFollowedUsers($conn, $_SESSION['userID']);
+    $posts = getPostOfFollowedUsers($conn, $_SESSION['userID'], $_POST['offset'], $_POST['limit']);
 } else {
-    $posts = getPostByContent($conn, $_POST["query"]);
+    $posts = getPostByContent($conn, $_POST["query"], $_POST['offset'], $_POST['limit']);
 }
 
 $noContent = $posts == null || count($posts) == 0;

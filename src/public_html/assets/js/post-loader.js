@@ -1,15 +1,15 @@
 $(document).ready( function() {
     var query = getUrlVars()['query'];
-    posts = ajaxLoadPosts("/html-snippets/post-drawer.php", query);
+    posts = ajaxLoadPosts("/html-snippets/post-drawer.php", query, 0, 2);
 
     $("#posts-container").append(posts);
 });
 
-function ajaxLoadPosts(phpUrl, queryData) {
+function ajaxLoadPosts(phpUrl, queryData, offset, perPage) {
     return $.ajax({
         url: phpUrl,
         type: "POST",
-        data: {query: queryData},
+        data: {query: queryData, offset: offset, limit: perPage},
         async: false
     }).responseText;
 }

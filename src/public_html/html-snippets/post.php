@@ -1,4 +1,17 @@
 <?php
+/**
+ * Draws a post
+ * @param int $postID ID of the post
+ * @param int $creatorID ID of the post creator
+ * @param string $creatorName Name of the post creator
+ * @param string $creatorProfilePicture Path to the profile picture of the post creator
+ * @param string $title Title of the post
+ * @param string $text Text of the post
+ * @param int $likes Number of likes
+ * @param bool $isLikedByMe If true, the post is liked by the current user
+ * @param array $comments Array of comments
+ * @param string $pathToImage Path to the image of the post
+ */
 function drawPost($postID, $creatorID, $creatorName, $creatorProfilePicture, $title, $text, $likes, $isLikedByMe, $comments, $pathToImage = null) {
 ?>
 <div class="row">

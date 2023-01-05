@@ -1,4 +1,10 @@
 <?php
+/**
+ * Dislikes a post removing it from the likes table and decrementing the likes counter.
+ * @param object $conn mysqli connection
+ * @param string $userID int user id
+ * @param string $postID int post id
+ */
 function dislikelikePost($conn, $userID, $postID) {
     $sql = "DELETE FROM likes WHERE User = '{$userID}' AND Post = '{$postID}'";
     if (mysqli_query($conn, $sql)) {

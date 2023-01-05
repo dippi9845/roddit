@@ -1,7 +1,12 @@
 <?php 
 
+/**
+ * Checks if the user exists.
+ * @param object $conn mysqli connection
+ * @param string $userID int user id
+ * @return boolean true if user exists
+ */
 function userExists($conn, $userID) {
-    // use prepare statement
     $sql = "SELECT * FROM users WHERE ID = ?";
     $stmt = mysqli_stmt_init($conn);
     if (!mysqli_stmt_prepare($stmt, $sql)) {
@@ -18,6 +23,12 @@ function userExists($conn, $userID) {
     }
 }
 
+/**
+ * Returns the userNickname of a given user id.
+ * @param object $conn mysqli connection
+ * @param string $userID int user id
+ * @return string userNickname of the user
+ */
 function getUserNameByID($conn, $userID) {
     $sql = "SELECT Nickname FROM users WHERE ID = ?";
     $stmt = mysqli_stmt_init($conn);
@@ -35,6 +46,12 @@ function getUserNameByID($conn, $userID) {
     }
 }
 
+/**
+ * Gets the profile picture of a user.
+ * @param object $conn mysqli connection
+ * @param string $userID int user id
+ * @return string profile picture path
+ */
 function getUserProfilePicture($conn, $userID) {
     $sql = "SELECT ProfileImagePath FROM users WHERE ID = ?";
     $stmt = mysqli_stmt_init($conn);
@@ -52,6 +69,12 @@ function getUserProfilePicture($conn, $userID) {
     }
 }
 
+/**
+ * Gets user's follower count.
+ * @param object $conn mysqli connection
+ * @param string $userID int user id
+ * @return int follower number of users that are following the user
+ */
 function getUserFollowerCount($conn, $userID) {
     $sql = "SELECT COUNT(*) AS FollowerCount FROM follow WHERE Following = ?";
     $stmt = mysqli_stmt_init($conn);
@@ -66,6 +89,12 @@ function getUserFollowerCount($conn, $userID) {
     return $row['FollowerCount'];
 }
 
+/**
+ * Gets user's following count.
+ * @param object $conn mysqli connection
+ * @param string $userID int user id
+ * @return int following number of users that the user is following
+ */
 function getUserFollowingCount($conn, $userID) {
     $sql = "SELECT COUNT(*) AS FollowingCount FROM follow WHERE Follower = ?";
     $stmt = mysqli_stmt_init($conn);
@@ -80,6 +109,13 @@ function getUserFollowingCount($conn, $userID) {
     return $row['FollowingCount'];
 }
 
+/**
+ * Checks if the user is following another user.
+ * @param object $conn mysqli connection
+ * @param string $userID int user id
+ * @param string $visitedUser int visited user id
+ * @return boolean true if user is following
+ */
 function isFollowing($conn, $visitedUser, $user) {
     $sql = "SELECT * FROM follow WHERE Follower = ? AND Following = ?";
     $stmt = mysqli_stmt_init($conn);
@@ -97,6 +133,12 @@ function isFollowing($conn, $visitedUser, $user) {
     }
 }
 
+/**
+ * Gets the user's followers.
+ * @param object $conn mysqli connection
+ * @param string $userID int user id
+ * @return array followers the users that are following the user
+ */
 function getUserFollowers($conn, $userID) {
     $sql = "SELECT follow.Follower AS ID, users.Nickname
             FROM follow
@@ -117,6 +159,12 @@ function getUserFollowers($conn, $userID) {
     return $followers;
 }
 
+/**
+ * Gets the user's following.
+ * @param object $conn mysqli connection
+ * @param string $userID int user id
+ * @return array following the users that the user is following
+ */
 function getFollowingUsers($conn, $userID) {
     $sql = "SELECT follow.Following AS ID, users.Nickname
             FROM follow

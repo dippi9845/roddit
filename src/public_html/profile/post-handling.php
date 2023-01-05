@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * Creates a new post with a file.
+ * @param object $conn mysqli connection
+ * @param string $title string title
+ * @param string $text string text
+ * @param string $path string path to file
+ * @param string $type string type of file
+ * @return boolean true if successful
+ */
 function createPostWithFile($conn, $title, $text, $path, $type) {
     $sql = "INSERT INTO post (Creator, Title, Text, PathToFile, MediaType) VALUES (?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
@@ -13,6 +22,13 @@ function createPostWithFile($conn, $title, $text, $path, $type) {
     return true;
 }
 
+/**
+ * Creates a new post with only text.
+ * @param object $conn mysqli connection
+ * @param string $title string title
+ * @param string $text string text
+ * @return boolean true if successful
+ */
 function createPost($conn, $title, $text) {
     $sql = "INSERT INTO post (Creator, Title, Text) VALUES (?, ?, ?)";
     $stmt = $conn->prepare($sql);
@@ -27,6 +43,12 @@ function createPost($conn, $title, $text) {
     return true;
 }
 
+/**
+ * Returns all posts from a user.
+ * @param object $conn mysqli connection
+ * @param string $userID int user id
+ * @return array posts containing all posts from a user
+ */
 function getUsersPosts($conn, $userID) {
     $sql = "SELECT post.*, users.Nickname
             FROM post
@@ -47,6 +69,13 @@ function getUsersPosts($conn, $userID) {
     return $posts;
 }
 
+/**
+ * Checks if a post is liked by a user.
+ * @param object $conn mysqli connection
+ * @param string $postID int post id
+ * @param string $userID int user id
+ * @return boolean true if post is liked by user
+ */
 function isLiked($conn, $postID, $userID) {
     $sql = "SELECT *
             FROM likes
@@ -65,6 +94,14 @@ function isLiked($conn, $postID, $userID) {
     return false;
 }
 
+/**
+ * Gets all posts of followed users.
+ * @param object $conn mysqli connection
+ * @param string $userID int user id
+ * @param string $offset int offset
+ * @param string $perPage int posts per page
+ * @return array posts containing all posts of followed users
+ */
 function getPostOfFollowedUsers($conn, $userID, $offset, $perPage) {
     $sql = "SELECT post.*, users.Nickname, users.ProfileImagePath, users.ID AS UserID
             FROM post
@@ -87,6 +124,12 @@ function getPostOfFollowedUsers($conn, $userID, $offset, $perPage) {
     return $posts;
 }
 
+/**
+ * Gets the number of posts of followed users.
+ * @param object $conn mysqli connection
+ * @param string $userID int user id
+ * @return int number of posts of followed users
+ */
 function getAllPostOfFollowedUsersCount($conn, $userID) {
     $sql = "SELECT COUNT(DISTINCT post.ID) AS 'Total'
             FROM post
@@ -106,6 +149,14 @@ function getAllPostOfFollowedUsersCount($conn, $userID) {
     return $row['Total'];
 }
 
+/**
+ * Gets all posts of a user.
+ * @param object $conn mysqli connection
+ * @param string $userID int user id
+ * @param string $offset int offset
+ * @param string $perPage int posts per page
+ * @return array posts containing all posts of a user
+ */
 function getPostByContent($conn, $content, $offset, $perPage) {
     $sql = "SELECT post.*, users.Nickname, users.ProfileImagePath, users.ID AS UserID
             FROM post
@@ -134,6 +185,12 @@ function getPostByContent($conn, $content, $offset, $perPage) {
     return $posts;
 }
 
+/**
+ * Gets the number of posts of a user.
+ * @param object $conn mysqli connection
+ * @param string $userID int user id
+ * @return int number of posts of a user
+ */
 function getAllPostByContentCount($conn, $content) {
     $sql = "SELECT COUNT(DISTINCT post.ID) AS 'Total'
             FROM post

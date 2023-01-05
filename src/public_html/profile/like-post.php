@@ -1,6 +1,12 @@
 <?php
 include_once $_SERVER['DOCUMENT_ROOT'].'/notify.php';
 
+/**
+ * Likes a post adding it to the likes table.
+ * @param object $conn mysqli connection
+ * @param string $userID int user id
+ * @param string $postID int post id
+ */
 function likePost($conn, $userID, $postID) {
     $sql = "INSERT INTO likes (User, Post) VALUES ('{$userID}', '{$postID}')";
     if (mysqli_query($conn, $sql)) {

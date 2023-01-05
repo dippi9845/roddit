@@ -1,9 +1,15 @@
 <?php
 
+/**
+ * checks if the form is valid
+ */
 function isFormValid() {
     return isset($_POST['title']) && isset($_POST['text']);
 }
 
+/**
+ * Creates the uploads folder if it doesn't exist
+ */
 function createImageFolderIfNotExists() {
     $path = $_SERVER['DOCUMENT_ROOT'].'/uploads/images/';
     if (!file_exists($path)) {
@@ -20,6 +26,9 @@ function saveImage($image) {
     return $path;
 }
 
+/**
+ * Creates a post with a file
+ */
 function main($data) {
     if (!isFormValid()) {
         echo("<br/>Invalid form");

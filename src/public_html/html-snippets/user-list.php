@@ -1,4 +1,9 @@
 <?php
+/**
+ * Draws a modal with a list of users
+ * @param string $title The title of the modal
+ * @param array $users The list of users to display
+ */
 function drawUserList($title, $users) {
 ?>
     <div class="modal fade" id="<?= $title ?>" tabindex="-1" role="dialog" aria-labelledby="<?= $title ?>Title" aria-hidden="true">

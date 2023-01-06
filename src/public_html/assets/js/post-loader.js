@@ -61,14 +61,6 @@ $(window).scroll(function() {
     }
  });
 
- /**
-  * This function is called when the page is loaded.
-  * It scrolls the page to the top.
-  */
- $(document).ready(function(){
-    $(this).scrollTop(0);
-});
-
 /**
  * This function returns the output of a php file given a query input.
  * @param {string} phpUrl the url of the php file that will be called

@@ -19,7 +19,7 @@ if (!isset($_POST['query'])) {
 $usersCount = 0;
 
 if ($_POST["query"] != "") {
-    $usersCount = getSearchedUsersCount($conn, $_POST["query"]);
+    $usersCount = getAllSearchedUsersCount($conn, $_POST["query"]);
 }
 
 echo $usersCount;

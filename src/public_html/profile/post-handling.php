@@ -171,8 +171,6 @@ function getPostByContent($conn, $content, $offset, $perPage) {
     $content = explode('+',$content);
     $content = implode('|', $content);
 
-    echo($content);
-
     if (!$stmt->bind_param("ssss", $content, $content, $offset, $perPage)) {
         return false;
     }

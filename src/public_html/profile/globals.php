@@ -152,6 +152,26 @@ function tryLoginCookie($conn) {
     return true;
 }
 
+/**
+ * Gets the count of users that Nickname is similar to a given pattern.
+ * @param object $conn mysqli connection
+ * @param string $search The pattern to search
+ * @return int The count of users
+ */
+function getSearchedUsersCount($conn, $search) {
+    $sql = "SELECT COUNT(*) AS Count 
+            FROM users
+            WHERE Nickname REGEXP ?";
+    
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $search);
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    return $row['Count'];
+}
+
 function saltPass($pass, $salt) {
     return $pass . "Sono Bello" . $salt;
 }

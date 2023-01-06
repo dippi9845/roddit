@@ -40,13 +40,25 @@ $(window).scroll(function() {
     }
     let query = getUrlVars()['query'];
     const postCount = ajaxGetRawOutput("/profile/get-posts-count.php", query);
-    if (window.visualizedPostCount >= postCount) {
-        return;
-    }
-    posts = ajaxLoadCards("/html-snippets/post-drawer.php", query, window.visualizedPostCount, window.cardsPerRequest);
-    $("#posts-container").append(posts);
+    const userCount = ajaxGetRawOutput("/profile/get-users-count.php", query);
 
-    window.visualizedPostCount += window.cardsPerRequest;
+    cards = "";
+
+    if (window.visualizedUserCount < userCount) {
+        cards += ajaxLoadCards("/html-snippets/user-card-drawer.php", query, window.visualizedUserCount, window.cardsPerRequest);
+
+        window.visualizedUserCount += window.cardsPerRequest;
+    }
+
+    if (window.visualizedPostCount < postCount) {
+        cards += ajaxLoadCards("/html-snippets/post-drawer.php", query, window.visualizedPostCount, window.cardsPerRequest);
+
+        window.visualizedPostCount += window.cardsPerRequest;
+    }
+
+    if (cards != "") {
+        $("#posts-container").append(cards);
+    }
  });
 
  /**

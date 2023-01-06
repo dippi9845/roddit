@@ -153,12 +153,43 @@ function tryLoginCookie($conn) {
 }
 
 /**
+ * Gets users that Nickname is similar to a given pattern and a given offset.
+ * @param object $conn mysqli connection
+ * @param string $search The pattern to search
+ * @param int $offset The offset
+ * @param int $perPage The number of users per page
+ * @return array|bool The array of users or false if an error occurred
+ */
+function getSearchedUsers($conn, $search, $offset, $perPage) {
+    $sql = "SELECT users.ID, users.Nickname, users.ProfileImagePath
+            FROM users
+            WHERE Nickname REGEXP ?
+            ORDER BY Nickname
+            LIMIT ?, ?";
+    
+    $stmt = $conn->prepare($sql);
+    if (!$stmt->bind_param("sss", $search, $offset, $perPage)) {
+        return false;
+    }
+
+    if (!$stmt->execute()) {
+        return false;
+    }
+    $result = $stmt->get_result();
+    $users = array();
+    while ($row = $result->fetch_assoc()) {
+        $users[] = $row;
+    }
+    return $users;
+}
+
+/**
  * Gets the count of users that Nickname is similar to a given pattern.
  * @param object $conn mysqli connection
  * @param string $search The pattern to search
  * @return int The count of users
  */
-function getSearchedUsersCount($conn, $search) {
+function getAllSearchedUsersCount($conn, $search) {
     $sql = "SELECT COUNT(*) AS Count 
             FROM users
             WHERE Nickname REGEXP ?";

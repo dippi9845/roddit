@@ -14,7 +14,7 @@ $(document).ready( function() {
     if (window.searchedUsersCount > 0) {
         cards += ajaxLoadCards("/html-snippets/user-card-drawer.php", query, window.visualizedUserCount, window.cardsPerRequest);
         
-        window.visualizedUserCount += window.cardsPerRequest;
+        window.visualizedUserCount += window.searchedUsersCount;
     }
     
     if (window.visualizedUserCount <= window.cardsPerRequest) {

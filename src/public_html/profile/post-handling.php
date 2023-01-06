@@ -168,8 +168,10 @@ function getPostByContent($conn, $content, $offset, $perPage) {
 
     $stmt = $conn->prepare($sql);
 
-    $content = explode(' ',$content);
+    $content = explode('+',$content);
     $content = implode('|', $content);
+
+    echo($content);
 
     if (!$stmt->bind_param("ssss", $content, $content, $offset, $perPage)) {
         return false;
@@ -201,7 +203,7 @@ function getAllPostByContentCount($conn, $content) {
 
     $stmt = $conn->prepare($sql);
 
-    $content = explode(' ',$content);
+    $content = explode('+',$content);
     $content = implode('|', $content);
 
     if (!$stmt->bind_param("ss", $content, $content)) {

@@ -28,7 +28,7 @@ $(window).scroll(function() {
     if (window.lastPostVisualized >= postCount) {
         return;
     }
-    posts = ajaxLoadPosts("/html-snippets/post-drawer.php", query, window.lastPostVisualized, window.postsPerRequest);
+    posts = ajaxLoadCards("/html-snippets/post-drawer.php", query, window.visualizedPostCount, window.cardsPerRequest);
     $("#posts-container").append(posts);
 
     window.lastPostVisualized += window.postsPerRequest;
@@ -58,14 +58,14 @@ function ajaxGetRawOutput(phpUrl, queryData) {
 }
 
 /**
- * This function creates the posts
+ * This function creates all the cards
  * @param {string} phpUrl the url of the php file that will be called
  * @param {string} queryData the query data that will be sent to the php file
  * @param {int} offset the last post that was loaded
  * @param {int} perPage the number of posts that will be loaded
- * @returns a string containing the posts
+ * @returns a string containing the cards
  */
-function ajaxLoadPosts(phpUrl, queryData, offset, perPage) {
+function ajaxLoadCards(phpUrl, queryData, offset, perPage) {
     return $.ajax({
         url: phpUrl,
         type: "POST",

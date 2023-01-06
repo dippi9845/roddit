@@ -3,16 +3,31 @@
  * It loads the first few posts and then it waits for the user to scroll down to load more posts.
  */
 $(document).ready( function() {
-    window.lastPostVisualized = 0;
-    window.postsPerRequest = 5;
-
+    window.visualizedPostCount = 0;
+    window.visualizedUserCount = 0;
+    window.cardsPerRequest = 5;
     let query = getUrlVars()['query'];
+    window.searchedUsersCount = ajaxGetRawOutput("/profile/get-users-count.php", query);
 
-    posts = ajaxLoadPosts("/html-snippets/post-drawer.php", query, window.lastPostVisualized, window.postsPerRequest);
+    cards = "";
 
-    window.lastPostVisualized += window.postsPerRequest;
+    if (window.searchedUsersCount > 0) {
+        cards += ajaxLoadCards("/html-snippets/user-card-drawer.php", query, window.visualizedUserCount, window.cardsPerRequest);
+        
+        window.visualizedUserCount += window.cardsPerRequest;
+    }
+    
+    if (window.visualizedUserCount <= window.cardsPerRequest) {
+        cards += ajaxLoadCards("/html-snippets/post-drawer.php", query, window.visualizedPostCount, window.cardsPerRequest-window.visualizedUserCount);
 
-    $("#posts-container").append(posts);
+        window.visualizedPostCount += window.cardsPerRequest;
+    }
+    
+    if (cards == "") {
+        cards = "<h1>No content found</h1>";
+    }
+
+    $("#posts-container").append(cards);
 });
 
 /**
@@ -25,13 +40,13 @@ $(window).scroll(function() {
     }
     let query = getUrlVars()['query'];
     const postCount = ajaxGetRawOutput("/profile/get-posts-count.php", query);
-    if (window.lastPostVisualized >= postCount) {
+    if (window.visualizedPostCount >= postCount) {
         return;
     }
     posts = ajaxLoadCards("/html-snippets/post-drawer.php", query, window.visualizedPostCount, window.cardsPerRequest);
     $("#posts-container").append(posts);
 
-    window.lastPostVisualized += window.postsPerRequest;
+    window.visualizedPostCount += window.cardsPerRequest;
  });
 
  /**

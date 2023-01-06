@@ -24,8 +24,8 @@ $(window).scroll(function() {
         return;
     }
     let query = getUrlVars()['query'];
-    const postsID = ajaxGetPostsCount("/profile/get-posts-count.php", query);
-    if (window.lastPostVisualized >= postsID) {
+    const postCount = ajaxGetRawOutput("/profile/get-posts-count.php", query);
+    if (window.lastPostVisualized >= postCount) {
         return;
     }
     posts = ajaxLoadPosts("/html-snippets/post-drawer.php", query, window.lastPostVisualized, window.postsPerRequest);
@@ -43,12 +43,12 @@ $(window).scroll(function() {
 });
 
 /**
- * This function returns the number of posts that will be loaded.
+ * This function returns the output of a php file given a query input.
  * @param {string} phpUrl the url of the php file that will be called
  * @param {string} queryData the query data that will be sent to the php file
- * @returns the number of posts that will be loaded
+ * @returns a string containing the output of the php file
  */
-function ajaxGetPostsCount(phpUrl, queryData) {
+function ajaxGetRawOutput(phpUrl, queryData) {
     return $.ajax({
         url: phpUrl,
         type: "POST",

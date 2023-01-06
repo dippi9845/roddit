@@ -28,14 +28,9 @@ if ($_POST["query"] == "") {
     $posts = getPostByContent($conn, $_POST["query"], $_POST['offset'], $_POST['limit']);
 }
 
-$noContent = $posts == null || count($posts) == 0;
-
 foreach ($posts as $post) {
     drawPost($post['ID'], $post['UserID'], $post['Nickname'], $post['ProfileImagePath'], $post['Title'], $post['Text'], $post['Likes'], isLiked($conn, $post['ID'], $_SESSION['userID']), null, $post['PathToFile']);
 }
 
-if ($noContent) {
-    echo "<h1>No content found</h1>";
-}
 $conn->close();
 ?>

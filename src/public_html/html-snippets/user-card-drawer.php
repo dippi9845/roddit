@@ -1,0 +1,33 @@
+<?php
+
+include_once($_SERVER['DOCUMENT_ROOT'].'/profile/globals.php');
+include_once($_SERVER['DOCUMENT_ROOT'].'/html-snippets/user.php');
+
+if (!isUserLoggedIn(true)) {
+    header('Location: /login.php');
+}
+
+$file = file_get_contents($_SERVER['DOCUMENT_ROOT'].'/../setup.json');
+$data = json_decode($file, false);
+
+$conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserName);
+
+if (!isset($_POST['query'])) {
+    $_POST['query'] = "";
+}
+
+if (!isset($_POST['offset']) || !isset($_POST['limit'])) {
+    $_POST['offset'] = 0;
+    $_POST['limit'] = 5;
+}
+
+if ($_POST["query"] != "") {
+    $users = getSearchedUsers($conn, $_POST["query"], $_POST['offset'], $_POST['limit']);
+
+    foreach ($users as $user) {
+        drawUserCard($user['ID'], $user['Nickname'], $user['ProfileImagePath']);
+    }
+}
+
+$conn->close();
+?>

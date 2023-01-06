@@ -2,6 +2,7 @@
 
 include_once($_SERVER['DOCUMENT_ROOT'].'/profile/globals.php');
 include_once($_SERVER['DOCUMENT_ROOT'].'/html-snippets/user.php');
+include_once($_SERVER['DOCUMENT_ROOT'] . '/profile/user-getters.php');
 
 if (!isUserLoggedIn(true)) {
     header('Location: /login.php');
@@ -25,9 +26,11 @@ if ($_POST["query"] != "") {
     $users = getSearchedUsers($conn, $_POST["query"], $_POST['offset'], $_POST['limit']);
 
     foreach ($users as $user) {
-        drawUserCard($user['ID'], $user['Nickname'], $user['ProfileImagePath']);
+        drawUserCard($user['ID'], $user['Nickname'], $user['ProfileImagePath'], isFollowing($conn, $user['ID'], $_SESSION['userID']), getUserFollowerCount($conn, $user['ID']), getUserFollowingCount($conn, $user['ID']));
     }
 }
 
 $conn->close();
 ?>
+
+<script src="assets/js/btn-ajax-form.js"></script>

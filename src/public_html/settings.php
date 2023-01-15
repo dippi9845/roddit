@@ -1,21 +1,21 @@
 <?php
 include_once($_SERVER['DOCUMENT_ROOT'].'/profile/globals.php');
+session_start();
 
 $err = false;
 $text_err = "";
 
 if (isset($_POST['new-email'])) {
-    
-    
-    if (filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
+
+    if (filter_var($_POST['new-email'], FILTER_VALIDATE_EMAIL)) {
+
         $new_email = htmlspecialchars($_POST['new-email'], ENT_QUOTES, 'UTF-8');
         $data = json_decode(file_get_contents($_SERVER['DOCUMENT_ROOT'].'/../setup.json'));
         
         $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserName);
         $stmt = $conn->prepare("UPDATE `users` SET `Email` = ? WHERE `ID` = ?");
-        $stmt->bind_param("si", $new_email, $_SESSION['UserID']);
+        $stmt->bind_param("si", $new_email, $_SESSION['userID']);
         $stmt->execute();
-        
         $stmt->close();
         $conn->close();
     }
@@ -136,7 +136,7 @@ if (file_exists($_FILES['new-photo']['tmp_name']) && is_uploaded_file($_FILES['n
         <div class="row">
             <div class="col-md-6"><img></div>
             <div class="col-md-6">
-                <form>
+                <form method="post" autocomplete="off">
                     <div class="row setting-row">
                         <div class="col">
                             <label class="form-label">Change email</label>
@@ -167,7 +167,7 @@ if (file_exists($_FILES['new-photo']['tmp_name']) && is_uploaded_file($_FILES['n
                             <label class="form-label">Change Profile image</label>
                             <input class="form-control" type="file">
                         </div>
-                    </div><button class="btn btn-primary" type="button" style="margin-top: 20px;">Update</button>
+                    </div><button class="btn btn-primary" type="submit" style="margin-top: 20px;">Update</button>
                 </form>
             </div>
         </div>

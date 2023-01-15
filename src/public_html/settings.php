@@ -5,6 +5,22 @@ session_start();
 $err = false;
 $text_err = "";
 
+$data = json_decode(file_get_contents($_SERVER['DOCUMENT_ROOT'].'/../setup.json'));
+
+$conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserName);
+$stmt = $conn->prepare("SELECT ProfileImagePath FROM `users` WHERE `ID` = ?");
+$stmt->bind_param("i", $_SESSION['userID']);
+$stmt->execute();
+
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+$photoPath = $row['ProfileImagePath'];
+
+$stmt->close();
+$conn->close();
+
+
+
 if (isset($_POST['new-email']) && !empty($_POST['new-email'])) {
 
     if (filter_var($_POST['new-email'], FILTER_VALIDATE_EMAIL)) {
@@ -95,7 +111,7 @@ if (isset($_FILES['new-photo']) && file_exists($_FILES['new-photo']['tmp_name'])
             $data = json_decode(file_get_contents($_SERVER['DOCUMENT_ROOT'].'/../setup.json'));
         
             $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserName);
-            $stmt = $conn->prepare("UPDATE `users` SET `Photo` = ? WHERE `ID` = ?");
+            $stmt = $conn->prepare("UPDATE `users` SET `ProfileImagePath` = ? WHERE `ID` = ?");
             $stmt->bind_param("si", $path, $_SESSION['userID']);
             $stmt->execute();
             
@@ -118,7 +134,7 @@ if (isset($_FILES['new-photo']) && file_exists($_FILES['new-photo']['tmp_name'])
     <title>Roddit</title>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
-    <link rel="stylesheet" href="assets/css/settings.css"> <!-- importarlo in questa dir, rinominarlo -->
+    <link rel="stylesheet" href="assets/css/settings.css">
 </head>
 
 <body>
@@ -136,12 +152,14 @@ if (isset($_FILES['new-photo']) && file_exists($_FILES['new-photo']['tmp_name'])
         </div>
         <?php } ?>
         <div class="row">
-            <div class="col-md-6"><img></div>
+            <div class="col-md-6">
+                <img src="<?= $photoPath ?>" style="max-width: 300px;" >
+            </div>
             <div class="col-md-6">
                 <form method="post" autocomplete="off">
                     <div class="row setting-row">
                         <div class="col">
-                            <label class="form-label">Change email</label>
+                            <label class="form-label">Change Email</label>
                             <input class="form-control" type="email" placeholder="New Email" name="new-email">
                         </div>
                     </div>
@@ -159,14 +177,14 @@ if (isset($_FILES['new-photo']) && file_exists($_FILES['new-photo']['tmp_name'])
                     </div>
                     <div class="row setting-row">
                         <div class="col">
-                            <label class="form-label">Change password</label>
+                            <label class="form-label">Change Password</label>
                             <input class="form-control" type="password" name="new-password" placeholder="New Password">
                             <input class="form-control" type="password" name="confirm-new-pass" placeholder="Confirm new password" style="margin-top: 20px;">
                         </div>
                     </div>
                     <div class="row setting-row">
                         <div class="col">
-                            <label class="form-label">Change Profile image</label>
+                            <label class="form-label">Change Profile Image</label>
                             <input class="form-control" type="file" name="new-photo">
                         </div>
                     </div>

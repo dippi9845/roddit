@@ -17,23 +17,16 @@ $row = $result->fetch_assoc();
 $photoPath = $row['ProfileImagePath'];
 
 $stmt->close();
-$conn->close();
-
-
 
 if (isset($_POST['new-email']) && !empty($_POST['new-email'])) {
 
     if (filter_var($_POST['new-email'], FILTER_VALIDATE_EMAIL)) {
-
         $new_email = htmlspecialchars($_POST['new-email'], ENT_QUOTES, 'UTF-8');
-        $data = json_decode(file_get_contents($_SERVER['DOCUMENT_ROOT'].'/../setup.json'));
-        
-        $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserName);
+  
         $stmt = $conn->prepare("UPDATE `users` SET `Email` = ? WHERE `ID` = ?");
         $stmt->bind_param("si", $new_email, $_SESSION['userID']);
         $stmt->execute();
         $stmt->close();
-        $conn->close();
     }
 
     else {
@@ -55,15 +48,11 @@ if (isset($_POST['new-nickname']) && !empty($_POST['new-nickname'])) {
 
     if ( !$err ) {
         $new_nickname = htmlspecialchars($_POST['new-nickname'], ENT_QUOTES, 'UTF-8');
-        $data = json_decode(file_get_contents($_SERVER['DOCUMENT_ROOT'].'/../setup.json'));
         
-        $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserName);
         $stmt = $conn->prepare("UPDATE `users` SET `Nickname` = ? WHERE `ID` = ?");
         $stmt->bind_param("si", $new_nickname, $_SESSION['userID']);
         $stmt->execute();
-        
         $stmt->close();
-        $conn->close();
     }
 }
 
@@ -75,32 +64,26 @@ if (isset($_POST['new-password']) && $_POST['new-password'] != "" && isset($_POS
     }
 
     if ( !$err ) {
-        $data = json_decode(file_get_contents($_SERVER['DOCUMENT_ROOT'].'/../setup.json'));
         
         $salt = uniqid();
         $password = password_hash(saltPass($password, $salt), PASSWORD_DEFAULT);
         
-        $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserName);
         $stmt = $conn->prepare("UPDATE `users` SET `Password` = ?, Salt = ? WHERE `ID` = ?");
         $stmt->bind_param("ssi", $password, $salt, $_SESSION['userID']);
         $stmt->execute();
         
         $stmt->close();
-        $conn->close();
     }
 }
 
 if (isset($_POST['new-biography']) && !empty($_POST['new-biography'])) {
     $new_biography = htmlspecialchars($_POST['new-biography'], ENT_QUOTES, 'UTF-8');
-    $data = json_decode(file_get_contents($_SERVER['DOCUMENT_ROOT'].'/../setup.json'));
     
-    $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserName);
     $stmt = $conn->prepare("UPDATE `users` SET `Bio` = ? WHERE `ID` = ?");
     $stmt->bind_param("si", $new_biography, $_SESSION['userID']);
     $stmt->execute();
     
     $stmt->close();
-    $conn->close();
 }
 
 if (isset($_FILES['new-photo']) && file_exists($_FILES['new-photo']['tmp_name']) && is_uploaded_file($_FILES['new-photo']['tmp_name'])) {
@@ -108,21 +91,19 @@ if (isset($_FILES['new-photo']) && file_exists($_FILES['new-photo']['tmp_name'])
     if ($check !== false) {
         $path = saveImage($_FILES['new-photo']);
         if ($path != false) {
-            $data = json_decode(file_get_contents($_SERVER['DOCUMENT_ROOT'].'/../setup.json'));
         
-            $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserName);
             $stmt = $conn->prepare("UPDATE `users` SET `ProfileImagePath` = ? WHERE `ID` = ?");
             $stmt->bind_param("si", $path, $_SESSION['userID']);
             $stmt->execute();
             
             $stmt->close();
-            $conn->close();
         }
         
     }
 
 }
 
+$conn->close();
 ?>
 
 <!DOCTYPE html>

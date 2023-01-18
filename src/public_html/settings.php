@@ -154,6 +154,7 @@ if (isset($_FILES['new-photo']) && file_exists($_FILES['new-photo']['tmp_name'])
         <div class="row">
             <div class="col-md-6">
                 <img src="<?= $photoPath ?>" style="max-width: 300px;" >
+                <!-- Mostrare i dati attuali -->
             </div>
             <div class="col-md-6">
                 <form method="post" autocomplete="off">

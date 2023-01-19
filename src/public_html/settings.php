@@ -8,15 +8,6 @@ $text_err = "";
 $data = json_decode(file_get_contents($_SERVER['DOCUMENT_ROOT'].'/../setup.json'));
 
 $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserName);
-$stmt = $conn->prepare("SELECT ProfileImagePath, Email, Nickname, Bio FROM `users` WHERE `ID` = ?");
-$stmt->bind_param("i", $_SESSION['userID']);
-$stmt->execute();
-
-$result = $stmt->get_result();
-$row = $result->fetch_assoc();
-$photoPath = $row['ProfileImagePath'];
-
-$stmt->close();
 
 if (isset($_POST['new-email']) && !empty($_POST['new-email'])) {
 
@@ -102,6 +93,16 @@ if (isset($_FILES['new-photo']) && file_exists($_FILES['new-photo']['tmp_name'])
     }
 
 }
+
+$stmt = $conn->prepare("SELECT ProfileImagePath, Email, Nickname, Bio FROM `users` WHERE `ID` = ?");
+$stmt->bind_param("i", $_SESSION['userID']);
+$stmt->execute();
+
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+$photoPath = $row['ProfileImagePath'];
+
+$stmt->close();
 
 $conn->close();
 ?>

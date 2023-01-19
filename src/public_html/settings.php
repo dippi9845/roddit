@@ -8,7 +8,7 @@ $text_err = "";
 $data = json_decode(file_get_contents($_SERVER['DOCUMENT_ROOT'].'/../setup.json'));
 
 $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserName);
-$stmt = $conn->prepare("SELECT ProfileImagePath FROM `users` WHERE `ID` = ?");
+$stmt = $conn->prepare("SELECT ProfileImagePath, Email, Nickname, Bio FROM `users` WHERE `ID` = ?");
 $stmt->bind_param("i", $_SESSION['userID']);
 $stmt->execute();
 
@@ -135,7 +135,11 @@ $conn->close();
         <div class="row">
             <div class="col-md-6">
                 <img src="<?= $photoPath ?>" style="max-width: 300px;" >
-                <!-- Mostrare i dati attuali -->
+                <p>
+                    <strong>Email: </strong><?= $row['Email'] ?> <br>
+                    <strong>Nickname: </strong><?= $row['Nickname'] ?> <br>
+                    <strong>Biography: </strong><?= $row['Bio'] ?> <br>
+                </p>
             </div>
             <div class="col-md-6">
                 <form method="post" autocomplete="off">

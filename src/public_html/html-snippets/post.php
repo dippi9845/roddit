@@ -52,6 +52,7 @@ function drawPost($postID, $creatorID, $creatorName, $creatorProfilePicture, $ti
                         </button>
                         </form>
                     <?php } ?>
+                    <!--
                     <form id="post-like-form-<?= $postID ?>" action="profile/like-post.php" method="post">
                             <input type="hidden" name="postID" value="<?= $postID ?>">
                             <button type="submit" class="btn btn-light btn-ajax-form">
@@ -60,6 +61,7 @@ function drawPost($postID, $creatorID, $creatorName, $creatorProfilePicture, $ti
                             </svg><?= " ".$comments ?>
                         </button>
                     </form>
+                    -->
                 </div>
             </div>
         </div>

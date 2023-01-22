@@ -1,4 +1,5 @@
 <?php
+include_once $_SERVER['DOCUMENT_ROOT'].'/profile/user-getters.php';
 
 /**
  * Creates a new post with a file.
@@ -12,7 +13,8 @@
 function createPostWithFile($conn, $title, $text, $path, $type) {
     $sql = "INSERT INTO post (Creator, Title, Text, PathToFile, MediaType) VALUES (?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
-    if (!$stmt->bind_param("sssss", $_SESSION['userID'], $title, $text, $path, $type)) {
+    $username = getUserNameByID($conn, $_SESSION['userID']);
+    if (!$stmt->bind_param("sssss", $username, $title, $text, $path, $type)) {
         return false;
     }
     if (!$stmt->execute()) {
@@ -30,9 +32,10 @@ function createPostWithFile($conn, $title, $text, $path, $type) {
  * @return boolean true if successful
  */
 function createPost($conn, $title, $text) {
-    $sql = "INSERT INTO post (Creator, Title, Text) VALUES (?, ?, ?)";
+    $sql = "INSERT INTO post (Creator, Title, Text) VALUE (?, ?, ?)";
     $stmt = $conn->prepare($sql);
-    if (!$stmt->bind_param("sss", $_SESSION['userID'], $title, $text)) {
+    $username = getUserNameByID($conn, $_SESSION['userID']);
+    if (!$stmt->bind_param("sss", $username, $title, $text)) {
         return false;
     }
 
@@ -52,10 +55,11 @@ function createPost($conn, $title, $text) {
 function getUsersPosts($conn, $userID) {
     $sql = "SELECT post.*, users.Nickname
             FROM post
-            INNER JOIN users ON post.Creator = users.ID
+            INNER JOIN users ON post.Creator = users.Nickname
             WHERE Creator = ?;";
     $stmt = $conn->prepare($sql);
-    if (!$stmt->bind_param("s", $userID)) {
+    $username = getUserNameByID($conn, $userID);
+    if (!$stmt->bind_param("s", $username)) {
         return false;
     }
     if (!$stmt->execute()) {
@@ -105,12 +109,12 @@ function isLiked($conn, $postID, $userID) {
 function getPostOfFollowedUsers($conn, $userID, $offset, $perPage) {
     $sql = "SELECT post.*, users.Nickname, users.ProfileImagePath, users.ID AS UserID
             FROM post
-            INNER JOIN users ON post.Creator = users.ID
-            WHERE Creator IN (SELECT Following FROM follow WHERE Follower = ?)
+            INNER JOIN users ON post.Creator = users.Nickname
+            WHERE users.ID IN (SELECT Following FROM follow WHERE Follower = ?)
             ORDER BY ID
             LIMIT ?, ?;";
     $stmt = $conn->prepare($sql);
-    if (!$stmt->bind_param("sss", $userID, $offset, $perPage)) {
+    if (!$stmt->bind_param("sii", $userID, $offset, $perPage)) {
         return false;
     }
     if (!$stmt->execute()) {
@@ -133,8 +137,8 @@ function getPostOfFollowedUsers($conn, $userID, $offset, $perPage) {
 function getAllPostOfFollowedUsersCount($conn, $userID) {
     $sql = "SELECT COUNT(DISTINCT post.ID) AS 'Total'
             FROM post
-            INNER JOIN users ON post.Creator = users.ID
-            WHERE Creator IN (SELECT Following FROM follow WHERE Follower = ?)
+            INNER JOIN users ON post.Creator = users.Nickname
+            WHERE users.ID IN (SELECT Following FROM follow WHERE Follower = ?)
             ORDER BY post.ID";
     $stmt = $conn->prepare($sql);
     if (!$stmt->bind_param("s", $userID)) {
@@ -160,7 +164,7 @@ function getAllPostOfFollowedUsersCount($conn, $userID) {
 function getPostByContent($conn, $content, $offset, $perPage) {
     $sql = "SELECT post.*, users.Nickname, users.ProfileImagePath, users.ID AS UserID
             FROM post
-            INNER JOIN users ON post.Creator = users.ID
+            INNER JOIN users ON post.Creator = users.Nickname
             WHERE Title REGEXP ?
             OR Text REGEXP ?
             ORDER BY ID DESC
@@ -194,7 +198,7 @@ function getPostByContent($conn, $content, $offset, $perPage) {
 function getAllPostByContentCount($conn, $content) {
     $sql = "SELECT COUNT(DISTINCT post.ID) AS 'Total'
             FROM post
-            INNER JOIN users ON post.Creator = users.ID
+            INNER JOIN users ON post.Creator = users.Nickname
             WHERE Title REGEXP ?
             OR Text REGEXP ?
             ORDER BY post.ID DESC;";

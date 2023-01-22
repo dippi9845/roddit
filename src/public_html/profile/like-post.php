@@ -1,5 +1,5 @@
 <?php
-include_once $_SERVER['DOCUMENT_ROOT'].'/notify.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/profile/notify.php';
 
 /**
  * Likes a post adding it to the likes table.

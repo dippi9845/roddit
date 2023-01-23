@@ -1,6 +1,15 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
 session_start();
+
+if (!isset($_GET['o'])) {
+    $_GET['o'] = 0;
+}
+
+if (!isset($_GET['n'])) {
+    $_GET['n'] = 5;
+}
+
 if (isset($_SESSION['userID'])) {
     $data = json_decode(file_get_contents($_SERVER['DOCUMENT_ROOT'].'/../setup.json'));
     $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserName);

@@ -59,10 +59,18 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
             </div>
             <div>
                 <div class="dropdown" style="width: fit-content;">
-                    <ul class="dropdown-menu" style="margin-top: 37px;" id="notification-list">
+                    <ul class="dropdown-menu" style="margin-top: 37px; max-height: 350px; overflow-y: scroll;" id="notification-list">
                     </ul>
                 </div>
-                <button id="noti-drop" class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Notifications</button>
+                <button id="noti-drop" class="btn btn-primary dropdown-toggle position-relative" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
+                    </span>
+
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bell-fill" viewBox="0 0 16 16">
+                        <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zm.995-14.901a1 1 0 1 0-1.99 0A5.002 5.002 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901z"/>
+                    </svg>
+                </button>
+                
                 <a class="btn btn-primary" onclick="window.location='profile.php';" role="button" href="#">My Profile</a>
             </div>
         </div>

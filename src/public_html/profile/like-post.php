@@ -30,7 +30,8 @@ $data = json_decode($file, false);
 $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserName);
 
 likePost($conn, $_SESSION['userID'], $_POST['postID']);
-notify_user($conn, $_POST['userID'], "New like", "You have a new like!");
+// reperire utente del post
+//notify_user($conn, $_POST['userID'], "New like", "You have a new like!");
 
 $conn->close();
 

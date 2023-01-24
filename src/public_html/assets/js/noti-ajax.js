@@ -1,34 +1,79 @@
 let latest = null;
-let first = null;
+let showed = 0;
+let badge = false;
+$('#noti-drop > span').hide();
 
 $('#noti-drop').on('show.bs.dropdown', function () {
-    $.ajax({
-        url: 'ajax/get-last-notification.php',
-        type: 'GET',
-        dataType: 'html',
-        success: function (data) {
-            data = JSON.parse(data);
-            console.log(data);
-            if (latest == null || latest < data['ID']) {
-                latest = data['ID'];
-                show();
-            }
+    var nty = null;
+    showing = true;
+    badge = false;
+    $('#noti-drop > span').hide(); // hide the badge
+
+    let tmp = getLatest();
+    
+    if (latest == null) {
+        latest = tmp;
+        nty = show(0);
+        console.log(nty);
+    }
+
+    else if (latest < tmp) {
+        // here, means there are new notifications
+        // start from the latest notification 0,
+        // and take the difference that must be 
+        nty = show(0, tmp - latest);
+        latest = tmp;
+    }
+
+    if (nty != null) {
+        for (var i = nty.length - 1; i >= 0 ; i--) {
+            $('#notification-list').prepend('<li class="dropdown-item"><h5>' + nty[i]['Title'] + '</h5><p>' + nty[i]['Message'] + '<br><span style="font-size:10px">' + nty[i]['Inserimento'] + '</span></p></li>');
         }
-    });
+        showed += nty.length;
+    }
+    
 });
 
-function show(latestID) {
+// TODO: caricamento delle precedenti
+// TODO: salvare il latest nei cookies
+
+setInterval(function () {
+    if (latest == null) return;
+    var tmp = getLatest();
+    
+    if (latest < tmp) {
+        badge = true;
+        $('#noti-drop > span').show();
+    }
+}, 1000);
+
+function getLatest() {
+    var latest_r = null;
     $.ajax({
-        url: 'ajax/get-my-notification.php?l=' + latestID,
+        async: false,
+        url: 'ajax/get-last-notification.php',
         type: 'GET',
-        dataType: 'html',
+        dataType: 'json',
         success: function (data) {
-            data = JSON.parse(data);
-            console.log(data);
-            for (var i = 0; i < data.length; i++) {
-                $('#notification-list')
-                .append('<li class="dropdown-item"><h4> ' + data[i]['Title'] + ' </h4><p> ' + data[i]['Message'] + ' </p></li>');
-            }
+            latest_r = data[0]['ID'];
         }
     });
+    
+    return latest_r;
+}
+
+function show(offset = 0, limit = 5) {
+    var rdata = null;
+    $.ajax({
+        async: false,
+        url: 'ajax/get-my-notification.php',
+        type: 'GET',
+        data : { o : offset, n : limit },
+        dataType: 'json',
+        success: function (data) {
+            //console.log(data);
+            rdata = data;
+        }
+    });
+    return rdata;
 }

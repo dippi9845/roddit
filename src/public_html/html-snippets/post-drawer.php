@@ -29,7 +29,7 @@ if ($_POST["query"] == "") {
 }
 
 foreach ($posts as $post) {
-    drawPost($post['ID'], $post['UserID'], $post['Nickname'], $post['ProfileImagePath'], $post['Title'], $post['Text'], $post['Likes'], isLiked($conn, $post['ID'], $_SESSION['userID']), null, $post['PathToFile']);
+    drawPost($post['ID'], $post['UserID'], $post['Nickname'], $post['ProfileImagePath'], $post['Title'], $post['Text'], $post['Likes'], isLiked($conn, $post['ID'], $_SESSION['userID']), $post['Comments'], $post['PathToFile']);
 }
 
 $conn->close();

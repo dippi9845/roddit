@@ -34,5 +34,3 @@ foreach ($posts as $post) {
 
 $conn->close();
 ?>
-
-<script src="assets/js/btn-ajax-form.js"></script>

@@ -30,6 +30,15 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
     <link rel="stylesheet" href="assets/css/index.css">
     <link rel="stylesheet" href="assets/css/post.css">
     <link rel="stylesheet" href="assets/css/icon-colors.css">
+    <style>
+        .modal {
+            position: absolute;
+            float: left;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
 </head>
 
 <body>
@@ -75,21 +84,35 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
             </div>
         </div>
     </nav>
+
     <div class="container" id="posts-container">
         
     </div>
-    <div id="modal-comment" class="modal fade modal-dialog modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-dialog">
+
+    <div id="modal-comment" class="modal fade" >
+        <div class="modal-lg modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
             <div class="modal-header">
                 <h1 class="modal-title fs-5" id="exampleModalLabel">Comments</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div id="modal-comment-body" class="modal-body">
+            <div style="overflow-y: scroll; max-height: 800px;">
+           </div>
+           <form class="row row-cols-lg-auto g-3 align-items-center" style="margin-top: 25px;">
+                <input type="hidden" id="post-id-for-comment" name="post-id">
+                <div class="mb-3">
+                    <label for="comment-textarea" class="form-label">Comment</label>
+                    <textarea class="form-control" style="width: 500px;" id="comment-textarea" rows="3"></textarea>
+                </div>
+
+                <div class="col-12">
+                    <button class="btn btn-success">Commenta</button>
+                </div>
+            </form>
             </div>
             <div class="modal-footer">
-                <!-- <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> -->
-                <button type="button" class="btn btn-primary">Close</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
             </div>
             </div>
         </div>

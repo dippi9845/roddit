@@ -38,6 +38,15 @@ if (!userExists($conn, $visitedUser)) {
     <link rel="stylesheet" href="assets/css/post.css">
     <link rel="stylesheet" href="assets/css/profile.css">
     <link rel="stylesheet" href="assets/css/icon-colors.css">
+    <style>
+        .modal {
+            position: absolute;
+            float: left;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
 </head>
 
 <body>
@@ -105,14 +114,27 @@ if (!userExists($conn, $visitedUser)) {
         ?>
     </div>
 
-    <div id="modal-comment" class="modal fade">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div id="modal-comment" class="modal fade" >
+        <div class="modal-lg modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
             <div class="modal-header">
                 <h1 class="modal-title fs-5" id="exampleModalLabel">Comments</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div id="modal-comment-body" class="modal-body">
+            <div style="overflow-y: scroll; max-height: 800px;">
+           </div>
+           <form class="row row-cols-lg-auto g-3 align-items-center" style="margin-top: 25px;" action="">
+                <input type="hidden" id="post-id-for-comment" name="post-id">
+                <div class="mb-3">
+                    <label for="comment-textarea" class="form-label">Comment</label>
+                    <textarea class="form-control" style="width: 500px;" id="comment-textarea" rows="3"></textarea>
+                </div>
+
+                <div class="col-12">
+                    <button id="send-comment" class="btn btn-success">Commenta</button>
+                </div>
+            </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
@@ -124,9 +146,6 @@ if (!userExists($conn, $visitedUser)) {
     <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <!--
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-    -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.3.0/jquery.form.min.js" integrity="sha384-qlmct0AOBiA2VPZkMY3+2WqkHtIQ9lSdAsAn5RUJD/3vA5MKDgSGcdmIv4ycVxyn" crossorigin="anonymous"></script>
     <script src="assets/js/btn-ajax-form.js"></script>
     <script src="assets/js/comments-ajax.js"></script>

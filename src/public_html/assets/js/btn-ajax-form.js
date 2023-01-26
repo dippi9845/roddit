@@ -13,7 +13,6 @@ $(".btn-ajax-form-like").click(function() {
             
             if (button.children(":first").attr("class").includes("red-heart")) {
                 // mette like
-                console.log("ciao");
                 let n = Number(button.text());
                 button.html(blankHeart + " " + String(n - 1));
                 button.closest("form").attr('action', 'profile/like-post.php');
@@ -21,7 +20,6 @@ $(".btn-ajax-form-like").click(function() {
             }
             else {
                 // toglie like
-                console.log("miao");
                 let n = Number(button.text());
                 button.html(redHeart + " " + String(n + 1));
                 button.closest("form").attr('action', 'profile/dislike-post.php');

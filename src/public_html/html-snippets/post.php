@@ -32,7 +32,7 @@ function drawPost($postID, $creatorID, $creatorName, $creatorProfilePicture, $ti
                     <img src=' <?= $pathToImage ?> ' class='card-img-top post-img img-fluid' alt='...'>
                 <?php } ?>
                 
-                <div class="d-flex p-2">
+                <div class="d-flex p-2" id="button-section-<?= $postID ?>">
                     <?php if ($isLikedByMe) {?>
                         <form id="post-dislike-form-<?= $postID ?>" action="profile/dislike-post.php" method="post">
                             <input type="hidden" name="postID" value="<?= $postID ?>">

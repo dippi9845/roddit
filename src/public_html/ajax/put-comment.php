@@ -1,5 +1,5 @@
 <?php
-include_once $_SERVER['DOCUMENT_ROOT'].'/../functions.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/profile/user-getters.php';
 header('Content-Type: application/json; charset=utf-8');
 session_start();
 
@@ -9,7 +9,8 @@ if (isset($_SESSION['userID']) && isset($_GET['text']) && isset($_GET['postID'])
     $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserName);
 
     $stmt = $conn->prepare("INSERT INTO comment (User, entityID, entityType, Text) VALUE (?, ?, 'Post', ?)");
-    $stmt->bind_param("sis", getUserNameByID($conn, $_SESSION['userID']), $_GET['postID'], $_GET['text']);
+    $username = getUserNameByID($conn, $_SESSION['userID']);
+    $stmt->bind_param("sis", $username , $_GET['postID'], $_GET['text']);
     $stmt->execute();
     $stmt->close();
 

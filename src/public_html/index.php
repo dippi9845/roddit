@@ -107,7 +107,7 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
                 </div>
 
                 <div class="col-12">
-                    <button class="btn btn-success">Commenta</button>
+                    <button id="send-comment" class="btn btn-success">Commenta</button>
                 </div>
             </form>
             </div>

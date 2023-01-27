@@ -17,6 +17,15 @@ function get_post_creator($conn, $postID) {
     return $result->fetch_all(MYSQLI_ASSOC)[0]['ID'];
 }
 
+function get_post_title($conn, $postID) {
+    $stmt = $conn->prepare("SELECT Title FROM post WHERE ID = ?");
+    $stmt->bind_param("i", $postID);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $stmt->close();
+    return $result->fetch_all(MYSQLI_ASSOC)[0]['Title'];
+}
+
 function notify_user($conn, $userID, $title, $message) {
     $stmt = $conn->prepare("INSERT INTO notification (UserID, Title, Message) VALUES (?, ?, ?)");
     $stmt->bind_param("iss", $userID, $title, $message);

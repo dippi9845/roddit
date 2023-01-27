@@ -1,5 +1,6 @@
 <?php
-include_once $_SERVER['DOCUMENT_ROOT'].'/notify.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/profile/notify.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/profile/user-getters.php';
 
 /**
  * Follows a user adding it to the follow table.
@@ -22,9 +23,9 @@ $data = json_decode($file, false);
 
 $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserName);
 
-followUser($conn, $_SESSION['userID'], $_POST['followedUser']); // TODO: fare un escape di $_POST['followedUser']
+followUser($conn, $_SESSION['userID'], $_POST['followedUser']);
 
-notify_user($conn, $_POST['followedUser'], "New follower", "You have a new follower!");
+notify_user($conn, $_POST['followedUser'], "New follower", "You have a new follower: " . getUserNameByID($conn, $_SESSION['userID']));
 
 $conn->close();
 

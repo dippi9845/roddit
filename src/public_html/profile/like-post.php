@@ -1,5 +1,6 @@
 <?php
 include_once $_SERVER['DOCUMENT_ROOT'].'/profile/notify.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/profile/user-getters.php';
 
 /**
  * Likes a post adding it to the likes table.
@@ -31,7 +32,7 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
 
 likePost($conn, $_SESSION['userID'], $_POST['postID']);
 // reperire utente del post
-notify_user($conn, get_post_creator($conn, $_POST['postID']), "New like", "You have a new like!");
+notify_user($conn, get_post_creator($conn, $_POST['postID']), "New like", "You have a new like, from ".getUserNameByID($conn, $_SESSION['userID'])." on your post: ".substr(get_post_title($conn, $_POST['postID']), 0, 100));
 
 $conn->close();
 

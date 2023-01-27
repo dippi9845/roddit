@@ -33,7 +33,7 @@ if (isset($_SESSION['userID']) && isset($_GET['text']) && isset($_GET['postID'])
 
     $stmt->close();
 
-    notify_user($conn, get_post_creator($conn, $_GET['postID']), "New comment", "You have a new comment to a post!");
+    notify_user($conn, get_post_creator($conn, $_GET['postID']), "New comment", "You have a new comment to a post: ".substr(get_post_title($conn, $_GET['postID']), 0, 100)." , from ".getUserNameByID($conn, $_SESSION['userID']));
     
     $conn->close();
 

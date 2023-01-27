@@ -27,9 +27,7 @@ $('#noti-drop').on('show.bs.dropdown', function () {
     }
 
     if (nty != null) {
-        for (var i = nty.length - 1; i >= 0 ; i--) {
-            $('#notification-list').prepend('<li class="dropdown-item"><h5>' + nty[i]['Title'] + '</h5><p>' + nty[i]['Message'] + '<br><span style="font-size:10px">' + nty[i]['Inserimento'] + '</span></p></li>');
-        }
+        drawNotifications(nty);
         showed += nty.length;
     }
     
@@ -49,11 +47,30 @@ setInterval(function () {
 }, 1000);
 
 setInterval(function () {
-    if (notificationList.scrollTop() + notificationList.height() >= notificationList[0].scrollHeight) {
+    if (notificationList.scrollTop() + notificationList.height() + 20 >= notificationList[0].scrollHeight) {
         console.log('bottom');
-        show(showed);
+        let a = show(showed);
+        if (a != null) {
+            drawNotifications(a, false);
+            showed += a.length;
+        }
     }
 }, 1000);
+
+
+function drawNotifications(nty, preppend = true) {
+    if (preppend) {
+        for (var i = nty.length - 1; i >= 0 ; i--) {
+            $('#notification-list').prepend('<li class="dropdown-item"><h5>' + nty[i]['Title'] + '</h5><p>' + nty[i]['Message'] + '<br><span style="font-size:10px">' + nty[i]['Inserimento'] + '</span></p></li>');
+        }
+    }
+    
+    else {
+        for (var i = 0; i < nty.length; i++) {
+            $('#notification-list').append('<li class="dropdown-item"><h5>' + nty[i]['Title'] + '</h5><p>' + nty[i]['Message'] + '<br><span style="font-size:10px">' + nty[i]['Inserimento'] + '</span></p></li>');
+        }
+    }
+}
 
 function getLatest() {
     var latest_r = null;
@@ -79,7 +96,6 @@ function show(offset = 0, limit = 5) {
         data : { o : offset, n : limit },
         dataType: 'json',
         success: function (data) {
-            //console.log(data);
             rdata = data;
         }
     });

@@ -2,6 +2,7 @@ let latest = null;
 let showed = 0;
 let badge = false;
 $('#noti-drop > span').hide();
+let notificationList = $('#notification-list');
 
 $('#noti-drop').on('show.bs.dropdown', function () {
     var nty = null;
@@ -44,6 +45,13 @@ setInterval(function () {
     if (latest < tmp) {
         badge = true;
         $('#noti-drop > span').show();
+    }
+}, 1000);
+
+setInterval(function () {
+    if (notificationList.scrollTop() + notificationList.height() >= notificationList[0].scrollHeight) {
+        console.log('bottom');
+        show(showed);
     }
 }, 1000);
 

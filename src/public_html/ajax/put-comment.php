@@ -1,5 +1,7 @@
 <?php
 include_once $_SERVER['DOCUMENT_ROOT'].'/profile/user-getters.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/profile/notify.php';
+
 header('Content-Type: application/json; charset=utf-8');
 session_start();
 
@@ -30,6 +32,9 @@ if (isset($_SESSION['userID']) && isset($_GET['text']) && isset($_GET['postID'])
     $mydata = $result->fetch_all(MYSQLI_ASSOC);
 
     $stmt->close();
+
+    notify_user($conn, get_post_creator($conn, $_GET['postID']), "New comment", "You have a new comment to a post!");
+    
     $conn->close();
 
     echo json_encode($mydata[0]);

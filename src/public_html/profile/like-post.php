@@ -31,7 +31,7 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
 
 likePost($conn, $_SESSION['userID'], $_POST['postID']);
 // reperire utente del post
-//notify_user($conn, $_POST['userID'], "New like", "You have a new like!");
+notify_user($conn, get_post_creator($conn, $_POST['postID']), "New like", "You have a new like!");
 
 $conn->close();
 

@@ -24,7 +24,7 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
 
 followUser($conn, $_SESSION['userID'], $_POST['followedUser']); // TODO: fare un escape di $_POST['followedUser']
 
-//notify_user($conn, $_POST['followedUser'], "New follower", "You have a new follower!");
+notify_user($conn, $_POST['followedUser'], "New follower", "You have a new follower!");
 
 $conn->close();
 

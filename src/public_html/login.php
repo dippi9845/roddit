@@ -15,6 +15,7 @@ if (isUserLoggedIn(true)) {
     <title>Roddit</title>
     <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="/assets/css/Navbar-Centered-Brand-icons.css">
+    <link rel="icon" type="image/x-icon" href="fav.ico">
 </head>
 
 <body>

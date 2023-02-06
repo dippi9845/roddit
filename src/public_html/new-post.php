@@ -16,6 +16,7 @@ if (!isUserLoggedIn(true)) {
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
     <link rel="stylesheet" href="assets/css/new-post.css">
+    <link rel="icon" type="image/x-icon" href="fav.ico">
 </head>
 
 <body>

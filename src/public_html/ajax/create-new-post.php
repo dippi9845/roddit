@@ -51,8 +51,8 @@ function main($data) {
     return true;
 }
 
-include_once($_SERVER['DOCUMENT_ROOT'].'/profile/globals.php');
-include_once($_SERVER['DOCUMENT_ROOT'].'/profile/post-handling.php');
+include_once($_SERVER['DOCUMENT_ROOT'].'../scripts/globals.php');
+include_once($_SERVER['DOCUMENT_ROOT'].'../scripts/post-handling.php');
 session_start();
 
 $file = file_get_contents($_SERVER['DOCUMENT_ROOT'].'/../setup.json');

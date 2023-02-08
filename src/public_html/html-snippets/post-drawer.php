@@ -1,7 +1,7 @@
 <?php
 
-include_once($_SERVER['DOCUMENT_ROOT'].'/profile/globals.php');
-include_once($_SERVER['DOCUMENT_ROOT'] . '/profile/post-handling.php');
+include_once($_SERVER['DOCUMENT_ROOT'].'../scripts/globals.php');
+include_once($_SERVER['DOCUMENT_ROOT'] . '../scripts/post-handling.php');
 include_once($_SERVER['DOCUMENT_ROOT'] . '/html-snippets/post.php');
 
 if (!isUserLoggedIn(true)) {

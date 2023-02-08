@@ -2,9 +2,9 @@
 <html lang="en">
 
 <?php
-include_once($_SERVER['DOCUMENT_ROOT'].'/profile/globals.php');
-include_once($_SERVER['DOCUMENT_ROOT'] . '/profile/post-handling.php');
-include_once($_SERVER['DOCUMENT_ROOT'] . '/profile/user-getters.php');
+include_once($_SERVER['DOCUMENT_ROOT'].'../scripts/globals.php');
+include_once($_SERVER['DOCUMENT_ROOT'] . '../scripts/post-handling.php');
+include_once($_SERVER['DOCUMENT_ROOT'] . '../scripts/user-getters.php');
 include_once($_SERVER['DOCUMENT_ROOT'] . '/html-snippets/post.php');
 include_once($_SERVER['DOCUMENT_ROOT'] . '/html-snippets/user-list.php');
 
@@ -69,12 +69,12 @@ if (!userExists($conn, $visitedUser)) {
                 </ul>
                 <div class="d-md-none my-2">
                     <a href="new-post.php" class="btn btn-light me-2">New Post</a>
-                    <a class="btn btn-light me-2" href="profile/logout.php">Log out</a>
+                    <a class="btn btn-light me-2" href="ajax/logout.php">Log out</a>
                 </div>
             </div>
             <div class="d-none d-md-block">
                 <a href="new-post.php" class="btn btn-light me-2">New Post</a>
-                <a class="btn btn-light me-2" href="profile/logout.php">Log out</a>
+                <a class="btn btn-light me-2" href="ajax/logout.php">Log out</a>
             </div>
         </div>
     </nav>
@@ -90,12 +90,12 @@ if (!userExists($conn, $visitedUser)) {
                     <div class="col">
                         <?php if ($visitedUser == $_SESSION['userID']) {
                         } elseif (isFollowing($conn, $visitedUser, $_SESSION['userID'])) { ?>
-                            <form id="unfollow-form" action="profile/unfollow.php" method="post">
+                            <form id="unfollow-form" action="ajax/unfollow.php" method="post">
                                 <input type="hidden" name="unfollowedUser" value="<?= $visitedUser ?>">
                                 <button type="submit" name="unfollow-submit" class="btn btn-primary btn-ajax-form">Unfollow</button>
                             </form>
                         <?php } else { ?>
-                            <form id="follow-form" action="profile/follow.php" method="post">
+                            <form id="follow-form" action="ajax/follow.php" method="post">
                                 <input type="hidden" name="followedUser" value="<?= $visitedUser ?>">
                                 <button type="submit" name="follow-submit" class="btn btn-primary btn-ajax-form">Follow</button>
                             </form>

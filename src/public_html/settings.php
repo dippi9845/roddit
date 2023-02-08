@@ -1,5 +1,5 @@
 <?php
-include_once($_SERVER['DOCUMENT_ROOT'].'/profile/globals.php');
+include_once($_SERVER['DOCUMENT_ROOT'].'../scripts/globals.php');
 session_start();
 
 $err = false;

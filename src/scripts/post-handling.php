@@ -1,5 +1,5 @@
 <?php
-include_once $_SERVER['DOCUMENT_ROOT'].'/profile/user-getters.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'../scripts/user-getters.php';
 
 /**
  * Creates a new post with a file.

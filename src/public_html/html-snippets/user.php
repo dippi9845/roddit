@@ -11,12 +11,12 @@ function drawUserCard($userID, $userName, $userProfilePicture, $isFollowing, $fo
         <div class="p-2">
             <?php if ($userID == $_SESSION['userID']) {
             } elseif ($isFollowing) { ?>
-                <form id="unfollow-form" action="profile/unfollow.php" method="post">
+                <form id="unfollow-form" action="ajax/unfollow.php" method="post">
                     <input type="hidden" name="unfollowedUser" value="<?= $userID ?>">
                     <button type="submit" name="unfollow-submit" class="btn btn-primary btn-ajax-form">Unfollow</button>
                 </form>
             <?php } else { ?>
-                <form id="follow-form" action="profile/follow.php" method="post">
+                <form id="follow-form" action="ajax/follow.php" method="post">
                     <input type="hidden" name="followedUser" value="<?= $userID ?>">
                     <button type="submit" name="follow-submit" class="btn btn-primary btn-ajax-form">Follow</button>
                 </form>

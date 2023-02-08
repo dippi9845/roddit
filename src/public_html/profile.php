@@ -163,7 +163,7 @@ if (!userExists($conn, $visitedUser)) {
                 <li class="list-inline-item me-4"><a class="link-secondary" href="#">Privacy Policy</a></li>
                 <li class="list-inline-item"><a class="link-secondary" href="#">Terms &amp; Conditions</a></li>
             </ul>
-            <p class="mb-0">Copyright © 2022 Brand</p>
+            <p class="mb-0">Copyright © 2022 Roddit</p>
         </div>
     </footer>
     

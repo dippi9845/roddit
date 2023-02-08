@@ -20,6 +20,26 @@ if (!isUserLoggedIn(true)) {
 </head>
 
 <body>
+<nav class="navbar navbar-light navbar-expand-md py-3">
+        <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="#">
+                <img src="fav.ico" alt="" width="50px">
+                <span onclick="window.location='/';">Roddit</span>
+            </a>
+            <button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-4">
+                <span class="visually-hidden">Toggle navigation</span>
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse flex-grow-0 order-md-first" id="navcol-4">
+                <div class="d-md-none my-2">
+                    <a class="btn btn-light me-2" href="profile.php">My Profile</a>
+                </div>
+            </div>
+            <div class="d-none d-md-block">
+                <a class="btn btn-light me-2" href="profile.php">My Profile</a>
+            </div>
+        </div>
+    </nav>
     <div class="container">
         <div class="row">
             <div class="col">
@@ -33,6 +53,16 @@ if (!isUserLoggedIn(true)) {
             </div>
         </div>
     </div>
+    <footer class="text-center" style="margin-top: 40px;">
+        <div class="container text-muted py-4 py-lg-5">
+            <ul class="list-inline">
+                <li class="list-inline-item me-4"><a class="link-secondary" href="#">Log in</a></li>
+                <li class="list-inline-item me-4"><a class="link-secondary" href="#">Privacy Policy</a></li>
+                <li class="list-inline-item"><a class="link-secondary" href="#">Terms &amp; Conditions</a></li>
+            </ul>
+            <p class="mb-0">Copyright © 2022 Brand</p>
+        </div>
+    </footer>
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
 </body>
 

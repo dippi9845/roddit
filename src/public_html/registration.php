@@ -106,26 +106,19 @@ if (!isset($_POST['pass_conf'])){
 <body>
     <nav class="navbar navbar-light navbar-expand-md py-3">
         <div class="container">
-            <button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-4">
-                <span class="visually-hidden">Toggle navigation</span>
-                <span class="navbar-toggler-icon"></span>
-            </button>
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img src="fav.ico" alt="" width="50px">
+                <span onclick="window.location='/';">Roddit</span>
+            </a>
             <div class="collapse navbar-collapse flex-grow-0 order-md-first" id="navcol-4">
                 <div class="d-none d-md-block">
-                    <a class="btn btn-light me-2" href="profile.php">My Profile</a>
                 </div>
-                <div class="d-md-none my-2"><button class="btn btn-light me-2" type="button">Button</button><button class="btn btn-primary" type="button">Button</button></div>
+            </div>
+            <div class="d-none d-md-block">
             </div>
         </div>
     </nav>
     <div class="container">
-        <nav class="navbar navbar-light navbar-expand-md py-3">
-            <div class="container"><a class="navbar-brand d-flex align-items-center" href="#">
-                <img src="fav.ico" alt="" width="50px">
-                <span>Roddit</span></a>
-            <div class="d-none d-md-block"></div>
-        </div>
-        </nav>
         <?php if ($err) { ?>
             <div class="row">
                 <div class="col">

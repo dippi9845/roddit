@@ -135,11 +135,15 @@ $conn->close();
                 <div class="d-none d-md-block">
                     <a class="btn btn-light me-2" href="profile.php">My Profile</a>
                 </div>
-                <div class="d-md-none my-2"><button class="btn btn-light me-2" type="button">Button</button><button class="btn btn-primary" type="button">Button</button></div>
+                <div class="d-md-none my-2">
+                    <a href="new-post.php" class="btn btn-light me-2">New Post</a>
+                    <a class="btn btn-light me-2" href="profile/logout.php">Log out</a>
+                    <a class="btn btn-light me-2" href="profile.php">My Profile</a>
+                </div>
             </div>
             <div class="d-none d-md-block">
-                <button onclick="window.location='new-post.php';" class="btn btn-light me-2" type="button">New Post</button>
-                <button class="btn btn-light me-2" type="button" onclick="window.location='profile/logout.php';">Log out</button>
+                <a href="new-post.php" class="btn btn-light me-2">New Post</a>
+                <a class="btn btn-light me-2" href="profile/logout.php">Log out</a>
             </div>
         </div>
     </nav>
@@ -204,6 +208,16 @@ $conn->close();
             </div>
         </div>
     </div>
+    <footer class="text-center" style="margin-top: 40px;">
+        <div class="container text-muted py-4 py-lg-5">
+            <ul class="list-inline">
+                <li class="list-inline-item me-4"><a class="link-secondary" href="#">Log in</a></li>
+                <li class="list-inline-item me-4"><a class="link-secondary" href="#">Privacy Policy</a></li>
+                <li class="list-inline-item"><a class="link-secondary" href="#">Terms &amp; Conditions</a></li>
+            </ul>
+            <p class="mb-0">Copyright © 2022 Brand</p>
+        </div>
+    </footer>
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
 </body>
 

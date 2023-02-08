@@ -60,7 +60,8 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
                         <form method="get"><input value="<?= $_GET['query'] ?>" class="form-control" type="search" id="search" name="query" placeholder="Search" autocomplete="off"></form>
                     </li>
                 </ul>
-                <div class="d-md-none my-2"><button class="btn btn-light me-2" type="button">Button</button><button class="btn btn-primary" type="button">Button</button></div>
+                <div class="d-md-none my-2">
+                </div>
             </div>
             <div>
                 <div class="dropdown" style="width: fit-content;">
@@ -76,7 +77,7 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
                     </svg>
                 </button>
                 
-                <a class="btn btn-primary" onclick="window.location='profile.php';" role="button" href="#">My Profile</a>
+                <a class="btn btn-primary" href="profile.php" role="button">My Profile</a>
             </div>
         </div>
     </nav>
@@ -113,7 +114,16 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
             </div>
         </div>
     </div>
-
+    <footer class="text-center" style="margin-top: 40px;">
+        <div class="container text-muted py-4 py-lg-5">
+            <ul class="list-inline">
+                <li class="list-inline-item me-4"><a class="link-secondary" href="#">Log in</a></li>
+                <li class="list-inline-item me-4"><a class="link-secondary" href="#">Privacy Policy</a></li>
+                <li class="list-inline-item"><a class="link-secondary" href="#">Terms &amp; Conditions</a></li>
+            </ul>
+            <p class="mb-0">Copyright © 2022 Brand</p>
+        </div>
+    </footer>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.3.0/jquery.form.min.js" integrity="sha384-qlmct0AOBiA2VPZkMY3+2WqkHtIQ9lSdAsAn5RUJD/3vA5MKDgSGcdmIv4ycVxyn" crossorigin="anonymous"></script>

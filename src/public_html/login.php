@@ -7,6 +7,7 @@ include_once($_SERVER['DOCUMENT_ROOT'].'/profile/globals.php');
 if (isUserLoggedIn(true)) {
     header('Location: /index.php');
 }
+
 ?>
 
 <head>
@@ -19,6 +20,20 @@ if (isUserLoggedIn(true)) {
 </head>
 
 <body>
+    <nav class="navbar navbar-light navbar-expand-md py-3">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img src="fav.ico" alt="" width="50px">
+                <span onclick="window.location='/';">Roddit</span>
+            </a>
+            <div class="collapse navbar-collapse flex-grow-0 order-md-first" id="navcol-4">
+                <div class="d-none d-md-block">
+                </div>
+            </div>
+            <div class="d-none d-md-block">
+            </div>
+        </div>
+    </nav>
     <section class="position-relative py-4 py-xl-5">
         <div class="container">
             <div class="row mb-5">
@@ -48,6 +63,16 @@ if (isUserLoggedIn(true)) {
             </div>
         </div>
     </section>
+    <footer class="text-center" style="margin-top: 40px;">
+        <div class="container text-muted py-4 py-lg-5">
+            <ul class="list-inline">
+                <li class="list-inline-item me-4"><a class="link-secondary" href="#">Log in</a></li>
+                <li class="list-inline-item me-4"><a class="link-secondary" href="#">Privacy Policy</a></li>
+                <li class="list-inline-item"><a class="link-secondary" href="#">Terms &amp; Conditions</a></li>
+            </ul>
+            <p class="mb-0">Copyright © 2022 Brand</p>
+        </div>
+    </footer>
     <script src="/assets/bootstrap/js/bootstrap.min.js"></script>
 </body>
 

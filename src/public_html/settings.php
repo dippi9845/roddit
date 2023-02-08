@@ -136,14 +136,10 @@ $conn->close();
                     <a class="btn btn-light me-2" href="profile.php">My Profile</a>
                 </div>
                 <div class="d-md-none my-2">
-                    <a href="new-post.php" class="btn btn-light me-2">New Post</a>
-                    <a class="btn btn-light me-2" href="profile/logout.php">Log out</a>
                     <a class="btn btn-light me-2" href="profile.php">My Profile</a>
                 </div>
             </div>
             <div class="d-none d-md-block">
-                <a href="new-post.php" class="btn btn-light me-2">New Post</a>
-                <a class="btn btn-light me-2" href="profile/logout.php">Log out</a>
             </div>
         </div>
     </nav>

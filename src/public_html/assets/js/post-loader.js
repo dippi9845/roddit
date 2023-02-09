@@ -37,7 +37,9 @@ $(document).ready( function() {
  * It loads more posts if the user has reached the bottom of the page.
  */
 $(window).scroll(function() {
-    if($(window).scrollTop() + $(window).height() != $(document).height()) {
+    let windowHeight = $(document).height();
+    let windowPosition = $(window).scrollTop() + $(window).height();
+    if(windowPosition < windowHeight * 0.7 ) {
         return;
     }
     let query = getUrlVars()['query'];

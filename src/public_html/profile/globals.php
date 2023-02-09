@@ -1,6 +1,16 @@
 <?php
 
 /**
+ * Creates the uploads folder if it doesn't exist
+ */
+function createImageFolderIfNotExists() {
+    $path = $_SERVER['DOCUMENT_ROOT'].'/uploads/images/';
+    if (!file_exists($path)) {
+        mkdir($path, 0777, true);
+    }
+}
+
+/**
  * Saves an image to the server.
  * @param array $image The image array from $_FILES
  * @return string|false The path to the image or false if the image could not be saved

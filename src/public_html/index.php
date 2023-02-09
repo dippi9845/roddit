@@ -31,15 +31,6 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
     <link rel="stylesheet" href="assets/css/post.css">
     <link rel="stylesheet" href="assets/css/icon-colors.css">
     <link rel="icon" type="image/x-icon" href="fav.ico">
-    <style>
-        .modal {
-            position: absolute;
-            float: left;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-        }
-    </style>
 </head>
 
 <body>

@@ -38,15 +38,6 @@ if (!userExists($conn, $visitedUser)) {
     <link rel="stylesheet" href="assets/css/post.css">
     <link rel="stylesheet" href="assets/css/profile.css">
     <link rel="stylesheet" href="assets/css/icon-colors.css">
-    <style>
-        .modal {
-            position: absolute;
-            float: left;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-        }
-    </style>
     <link rel="icon" type="image/x-icon" href="fav.ico">
 </head>
 

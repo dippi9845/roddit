@@ -7,7 +7,7 @@ $(document).ready( function() {
     window.visualizedUserCount = 0;
     window.cardsPerRequest = 5;
     let query = getUrlVars()['query'];
-    window.searchedUsersCount = ajaxGetRawOutput("ajax/get-users-count.php", query);
+    window.searchedUsersCount = ajaxGetRawOutput("/ajax/get-users-count.php", query);
 
     cards = "";
 
@@ -41,8 +41,8 @@ $(window).scroll(function() {
         return;
     }
     let query = getUrlVars()['query'];
-    const postCount = ajaxGetRawOutput("ajax/get-posts-count.php", query);
-    const userCount = ajaxGetRawOutput("ajax/get-users-count.php", query);
+    const postCount = ajaxGetRawOutput("/ajax/get-posts-count.php", query);
+    const userCount = ajaxGetRawOutput("/ajax/get-users-count.php", query);
 
     cards = "";
 

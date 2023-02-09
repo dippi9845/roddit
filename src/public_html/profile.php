@@ -113,7 +113,7 @@ if (!userExists($conn, $visitedUser)) {
                     </div>
                 </div>
                 <div class="row ms-auto my-1">
-                    <div class="col">Biografia</div>
+                    <div class="col"> <?= getUserBiography($conn, $visitedUser) ?> </div>
                 </div>
             </div>
         </div>

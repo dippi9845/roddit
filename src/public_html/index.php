@@ -108,7 +108,6 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
     <footer class="text-center" style="margin-top: 40px;">
         <div class="container text-muted py-4 py-lg-5">
             <ul class="list-inline">
-                <li class="list-inline-item me-4"><a class="link-secondary" href="#">Log in</a></li>
                 <li class="list-inline-item me-4"><a class="link-secondary" href="#">Privacy Policy</a></li>
                 <li class="list-inline-item"><a class="link-secondary" href="#">Terms &amp; Conditions</a></li>
             </ul>

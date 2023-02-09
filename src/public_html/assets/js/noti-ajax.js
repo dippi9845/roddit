@@ -108,7 +108,9 @@ function getLatest() {
         type: 'GET',
         dataType: 'json',
         success: function (data) {
-            latest_r = data[0]['ID'];
+            if (data.length > 0) {
+                latest_r = data[0]['ID'];
+            }
         }
     });
     

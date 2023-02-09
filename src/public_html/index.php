@@ -37,7 +37,7 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
     <nav class="navbar navbar-light navbar-expand-md py-3">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="#">
-                <img src="fav.ico" alt="" width="50px">
+                <img onclick="window.location='/';" src="fav.ico" alt="" width="50px">
                 <span onclick="window.location='/';">Roddit</span>
             </a>
             <button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-4">

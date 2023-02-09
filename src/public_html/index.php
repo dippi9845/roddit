@@ -65,7 +65,7 @@ $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserN
             </div>
             <div>
                 <div class="dropdown" style="width: fit-content;">
-                    <ul class="dropdown-menu" style="margin-top: 37px; max-height: 350px; overflow-y: scroll;" id="notification-list">
+                    <ul class="dropdown-menu dropdown-menu-right" style="max-width:350px;margin-top: 37px; max-height: 350px; overflow-y: scroll;" id="notification-list">
                     </ul>
                 </div>
                 <button id="noti-drop" class="btn btn-primary dropdown-toggle position-relative" type="button" data-bs-toggle="dropdown" aria-expanded="false">

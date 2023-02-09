@@ -2,7 +2,7 @@
 <html lang="en">
 
 <?php
-include_once($_SERVER['DOCUMENT_ROOT'].'../scripts/globals.php');
+include_once($_SERVER['DOCUMENT_ROOT'].'/../scripts/globals.php');
 
 if (isUserLoggedIn(true)) {
     header('Location: /index.php');

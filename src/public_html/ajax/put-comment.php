@@ -1,6 +1,6 @@
 <?php
-include_once $_SERVER['DOCUMENT_ROOT'].'../scripts/user-getters.php';
-include_once $_SERVER['DOCUMENT_ROOT'].'../scripts/notify.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/../scripts/user-getters.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/../scripts/notify.php';
 
 header('Content-Type: application/json; charset=utf-8');
 session_start();

@@ -1,8 +1,8 @@
 <?php
 
-include_once($_SERVER['DOCUMENT_ROOT'].'../scripts/globals.php');
+include_once($_SERVER['DOCUMENT_ROOT'].'/../scripts/globals.php');
 include_once($_SERVER['DOCUMENT_ROOT'].'/html-snippets/user.php');
-include_once($_SERVER['DOCUMENT_ROOT'] . '../scripts/user-getters.php');
+include_once($_SERVER['DOCUMENT_ROOT'] . '/../scripts/user-getters.php');
 
 if (!isUserLoggedIn(true)) {
     header('Location: /login.php');

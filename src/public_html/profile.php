@@ -2,9 +2,9 @@
 <html lang="en">
 
 <?php
-include_once($_SERVER['DOCUMENT_ROOT'].'../scripts/globals.php');
-include_once($_SERVER['DOCUMENT_ROOT'] . '../scripts/post-handling.php');
-include_once($_SERVER['DOCUMENT_ROOT'] . '../scripts/user-getters.php');
+include_once($_SERVER['DOCUMENT_ROOT'].'/../scripts/globals.php');
+include_once($_SERVER['DOCUMENT_ROOT'] . '/../scripts/post-handling.php');
+include_once($_SERVER['DOCUMENT_ROOT'] . '/../scripts/user-getters.php');
 include_once($_SERVER['DOCUMENT_ROOT'] . '/html-snippets/post.php');
 include_once($_SERVER['DOCUMENT_ROOT'] . '/html-snippets/user-list.php');
 

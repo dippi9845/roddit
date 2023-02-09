@@ -41,7 +41,7 @@ if ( ! $err && isset($_POST['first'])) {
         }
 
         if ( !$err ) {
-            include_once($_SERVER['DOCUMENT_ROOT'].'../scripts/globals.php');
+            include_once($_SERVER['DOCUMENT_ROOT'].'/../scripts/globals.php');
             $data = json_decode(file_get_contents($_SERVER['DOCUMENT_ROOT'].'/../setup.json'));
             
             $conn = new mysqli("localhost", $data->dbName, $data->dbPassword, $data->dbUserName);

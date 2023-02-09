@@ -167,7 +167,7 @@ $conn->close();
                 </p>
             </div>
             <div class="col-md-6">
-                <form method="post" autocomplete="off">
+                <form method="post" autocomplete="off" enctype="multipart/form-data">
                     <div class="row setting-row">
                         <div class="col">
                             <label class="form-label">Change Email</label>

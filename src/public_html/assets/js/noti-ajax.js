@@ -76,7 +76,6 @@ setInterval(function () {
 
 setInterval(function () {
     if (notificationList.hasClass("show") && (notificationList.scrollTop() + notificationList.height() + 20 >= notificationList[0].scrollHeight)) {
-        console.log('bottom');
         let a = show(showed);
         if (a != null) {
             drawNotifications(a, false);

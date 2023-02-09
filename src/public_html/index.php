@@ -2,8 +2,8 @@
 <html lang="en">
 
 <?php
-include_once($_SERVER['DOCUMENT_ROOT'].'/profile/globals.php');
-include_once($_SERVER['DOCUMENT_ROOT'] . '/profile/user-getters.php');
+include_once($_SERVER['DOCUMENT_ROOT'].'/../scripts/globals.php');
+include_once($_SERVER['DOCUMENT_ROOT'] . '/../scripts/user-getters.php');
 
 if (!isUserLoggedIn(true)) {
     header('Location: /login.php');

@@ -1,6 +1,6 @@
 <?php
-include_once $_SERVER['DOCUMENT_ROOT'].'/profile/notify.php';
-include_once $_SERVER['DOCUMENT_ROOT'].'/profile/user-getters.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/../scripts/notify.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/../scripts/user-getters.php';
 
 /**
  * Likes a post adding it to the likes table.

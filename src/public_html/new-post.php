@@ -2,7 +2,7 @@
 <html lang="en">
 
 <?php
-include_once($_SERVER['DOCUMENT_ROOT'].'/profile/globals.php');
+include_once($_SERVER['DOCUMENT_ROOT'].'/../scripts/globals.php');
 
 if (!isUserLoggedIn(true)) {
     header('Location: /login.php');
@@ -44,7 +44,7 @@ if (!isUserLoggedIn(true)) {
         <div class="row">
             <div class="col">
                 <h1 class="text-center">Create new post</h1>
-                <form class="mx-auto" action="/profile/create-new-post.php" method="post" enctype="multipart/form-data">
+                <form class="mx-auto" action="/ajax/create-new-post.php" method="post" enctype="multipart/form-data">
                     <input class="form-control form-element font-weight-bold bold-input my-2" type="text" name="title" placeholder="Post Title" required />
                     <textarea class="form-control form-element my-2" name="text" placeholder="Post Text" required></textarea>
                     <input class="form-control form-element my-2" name="file" type="file" accept="image/*" />

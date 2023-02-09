@@ -34,7 +34,7 @@ function drawPost($postID, $creatorID, $creatorName, $creatorProfilePicture, $ti
                 
                 <div class="d-flex p-2" id="button-section-<?= $postID ?>">
                     <?php if ($isLikedByMe) {?>
-                        <form id="post-dislike-form-<?= $postID ?>" action="profile/dislike-post.php" method="post">
+                        <form id="post-dislike-form-<?= $postID ?>" action="ajax/dislike-post.php" method="post">
                             <input type="hidden" name="postID" value="<?= $postID ?>">
                             <button type="submit" class="btn btn-light btn-ajax-form-like">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="bi bi-heart-fill red-heart" viewBox="0 0 16 16">
@@ -43,7 +43,7 @@ function drawPost($postID, $creatorID, $creatorName, $creatorProfilePicture, $ti
                             </button>
                         </form>
                     <?php } else { ?>
-                        <form id="post-like-form-<?= $postID ?>" action="profile/like-post.php" method="post">
+                        <form id="post-like-form-<?= $postID ?>" action="ajax/like-post.php" method="post">
                             <input type="hidden" name="postID" value="<?= $postID ?>">
                             <button type="submit" class="btn btn-light btn-ajax-form-like">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">

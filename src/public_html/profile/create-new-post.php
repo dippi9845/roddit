@@ -8,16 +8,6 @@ function isFormValid() {
 }
 
 /**
- * Creates the uploads folder if it doesn't exist
- */
-function createImageFolderIfNotExists() {
-    $path = $_SERVER['DOCUMENT_ROOT'].'/uploads/images/';
-    if (!file_exists($path)) {
-        mkdir($path, 0777, true);
-    }
-}
-
-/**
  * Creates a post with a file
  */
 function main($data) {

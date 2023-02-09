@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Creato il: Gen 03, 2023 alle 16:23
+-- Creato il: Feb 09, 2023 alle 15:11
 -- Versione del server: 10.4.20-MariaDB
 -- Versione PHP: 7.3.29
 
@@ -77,10 +77,11 @@ CREATE TABLE `likes` (
 --
 
 CREATE TABLE `notification` (
+  `ID` bigint(20) NOT NULL,
   `UserID` bigint(20) UNSIGNED NOT NULL,
   `Title` varchar(256) NOT NULL,
-  `Message` varchar(256) NOT NULL,
-  `Inserimento` date NOT NULL DEFAULT current_timestamp()
+  `Message` varchar(1000) NOT NULL,
+  `Inserimento` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -110,17 +111,11 @@ CREATE TABLE `users` (
   `ID` int(10) UNSIGNED NOT NULL,
   `Nickname` varchar(255) NOT NULL,
   `Email` varchar(255) NOT NULL,
+  `Bio` varchar(1000) NOT NULL,
   `Password` varchar(255) NOT NULL,
   `Salt` varchar(255) NOT NULL,
   `ProfileImagePath` varchar(256) NOT NULL DEFAULT '/uploads/images/default_profile_picture.jpg'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Dump dei dati per la tabella `users`
---
-
-INSERT INTO `users` (`ID`, `Nickname`, `Email`, `Password`, `Salt`, `ProfileImagePath`) VALUES
-(6, 'Gianni', 'giannimorandi@sonoio.com', '$2y$10$swX0OetT5eHOjzvXiIZHROrlKmmIwAT9h1pXPDnU/1GUT5uFNtHWe', '63b0664cf1aa1', '/uploads/images/default_profile_picture.jpg');
 
 --
 -- Indici per le tabelle scaricate
@@ -131,8 +126,7 @@ INSERT INTO `users` (`ID`, `Nickname`, `Email`, `Password`, `Salt`, `ProfileImag
 --
 ALTER TABLE `comment`
   ADD PRIMARY KEY (`ID`),
-  ADD UNIQUE KEY `ricerca` (`entityID`,`entityType`),
-  ADD KEY `User` (`User`);
+  ADD KEY `Ricerca` (`User`,`entityType`,`entityID`) USING BTREE;
 ALTER TABLE `comment` ADD FULLTEXT KEY `Text` (`Text`);
 
 --
@@ -161,6 +155,7 @@ ALTER TABLE `likes`
 -- Indici per le tabelle `notification`
 --
 ALTER TABLE `notification`
+  ADD PRIMARY KEY (`ID`),
   ADD KEY `UserID` (`UserID`,`Inserimento`) USING BTREE;
 
 --
@@ -190,6 +185,12 @@ ALTER TABLE `comment`
   MODIFY `ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT per la tabella `notification`
+--
+ALTER TABLE `notification`
+  MODIFY `ID` bigint(20) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT per la tabella `post`
 --
 ALTER TABLE `post`
@@ -199,7 +200,7 @@ ALTER TABLE `post`
 -- AUTO_INCREMENT per la tabella `users`
 --
 ALTER TABLE `users`
-  MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- Limiti per le tabelle scaricate
@@ -231,13 +232,11 @@ ALTER TABLE `likes`
   ADD CONSTRAINT `likes_ibfk_1` FOREIGN KEY (`Post`) REFERENCES `post` (`ID`),
   ADD CONSTRAINT `likes_ibfk_2` FOREIGN KEY (`User`) REFERENCES `users` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
-DELIMITER $$
 --
--- Eventi
+-- Limiti per la tabella `post`
 --
-CREATE DEFINER=`root`@`localhost` EVENT `Cleaning` ON SCHEDULE EVERY 1 DAY STARTS '2022-12-07 16:54:33' ON COMPLETION NOT PRESERVE ENABLE DO DELETE FROM cookies WHERE cookies.ExpireDate < CURRENT_DATE()$$
-
-DELIMITER ;
+ALTER TABLE `post`
+  ADD CONSTRAINT `post_ibfk_1` FOREIGN KEY (`Creator`) REFERENCES `users` (`Nickname`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

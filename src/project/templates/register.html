@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Roddit</title>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/register.css">
+</head>
+<body>
+
+<div class="container">
+
+    {% if err %}
+    <div class="alert alert-danger text-center">
+        {{ text_err }}
+    </div>
+    {% endif %}
+
+    <h1 class="text-center">New Account</h1>
+
+    <form method="post">
+        <input class="form-control register" type="text" name="nickname" placeholder="Nickname" value="{{ form.nickname }}">
+        <input class="form-control register" type="email" name="email" placeholder="Email" value="{{ form.email }}">
+        <input class="form-control register" type="password" name="password" placeholder="Password" value="{{ form.password }}">
+        <input class="form-control register" type="password" name="pass_conf" placeholder="Confirm Password" value="{{ form.pass_conf }}">
+
+        <input type="hidden" name="first" value="Data">
+
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="privacy-policy" value="accept">
+            <label class="form-check-label">Accept privacy policy</label>
+        </div>
+
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="terms-conditions" value="accept">
+            <label class="form-check-label">Accept terms and conditions</label>
+        </div>
+
+        <button class="btn btn-danger" type="submit">Register</button>
+    </form>
+</div>
+
+</body>
+</html>

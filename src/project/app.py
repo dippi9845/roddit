@@ -105,7 +105,76 @@ def ajax_login():
     else:
         return redirect("/login")
 
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    err = False
+    text_err = ""
 
+    form = {
+        "nickname": "",
+        "email": "",
+        "password": "",
+        "pass_conf": ""
+    }
+
+    if request.method == "POST":
+        form["nickname"] = request.form.get("nickname", "")
+        form["email"] = request.form.get("email", "")
+        form["password"] = request.form.get("password", "")
+        form["pass_conf"] = request.form.get("pass_conf", "")
+
+        if "first" in request.form:
+
+            # Privacy policy
+            if request.form.get("privacy-policy") != "accept":
+                err = True
+                text_err = "You must accept the privacy policy"
+
+            # Terms
+            elif request.form.get("terms-conditions") != "accept":
+                err = True
+                text_err = "You must accept the terms and conditions"
+
+            else:
+                # Controllo campi
+                if not all([form["nickname"], form["email"], form["password"], form["pass_conf"]]):
+                    err = True
+                    text_err = "You must fill all the fields"
+
+                elif form["password"] != form["pass_conf"]:
+                    err = True
+                    text_err = "Two passwords are different"
+
+                elif not re.match(r"[^@]+@[^@]+\.[^@]+", form["email"]):
+                    err = True
+                    text_err = "Email provided is not a valid email"
+
+                elif len(form["nickname"]) > 64:
+                    err = True
+                    text_err = "Nickname provided is too long, (more than 64 characters)"
+
+                elif not re.match(r"^[0-9a-zA-Z_]+$", form["nickname"]):
+                    err = True
+                    text_err = "Nickname provided is not valid, (only numbers, letters and underscore)"
+
+                # Se tutto OK → inserimento DB
+                if not err:
+
+                    nickname = html.escape(form["nickname"])
+                    email = html.escape(form["email"])
+
+                    salt = uuid.uuid4().hex
+                    password_hash = generate_password_hash(form["password"] + salt)
+
+                    cursor.execute(
+                        "INSERT INTO users (Nickname, Email, Password, Salt) VALUES (%s, %s, %s, %s)",
+                        (nickname, email, password_hash, salt)
+                    )
+
+
+                    return redirect("/login")
+
+    return render_template("register.html", err=err, text_err=text_err, form=form)
 
 
 if __name__ == "__main__":

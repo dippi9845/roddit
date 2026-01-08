@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect, session, make_response
 import json
 from globals import *
 
@@ -58,12 +58,48 @@ def profile():
 
 @app.route("/login")
 def login():
-    pass
+    if is_user_logged_in(True):
+        return redirect("/")
+
+    return render_template("login.html")
 
 @app.route("ajax/login", methods=["POST"])
 def ajax_login():
-    pass
+    
+    def is_form_valid():
+        return 'email' in request.form and 'password' in request.form
 
+    def get_user_id(conn, email, password):
+        pass # TODO to implement
+
+    
+    def main(conn):
+        if not is_form_valid():
+            print("Invalid form")
+            return False, None
+
+        user_id = get_user_id(conn, request.form['email'], request.form['password'])
+        if not user_id:
+            print("Invalid credentials")
+            return False, None
+
+        create_session(user_id)
+
+        response = make_response()
+
+        if 'remember' in request.form:
+            create_cookie(response, user_id)
+
+        return True, response
+
+    ok, response = main(conn)
+
+    if ok:
+        response.headers["Location"] = "/"
+        response.status_code = 302
+        return response
+    else:
+        return redirect("/login")
 
 if __name__ == "__main__":
     app.run(debug=True)

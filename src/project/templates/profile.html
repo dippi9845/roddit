@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Roddit</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/bootstrap/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/post.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/profile.css') }}">
+</head>
+<body>
+
+<div class="container">
+    <div class="row">
+        <div class="col-4">
+            <img src="{{ profile.picture }}" class="img-thumbnail">
+        </div>
+
+        <div class="col-8">
+            <h3>{{ profile.name }}</h3>
+
+            {% if not profile.is_me %}
+                {% if profile.is_following %}
+                    <form action="/unfollow" method="post">
+                        <input type="hidden" name="user" value="{{ profile.id }}">
+                        <button class="btn btn-primary">Unfollow</button>
+                    </form>
+                {% else %}
+                    <form action="/follow" method="post">
+                        <input type="hidden" name="user" value="{{ profile.id }}">
+                        <button class="btn btn-primary">Follow</button>
+                    </form>
+                {% endif %}
+            {% endif %}
+
+            <p>{{ profile.bio }}</p>
+
+            <p><b>{{ profile.followers_count }}</b> followers | <b>{{ profile.following_count }}</b> following</p>
+        </div>
+    </div>
+
+    <hr>
+
+    {% for post in posts %}
+        {% include "components/post.html" %}
+    {% endfor %}
+</div>
+
+</body>
+</html>

@@ -55,6 +55,12 @@ def profile():
     conn.close()
 
     return render_template("profile.html", profile=profile_data, posts=posts)
+
+@app.route("/login")
+def login():
+    
+
+
 if __name__ == "__main__":
     app.run(debug=True)
 

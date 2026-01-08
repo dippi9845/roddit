@@ -58,7 +58,11 @@ def profile():
 
 @app.route("/login")
 def login():
-    
+    pass
+
+@app.route("ajax/login", methods=["POST"])
+def ajax_login():
+    pass
 
 
 if __name__ == "__main__":

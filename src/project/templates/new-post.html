@@ -1,22 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<?php
-include_once($_SERVER['DOCUMENT_ROOT'].'/../scripts/globals.php');
-
-if (!isUserLoggedIn(true)) {
-    header('Location: /login.php');
-}
-?>
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>Roddit</title>
-    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/assets/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
-    <link rel="stylesheet" href="assets/css/new-post.css">
-    <link rel="icon" type="image/x-icon" href="fav.ico">
+    <link rel="stylesheet" href="/static/assets/css/new-post.css">
+    <link rel="icon" type="image/x-icon" href="/static/fav.ico">
 </head>
 
 <body>
@@ -62,7 +53,7 @@ if (!isUserLoggedIn(true)) {
             <p class="mb-0">Copyright © 2022 Roddit</p>
         </div>
     </footer>
-    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/static/assets/bootstrap/js/bootstrap.min.js"></script>
 </body>
 
 </html>

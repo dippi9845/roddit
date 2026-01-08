@@ -10,17 +10,14 @@ app.secret_key = "CAMBIA_QUESTA_CHIAVE"
 @app.route("/")
 def index():
 
-    # === Controllo login ===
-    #if not is_user_logged_in(force=True):
-    #    return redirect("/login")
-
-    # === Query ===
+    if not is_user_logged_in(True):
+        return redirect("/login")
+    
     query = request.args.get("query", "")
 
     # TODO Qui puoi caricare i post dal DB
 
     return render_template("index.html", query=query)
-
 
 @app.route("/profile")
 def profile():
@@ -63,6 +60,13 @@ def login():
 
     return render_template("login.html")
 
+@app.route("/new-post")
+def new_post():
+    if not is_user_logged_in(True):
+        return redirect("/login")
+    
+    return render_template("new-post.html")
+
 @app.route("ajax/login", methods=["POST"])
 def ajax_login():
     
@@ -100,6 +104,9 @@ def ajax_login():
         return response
     else:
         return redirect("/login")
+
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)

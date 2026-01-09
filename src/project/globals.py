@@ -39,3 +39,15 @@ def is_user_logged_in(force_cookie_login=False):
         conn.close()
 
     return False
+
+def save_image(file):
+    UPLOAD_FOLDER = "static/uploads"
+    try:
+        img = Image.open(file)
+        ext = file.filename.split(".")[-1]
+        filename = uuid.uuid4().hex + "." + ext
+        path = os.path.join(UPLOAD_FOLDER, filename)
+        img.save(path)
+        return "/" + path.replace("\\", "/")
+    except:
+        return False

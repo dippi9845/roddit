@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Roddit</title>
+    <link rel="stylesheet" href="/static/assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+    <link rel="stylesheet" href="/static/assets/css/settings.css">
+    <link rel="icon" type="image/x-icon" href="/static/fav.ico">
+</head>
+
+<body>
+    <nav class="navbar navbar-light navbar-expand-md py-3">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <img src="/static/fav.ico" alt="" width="50px">
+                <span>Roddit</span>
+            </a>
+
+            <div class="collapse navbar-collapse flex-grow-0 order-md-first">
+                <div class="d-none d-md-block">
+                    <a class="btn btn-light me-2" href="/profile">My Profile</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h1 class="text-center">Settings</h1>
+            </div>
+        </div>
+
+        {% if err %}
+        <div class="row">
+            <div class="col">
+                <div class="alert alert-danger text-center" role="alert">
+                    {{ text_err }}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="row">
+            <div class="col-md-6">
+
+                <img src="{{ user.photo }}" style="max-width: 300px;">
+
+                <p>
+                    <strong>Email:</strong> {{ user.email }} <br>
+                    <strong>Nickname:</strong> {{ user.nickname }} <br>
+                    <strong>Biography:</strong> {{ user.bio }} <br>
+                </p>
+
+            </div>
+
+            <div class="col-md-6">
+                <form method="post" autocomplete="off" enctype="multipart/form-data">
+
+                    <div class="row setting-row">
+                        <div class="col">
+                            <label class="form-label">Change Email</label>
+                            <input class="form-control" type="email" placeholder="New Email" name="new-email">
+                        </div>
+                    </div>
+
+                    <div class="row setting-row">
+                        <div class="col">
+                            <label class="form-label">Change Nickname</label>
+                            <input class="form-control" type="text" placeholder="New nickname" name="new-nickname">
+                        </div>
+                    </div>
+
+                    <div class="row setting-row">
+                        <div class="col">
+                            <label class="form-label">Change Biography</label>
+                            <textarea class="form-control" placeholder="Biography" name="new-biography"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="row setting-row">
+                        <div class="col">
+                            <label class="form-label">Change Password</label>
+                            <input class="form-control" type="password" name="new-password" placeholder="New Password">
+                            <input class="form-control" type="password" name="confirm-new-pass" placeholder="Confirm new password" style="margin-top: 20px;">
+                        </div>
+                    </div>
+
+                    <div class="row setting-row">
+                        <div class="col">
+                            <label class="form-label">Change Profile Image</label>
+                            <input class="form-control" type="file" name="new-photo">
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" type="submit" style="margin-top: 20px;">Update</button>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-center" style="margin-top: 40px;">
+        <div class="container text-muted py-4 py-lg-5">
+            <ul class="list-inline">
+                <li class="list-inline-item me-4"><a class="link-secondary" href="#">Privacy Policy</a></li>
+                <li class="list-inline-item"><a class="link-secondary" href="#">Terms &amp; Conditions</a></li>
+            </ul>
+            <p class="mb-0">Copyright © 2022 Roddit</p>
+        </div>
+    </footer>
+
+</body>
+</html>

@@ -177,9 +177,6 @@ def register():
     return render_template("register.html", err=err, text_err=text_err, form=form)
 
 
-# -----------------------------
-# Route impostazioni profilo
-# -----------------------------
 @app.route("/settings", methods=["GET", "POST"])
 def settings():
 
@@ -294,17 +291,20 @@ def settings():
     )
 
     row = cursor.fetchone()
-    user = {
+    cursor.close()
+    conn.close()
+
+    return render_template(
+    "settings.html",
+    user={
         "photo": row[0],
         "email": row[1],
         "nickname": row[2],
         "bio": row[3]
-    }
-
-    cursor.close()
-    conn.close()
-
-    return render_template("settings.html", user=user, err=err, text_err=text_err)
+    },
+    err=err,
+    text_err=text_err
+)
 
 
 if __name__ == "__main__":

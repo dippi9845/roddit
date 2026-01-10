@@ -5,6 +5,7 @@ from cassandra.cluster import Cluster
 from cassandra.auth import PlainTextAuthProvider
 
 
+
 app = Flask(__name__)
 app.secret_key = "CAMBIA_QUESTA_CHIAVE"
 

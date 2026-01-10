@@ -20,14 +20,14 @@ def try_login_cookie(conn):
     #session["userID"] = row["user_id"]
     return True
 
-def is_user_logged_in(force_cookie_login=False):
+def is_user_logged_in(login_if_cookie_exists=False):
 
     # === Se già in sessione ===
     if "userID" in session:
         return True
 
     # === Se dobbiamo provare con cookie ===
-    if force_cookie_login:
+    if login_if_cookie_exists:
 
 
         conn = ...

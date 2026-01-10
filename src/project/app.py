@@ -1,8 +1,9 @@
 from flask import Flask, render_template, request, redirect, session, make_response
 import json
 from globals import *
+from cassandra.cluster import Cluster
+from cassandra.auth import PlainTextAuthProvider
 
-#from user_getters import is_user_logged_in
 
 app = Flask(__name__)
 app.secret_key = "CAMBIA_QUESTA_CHIAVE"
@@ -67,7 +68,7 @@ def new_post():
     
     return render_template("new-post.html")
 
-@app.route("ajax/login", methods=["POST"])
+@app.route("/ajax/login", methods=["POST"])
 def ajax_login():
     
     def is_form_valid():

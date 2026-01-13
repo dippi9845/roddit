@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS comment (
 
 CREATE TABLE IF NOT EXISTS cookies ( -- TODO: Definire una primary key
   UserID UUID,
-  Token text,
+  AuthToken text,
   ExpireDate text,
   HashToken text
 );

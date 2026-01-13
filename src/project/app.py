@@ -69,44 +69,6 @@ def new_post():
     
     return render_template("new-post.html")
 
-@app.route("/ajax/login", methods=["POST"])
-def ajax_login():
-    
-    def is_form_valid():
-        return 'email' in request.form and 'password' in request.form
-
-    def get_user_id(conn, email, password):
-        pass # TODO to implement
-
-    
-    def main(conn):
-        if not is_form_valid():
-            print("Invalid form")
-            return False, None
-
-        user_id = get_user_id(conn, request.form['email'], request.form['password'])
-        if not user_id:
-            print("Invalid credentials")
-            return False, None
-
-        create_session(user_id)
-
-        response = make_response()
-
-        if 'remember' in request.form:
-            create_cookie(response, user_id)
-
-        return True, response
-
-    ok, response = main(conn)
-
-    if ok:
-        response.headers["Location"] = "/"
-        response.status_code = 302
-        return response
-    else:
-        return redirect("/login")
-
 @app.route("/register", methods=["GET", "POST"])
 def register():
     err = False
@@ -177,7 +139,6 @@ def register():
                     return redirect("/login")
 
     return render_template("register.html", err=err, text_err=text_err, form=form)
-
 
 @app.route("/settings", methods=["GET", "POST"])
 def settings():
@@ -307,6 +268,44 @@ def settings():
     err=err,
     text_err=text_err
 )
+
+@app.route("/ajax/login", methods=["POST"])
+def ajax_login():
+    
+    def is_form_valid():
+        return 'email' in request.form and 'password' in request.form
+
+    def get_user_id(conn, email, password):
+        pass # TODO to implement
+
+    
+    def main(conn):
+        if not is_form_valid():
+            print("Invalid form")
+            return False, None
+
+        user_id = get_user_id(conn, request.form['email'], request.form['password'])
+        if not user_id:
+            print("Invalid credentials")
+            return False, None
+
+        create_session(user_id)
+
+        response = make_response()
+
+        if 'remember' in request.form:
+            create_cookie(response, user_id)
+
+        return True, response
+
+    ok, response = main(conn)
+
+    if ok:
+        response.headers["Location"] = "/"
+        response.status_code = 302
+        return response
+    else:
+        return redirect("/login")
 
 
 if __name__ == "__main__":

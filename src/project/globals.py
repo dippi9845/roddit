@@ -3,10 +3,6 @@ from cassandra.cluster import Session
 
 USER_ID_IN_SESSION = "userID"
 
-def get_db():
-    #TODO to implement with a database
-    pass
-
 def create_session(user_id):
     session[USER_ID_IN_SESSION] = user_id
 

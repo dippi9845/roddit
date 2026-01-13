@@ -1,5 +1,7 @@
 from flask import session, request
 from cassandra.cluster import Session
+import uuid
+from os import path
 
 USER_ID_IN_SESSION = "userID"
 
@@ -40,7 +42,7 @@ def save_image(file):
         img = Image.open(file)
         ext = file.filename.split(".")[-1]
         filename = uuid.uuid4().hex + "." + ext
-        path = os.path.join(UPLOAD_FOLDER, filename)
+        path = path.join(UPLOAD_FOLDER, filename)
         img.save(path)
         return "/" + path.replace("\\", "/")
     except:

@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS comment (
   entityID UUID
 );
 
-CREATE TABLE IF NOT EXISTS cookies (
+CREATE TABLE IF NOT EXISTS cookies ( -- TODO: Definire una primary key
   UserID UUID,
   Token text,
   ExpireDate text,

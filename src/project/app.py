@@ -20,7 +20,7 @@ app.secret_key = "CAMBIA_QUESTA_CHIAVE"
 @app.route("/")
 def index():
 
-    if not is_user_logged_in(True):
+    if not is_user_logged_in(cassandra_session, True):
         return redirect("/login")
     
     query = request.args.get("query", "")
@@ -31,48 +31,44 @@ def index():
 
 @app.route("/profile")
 def profile():
-    if not is_user_logged_in(force=True):
+    if not is_user_logged_in(cassandra_session, True):
         return redirect("/login")
-
-    conn = get_db()
 
     visited_user = request.args.get("user", session["userID"])
 
-    if not user_exists(conn, visited_user):
+    if not user_exists(cassandra_session, visited_user):
         return redirect("/404")
 
     profile_data = {
         "id": visited_user,
-        "name": get_user_name_by_id(conn, visited_user),
-        "bio": get_user_biography(conn, visited_user),
-        "picture": get_user_profile_picture(conn, visited_user),
-        "followers_count": get_user_follower_count(conn, visited_user),
-        "following_count": get_user_following_count(conn, visited_user),
-        "followers": get_user_followers(conn, visited_user),
-        "following": get_following_users(conn, visited_user),
+        "name": get_user_name_by_id(cassandra_session, visited_user),
+        "bio": get_user_biography(cassandra_session, visited_user),
+        "picture": get_user_profile_picture(cassandra_session, visited_user),
+        "followers_count": get_user_follower_count(cassandra_session, visited_user),
+        "following_count": get_user_following_count(cassandra_session, visited_user),
+        "followers": get_user_followers(cassandra_session, visited_user),
+        "following": get_following_users(cassandra_session, visited_user),
         "is_me": visited_user == session["userID"],
-        "is_following": is_following(conn, visited_user, session["userID"])
+        "is_following": is_following(cassandra_session, visited_user, session["userID"])
     }
 
-    posts = get_users_posts(conn, visited_user)
+    posts = get_users_posts(cassandra_session, visited_user)
 
     for p in posts:
-        p["liked"] = is_liked(conn, p["ID"], session["userID"])
-
-    conn.close()
+        p["liked"] = is_liked(cassandra_session, p["ID"], session["userID"])
 
     return render_template("profile.html", profile=profile_data, posts=posts)
 
 @app.route("/login")
 def login():
-    if is_user_logged_in(True):
+    if is_user_logged_in(cassandra_session, True):
         return redirect("/")
 
     return render_template("login.html")
 
 @app.route("/new-post")
 def new_post():
-    if not is_user_logged_in(True):
+    if not is_user_logged_in(cassandra_session, True):
         return redirect("/login")
     
     return render_template("new-post.html")
@@ -291,7 +287,7 @@ def ajax_login():
         else:
             return row.ID
     
-    def main(conn):
+    def main():
         if not is_form_valid():
             print("Invalid form")
             return False, None
@@ -310,7 +306,7 @@ def ajax_login():
 
         return True, response
 
-    ok, response = main(conn)
+    ok, response = main()
 
     if ok:
         response.headers["Location"] = "/"

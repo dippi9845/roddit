@@ -1,16 +1,17 @@
 from flask import session, request
+from cassandra.cluster import Session
 
 def get_db():
     #TODO to implement with a database
     pass
 
-def try_login_cookie(conn):
+def try_login_cookie(conn : Session):
 
     token = request.cookies.get("login_token")
     if not token:
         return False
 
-    pass # TODO check che del cookie nel database
+    conn.execute("SELECT * FROM cookies WHERE Token = ?") # TODO check che del cookie nel database
 
     #TODO check if the cookis is present
     #if not row:
@@ -20,7 +21,7 @@ def try_login_cookie(conn):
     #session["userID"] = row["user_id"]
     return True
 
-def is_user_logged_in(login_if_cookie_exists=False):
+def is_user_logged_in(db_connection : Session, login_if_cookie_exists=False):
 
     # === Se già in sessione ===
     if "userID" in session:
@@ -29,14 +30,8 @@ def is_user_logged_in(login_if_cookie_exists=False):
     # === Se dobbiamo provare con cookie ===
     if login_if_cookie_exists:
 
-
-        conn = ...
-
-        if try_login_cookie(conn):
-            conn.close()
+        if try_login_cookie(db_connection):
             return True
-
-        conn.close()
 
     return False
 

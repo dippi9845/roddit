@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS cookies ( -- TODO: Definire una primary key
   UserID UUID,
   AuthToken text,
   ExpireDate text,
-  HashToken text
+  HashToken text PRIMARY KEY
 );
 
 CREATE TABLE IF NOT EXISTS follow (

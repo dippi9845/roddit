@@ -1,2 +1,4 @@
 env/
 __pycache__/
+src/project/static/uploads/images/
+!src/project/static/uploads/images/default_profile_picture.jpg

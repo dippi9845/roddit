@@ -1,9 +1,17 @@
 from flask import Flask, render_template, request, redirect, session, make_response
 import json
 from globals import *
-from cassandra.cluster import Cluster
+from cassandra.cluster import Cluster, Session as CassandraSession
 from cassandra.auth import PlainTextAuthProvider
 
+
+auth_provider = PlainTextAuthProvider(
+    username="flask",
+    password="cassandra123"
+)
+
+cluster = Cluster(["127.0.0.1"], auth_provider=auth_provider)
+cassandra_session = cluster.connect("roddit")
 
 
 app = Flask(__name__)
@@ -275,16 +283,20 @@ def ajax_login():
     def is_form_valid():
         return 'email' in request.form and 'password' in request.form
 
-    def get_user_id(conn, email, password):
-        pass # TODO to implement
+    def get_user_id(email, password):
+        row = cassandra_session.execute("SELECT ID FROM users WHERE Email = ? AND Password = ?", (email, password))
 
+        if not row:
+            return None
+        else:
+            return row.ID
     
     def main(conn):
         if not is_form_valid():
             print("Invalid form")
             return False, None
 
-        user_id = get_user_id(conn, request.form['email'], request.form['password'])
+        user_id = get_user_id(request.form['email'], request.form['password'])
         if not user_id:
             print("Invalid credentials")
             return False, None
@@ -294,7 +306,7 @@ def ajax_login():
         response = make_response()
 
         if 'remember' in request.form:
-            create_cookie(response, user_id)
+            create_cookie(cassandra_session, user_id)
 
         return True, response
 

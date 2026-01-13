@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS post (
   MediaType text -- Immagine, Video
 );
 
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE IF NOT EXISTS users (-- TODO introdurre le immagini come blob perché così sono distribuite
   ID UUID PRIMARY KEY,
   Nickname text,
   Email text,

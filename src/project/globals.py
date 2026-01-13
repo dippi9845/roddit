@@ -11,14 +11,12 @@ def try_login_cookie(conn : Session):
     if not token:
         return False
 
-    conn.execute("SELECT * FROM cookies WHERE Token = ?") # TODO check che del cookie nel database
+    row = conn.execute("SELECT * FROM cookies WHERE IDToken = ?", (token))
+    
+    if not row:
+        return False
 
-    #TODO check if the cookis is present
-    #if not row:
-    #    return False
-
-    # TODO Assign the database id to session id
-    #session["userID"] = row["user_id"]
+    session["userID"] = row.UserID
     return True
 
 def is_user_logged_in(db_connection : Session, login_if_cookie_exists=False):

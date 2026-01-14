@@ -302,7 +302,7 @@ def ajax_login():
         response = make_response()
 
         if 'remember' in request.form:
-            create_cookie(cassandra_session, user_id)
+            create_cookie(user_id)
 
         return True, response
 

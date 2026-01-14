@@ -1,12 +1,27 @@
-from flask import session, request
+from flask import session, request, make_response
 from cassandra.cluster import Session
 import uuid
 from os import path
+from datetime import datetime, timedelta, timezone
+
 
 USER_ID_IN_SESSION = "userID"
 
 def create_session(user_id):
     session[USER_ID_IN_SESSION] = user_id
+
+def create_cookie(user_id):
+    expiration_time = datetime.now(timezone.utc) + timedelta(days=15)
+    response = make_response()
+    
+    response.set_cookie(
+        "UserID",
+        user_id,
+        expires=expiration_time,
+        path="/"
+    )
+    
+
 
 def try_login_cookie(conn : Session):
 

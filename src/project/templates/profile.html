@@ -20,17 +20,6 @@
             <h3>{{ profile.name }}</h3>
 
             {% if not profile.is_me %}
-                {% if profile.is_following %}
-                    <form action="/unfollow" method="post">
-                        <input type="hidden" name="user" value="{{ profile.id }}">
-                        <button class="btn btn-primary">Unfollow</button>
-                    </form>
-                {% else %}
-                    <form action="/follow" method="post">
-                        <input type="hidden" name="user" value="{{ profile.id }}">
-                        <button class="btn btn-primary">Follow</button>
-                    </form>
-                {% endif %}
             {% endif %}
 
             <p>{{ profile.bio }}</p>

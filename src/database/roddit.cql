@@ -17,12 +17,6 @@ CREATE TABLE comment (
   entityID UUID
 );
 
-CREATE TABLE follow (
-  Follower UUID,
-  Following UUID,
-  PRIMARY KEY (Follower, Following)
-);
-
 CREATE TABLE likes (
   User UUID,
   Post UUID,

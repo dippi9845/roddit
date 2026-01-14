@@ -44,7 +44,7 @@ CREATE TABLE post (
   Testo text,
   Likes int,
   Comments int,
-  File blob,
+  PathToFile text,
   MediaType text -- Immagine, Video
 );
 
@@ -55,5 +55,5 @@ CREATE TABLE users (-- TODO introdurre le immagini come blob perché così sono 
   Bio text,
   Password text,
   Salt text,
-  ProfileImage blob
+  ProfileImagePath text
 );

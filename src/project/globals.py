@@ -25,16 +25,11 @@ def create_cookie(user_id):
 
 def try_login_cookie(conn : Session):
 
-    token = request.cookies.get("login_token")
+    token = request.cookies.get("UserID")
     if not token:
         return False
 
-    row = conn.execute("SELECT * FROM cookies WHERE IDToken = ?", (token))
-    
-    if not row:
-        return False
-
-    session[USER_ID_IN_SESSION] = row.UserID
+    session[USER_ID_IN_SESSION] = token
     return True
 
 def is_user_logged_in(db_connection : Session, login_if_cookie_exists=False):

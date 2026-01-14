@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, session, make_response
 import json
 from globals import *
+from user_getters import *
 from cassandra.cluster import Cluster, Session as CassandraSession
 from cassandra.auth import PlainTextAuthProvider
 
@@ -39,18 +40,7 @@ def profile():
     if not user_exists(cassandra_session, visited_user):
         return redirect("/404")
 
-    profile_data = {
-        "id": visited_user,
-        "name": get_user_name_by_id(cassandra_session, visited_user),
-        "bio": get_user_biography(cassandra_session, visited_user),
-        "picture": get_user_profile_picture(cassandra_session, visited_user),
-        "followers_count": get_user_follower_count(cassandra_session, visited_user),
-        "following_count": get_user_following_count(cassandra_session, visited_user),
-        "followers": get_user_followers(cassandra_session, visited_user),
-        "following": get_following_users(cassandra_session, visited_user),
-        "is_me": visited_user == session["userID"],
-        "is_following": is_following(cassandra_session, visited_user, session["userID"])
-    }
+    profile_data = get_user_info(cassandra_session, visited_user)
 
     posts = get_users_posts(cassandra_session, visited_user)
 

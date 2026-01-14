@@ -6,16 +6,19 @@ from datetime import datetime, timedelta, timezone
 
 
 USER_ID_IN_SESSION = "userID"
+USER_ID_IN_COOKIE = USER_ID_IN_SESSION
+
 
 def create_session(user_id):
     session[USER_ID_IN_SESSION] = user_id
+
 
 def create_cookie(user_id):
     expiration_time = datetime.now(timezone.utc) + timedelta(days=15)
     response = make_response()
     
     response.set_cookie(
-        "UserID",
+        USER_ID_IN_COOKIE,
         user_id,
         expires=expiration_time,
         path="/"
@@ -25,7 +28,7 @@ def create_cookie(user_id):
 
 def try_login_cookie(conn : Session):
 
-    token = request.cookies.get("UserID")
+    token = request.cookies.get(USER_ID_IN_COOKIE)
     if not token:
         return False
 

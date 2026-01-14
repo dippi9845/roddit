@@ -1,4 +1,4 @@
-CREATE KEYSPACE IF NOT EXISTS roddit
+CREATE KEYSPACE roddit
 WITH replication = {
   'class': 'SimpleStrategy',
   'replication_factor': 1
@@ -9,7 +9,7 @@ USE roddit;
 CREATE ROLE flask WITH PASSWORD='cassandra123' AND LOGIN=true;
 GRANT ALL PERMISSIONS ON KEYSPACE ks TO roddit;
 
-CREATE TABLE IF NOT EXISTS comment (
+CREATE TABLE comment (
   ID UUID PRIMARY KEY,
   User text,
   Testo text,
@@ -17,25 +17,19 @@ CREATE TABLE IF NOT EXISTS comment (
   entityID UUID
 );
 
-CREATE TABLE IF NOT EXISTS cookies (
-  UserID UUID,
-  ExpireDate timestamp,
-  IDToken UUID PRIMARY KEY
-);
-
-CREATE TABLE IF NOT EXISTS follow (
+CREATE TABLE follow (
   Follower UUID,
   Following UUID,
   PRIMARY KEY (Follower, Following)
 );
 
-CREATE TABLE IF NOT EXISTS likes (
+CREATE TABLE likes (
   User UUID,
   Post UUID,
   PRIMARY KEY (User, Post)
 );
 
-CREATE TABLE IF NOT EXISTS notification (
+CREATE TABLE notification (
   ID UUID PRIMARY KEY,
   UserID UUID,
   Titolo text,
@@ -43,7 +37,7 @@ CREATE TABLE IF NOT EXISTS notification (
   Inserimento timestamp,
 );
 
-CREATE TABLE IF NOT EXISTS post (
+CREATE TABLE post (
   ID UUID PRIMARY KEY,
   Creator text,
   Titolo text,
@@ -54,7 +48,7 @@ CREATE TABLE IF NOT EXISTS post (
   MediaType text -- Immagine, Video
 );
 
-CREATE TABLE IF NOT EXISTS users (-- TODO introdurre le immagini come blob perché così sono distribuite
+CREATE TABLE users (-- TODO introdurre le immagini come blob perché così sono distribuite
   ID UUID PRIMARY KEY,
   Nickname text,
   Email text,

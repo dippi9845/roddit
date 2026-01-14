@@ -48,7 +48,7 @@ CREATE TABLE post (
   MediaType text -- Immagine, Video
 );
 
-CREATE TABLE users (-- TODO introdurre le immagini come blob perché così sono distribuite
+CREATE TABLE users (-- TODO trovare un modo per distribuire le immagini tra vari nodi
   ID UUID PRIMARY KEY,
   Nickname text,
   Email text,

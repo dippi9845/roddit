@@ -1,5 +1,4 @@
 from flask import session, request, make_response
-from cassandra.cluster import Session
 import uuid
 from os import path
 from datetime import datetime, timedelta, timezone

@@ -20,7 +20,7 @@ app.secret_key = "CAMBIA_QUESTA_CHIAVE"
 @app.route("/")
 def index():
 
-    if not is_user_logged_in(cassandra_session, True):
+    if not is_user_logged_in(True):
         return redirect("/login")
     
     query = request.args.get("query", "")
@@ -31,7 +31,7 @@ def index():
 
 @app.route("/profile")
 def profile():
-    if not is_user_logged_in(cassandra_session, True):
+    if not is_user_logged_in(True):
         return redirect("/login")
 
     visited_user = request.args.get("user", session["userID"])
@@ -61,14 +61,14 @@ def profile():
 
 @app.route("/login")
 def login():
-    if is_user_logged_in(cassandra_session, True):
+    if is_user_logged_in(True):
         return redirect("/")
 
     return render_template("login.html")
 
 @app.route("/new-post")
 def new_post():
-    if not is_user_logged_in(cassandra_session, True):
+    if not is_user_logged_in(True):
         return redirect("/login")
     
     return render_template("new-post.html")

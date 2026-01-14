@@ -26,7 +26,7 @@ def create_cookie(user_id):
     
 
 
-def try_login_cookie(conn : Session):
+def try_login_cookie():
 
     token = request.cookies.get(USER_ID_IN_COOKIE)
     if not token:
@@ -35,19 +35,20 @@ def try_login_cookie(conn : Session):
     session[USER_ID_IN_SESSION] = token
     return True
 
-def is_user_logged_in(db_connection : Session, login_if_cookie_exists=False):
 
-    # === Se già in sessione ===
+def is_user_logged_in(login_if_cookie_exists=False):
+
+
     if USER_ID_IN_SESSION in session:
         return True
 
-    # === Se dobbiamo provare con cookie ===
     if login_if_cookie_exists:
 
-        if try_login_cookie(db_connection):
+        if try_login_cookie():
             return True
 
     return False
+
 
 def save_image(file):
     UPLOAD_FOLDER = "static/uploads"

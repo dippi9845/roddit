@@ -26,17 +26,17 @@
         <div class="collapse navbar-collapse flex-grow-0 order-md-first" id="navcol-4">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
-                    <a class="btn btn-light me-2" href="settings.php">Settings</a>
+                    <a class="btn btn-light me-2" href="/settings">Settings</a>
                 </li>
             </ul>
             <div class="d-md-none my-2">
-                <a href="new-post.php" class="btn btn-light me-2">New Post</a>
-                <a class="btn btn-light me-2" href="ajax/logout.php">Log out</a>
+                <a href="/new-post" class="btn btn-light me-2">New Post</a>
+                <a class="btn btn-light me-2" href="/ajax/logout">Log out</a>
             </div>
         </div>
         <div class="d-none d-md-block">
-            <a href="new-post.php" class="btn btn-light me-2">New Post</a>
-            <a class="btn btn-light me-2" href="ajax/logout.php">Log out</a>
+            <a href="/new-post" class="btn btn-light me-2">New Post</a>
+            <a class="btn btn-light me-2" href="/ajax/logout">Log out</a>
         </div>
     </div>
 </nav>
@@ -44,18 +44,20 @@
 <div class="container">
     <div class="row">
         <div class="col-4">
-            <img src="{{ profile.picture }}" class="img-thumbnail">
+            <img src="{{ profile.picture }}" alt="..." class="img-thumbnail profile-picutre">
         </div>
 
         <div class="col-8">
-            <h3>{{ profile.name }}</h3>
+            <div class="row ms-auto">
+                <div class="col"><p>{{ profile.name }}</p></div>
 
             {% if not profile.is_me %}
             {% endif %}
 
-            <p>{{ profile.bio }}</p>
+            <div class="row ms-auto my-1">
+                <div class="col"> {{ profile.bio }} </div>
+            </div>
 
-            <p><b>{{ profile.followers_count }}</b> followers | <b>{{ profile.following_count }}</b> following</p>
         </div>
     </div>
 

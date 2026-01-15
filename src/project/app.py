@@ -4,7 +4,9 @@ from globals import *
 from user_getters import *
 from cassandra.cluster import Cluster, Session as CassandraSession
 from cassandra.auth import PlainTextAuthProvider
-
+import re
+import html
+from hashlib import sha256
 
 auth_provider = PlainTextAuthProvider(
     username="flask",
@@ -42,10 +44,10 @@ def profile():
 
     profile_data = get_user_info(cassandra_session, visited_user)
 
-    posts = get_users_posts(cassandra_session, visited_user)
+    posts = get_users_posts(cassandra_session, profile_data['name'])
 
     for p in posts:
-        p["liked"] = is_liked(cassandra_session, p["ID"], session["userID"])
+        p["liked"] = is_post_liked_by(cassandra_session, p["ID"], session["userID"])
 
     return render_template("profile.html", profile=profile_data, posts=posts)
 
@@ -114,18 +116,23 @@ def register():
                 elif not re.match(r"^[0-9a-zA-Z_]+$", form["nickname"]):
                     err = True
                     text_err = "Nickname provided is not valid, (only numbers, letters and underscore)"
-
-                # Se tutto OK → inserimento DB
+                
+                row = cassandra_session.execute("SELECT * FROM users WHERE Nickname = ?", (form["nickname"]))
+                if row:
+                    err = True
+                    text_err = "Nickname already taken"
+                
+                
                 if not err:
 
                     nickname = html.escape(form["nickname"])
                     email = html.escape(form["email"])
 
                     salt = uuid.uuid4().hex
-                    password_hash = generate_password_hash(form["password"] + salt)
+                    password_hash = sha256(form["password"] + salt).hexdigest()
 
-                    cursor.execute(
-                        "INSERT INTO users (Nickname, Email, Password, Salt) VALUES (%s, %s, %s, %s)",
+                    cassandra_session.execute(
+                        "INSERT INTO users (Nickname, Email, Password, Salt, ProfileImagePath) VALUES (?, ?, ?, ?, \"/static/uploads/images/default_profile_picture.jpg\")",
                         (nickname, email, password_hash, salt)
                     )
 

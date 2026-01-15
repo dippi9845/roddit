@@ -17,3 +17,14 @@ def get_user_info(cs: Session, user_id):
         "bio": row.Bio,
         "picture": row.ProfileImagePath
     }
+
+def is_post_liked_by(cs: Session, post_id, user_id):
+    row = cs.execute("SELECT * FROM likes WHERE User = ? AND Post = ?", (user_id, post_id))
+    if row:
+        return True
+    else:
+        return False
+    
+def get_users_posts(cs : Session, nickname : str):
+    result = cs.execute("SELECT ID, Creator, Titolo, Testo, Likes, Comments, PathToFile, MediaType FROM post WHERE Creator = ?", (nickname))
+    return [row._asdict() for row in result]

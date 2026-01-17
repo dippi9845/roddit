@@ -212,7 +212,7 @@ def settings():
             text_err = "Two passwords are different"
         else:
             salt = uuid.uuid4().hex
-            password_hash = generate_password_hash(new_password + salt)
+            password_hash = sha256(new_password + salt).hexdigest()
 
             cursor.execute(
                 "UPDATE users SET Password=%s, Salt=%s WHERE ID=%s",

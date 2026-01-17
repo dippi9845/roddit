@@ -312,6 +312,9 @@ def ajax_login():
     else:
         return redirect("/login")
 
+@app.route("/ajax/comments", methods=["POST"])
+def ajax_comments():
+    pass
 
 if __name__ == "__main__":
     app.run(debug=True)

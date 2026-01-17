@@ -259,6 +259,10 @@ def settings():
     text_err=text_err
 )
 
+@app.route("/404")
+def not_found():
+    return render_template("404.html")
+
 @app.route("/ajax/login", methods=["POST"])
 def ajax_login():
     

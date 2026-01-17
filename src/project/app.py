@@ -150,19 +150,6 @@ def settings():
     err = False
     text_err = ""
 
-    # Carica config DB
-    with open("../setup.json") as f:
-        data = json.load(f)
-
-    conn = mysql.connector.connect(
-        host="localhost",
-        user=data["dbName"],
-        password=data["dbPassword"],
-        database=data["dbUserName"]
-    )
-
-    cursor = conn.cursor()
-
     user_id = session["user_id"]
 
     # -------------------------
@@ -172,11 +159,10 @@ def settings():
     if new_email:
         if re.match(r"[^@]+@[^@]+\.[^@]+", new_email):
             new_email = html.escape(new_email)
-            cursor.execute(
-                "UPDATE users SET Email=%s WHERE ID=%s",
+            cassandra_session.execute(
+                "UPDATE users SET Email = ? WHERE ID = ?",
                 (new_email, user_id)
             )
-            conn.commit()
         else:
             err = True
             text_err = "Email provided is not a valid email"
@@ -194,11 +180,21 @@ def settings():
             text_err = "Nickname provided is not valid, (only numbers, letters and underscore)"
         else:
             new_nickname = html.escape(new_nickname)
-            cursor.execute(
-                "UPDATE users SET Nickname=%s WHERE ID=%s",
-                (new_nickname, user_id)
+            
+            row = cassandra_session.execute(
+                "SELECT * FROM users WHERE Nickname = ?",
+                (new_nickname,)
             )
-            conn.commit()
+            
+            if row:
+                err = True
+                text_err = "Nickname already taken"
+            
+            else:    
+                cassandra_session.execute(
+                    "UPDATE users SET Nickname = ? WHERE ID = ?",
+                    (new_nickname, user_id)
+                )
 
     # -------------------------
     # Cambio password
@@ -214,11 +210,10 @@ def settings():
             salt = uuid.uuid4().hex
             password_hash = sha256(new_password + salt).hexdigest()
 
-            cursor.execute(
-                "UPDATE users SET Password=%s, Salt=%s WHERE ID=%s",
+            cassandra_session.execute(
+                "UPDATE users SET Password = ?, Salt = ? WHERE ID = ?",
                 (password_hash, salt, user_id)
             )
-            conn.commit()
 
     # -------------------------
     # Cambio bio
@@ -226,11 +221,10 @@ def settings():
     new_bio = request.form.get("new-biography")
     if new_bio:
         new_bio = html.escape(new_bio)
-        cursor.execute(
-            "UPDATE users SET Bio=%s WHERE ID=%s",
+        cassandra_session.execute(
+            "UPDATE users SET Bio=? WHERE ID=?",
             (new_bio, user_id)
         )
-        conn.commit()
 
     # -------------------------
     # Cambio immagine
@@ -240,31 +234,26 @@ def settings():
         if file and file.filename != "":
             path = save_image(file)
             if path:
-                cursor.execute(
-                    "UPDATE users SET ProfileImagePath=%s WHERE ID=%s",
+                cassandra_session.execute(
+                    "UPDATE users SET ProfileImagePath = ? WHERE ID = ?",
                     (path, user_id)
                 )
-                conn.commit()
 
     # -------------------------
     # Recupera dati utente
     # -------------------------
-    cursor.execute(
-        "SELECT ProfileImagePath, Email, Nickname, Bio FROM users WHERE ID=%s",
+    data = cassandra_session.execute(
+        "SELECT ProfileImagePath, Email, Nickname, Bio FROM users WHERE ID = ?",
         (user_id,)
     )
-
-    row = cursor.fetchone()
-    cursor.close()
-    conn.close()
 
     return render_template(
     "settings.html",
     user={
-        "photo": row[0],
-        "email": row[1],
-        "nickname": row[2],
-        "bio": row[3]
+        "photo": data.ProfileImagePath,
+        "email": data.Email,
+        "nickname": data.Nickname,
+        "bio": data.Bio
     },
     err=err,
     text_err=text_err

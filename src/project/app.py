@@ -353,6 +353,17 @@ def ajax_like_post():
     cassandra_session.execute("UPDATE post SET Likes = Likes + 1 WHERE ID = ?", (post_id,))
     notify_user(cassandra_session, get_post_creator(cassandra_session, post_id), "New like", "a new user liked your post")
 
+@app.route("/ajax/logout")
+def ajax_logout():
+    session.clear()
+    response = make_response()
+    response.set_cookie(
+        USER_ID_IN_COOKIE,
+        "",
+        expires=0,
+        path="/"
+    )
+    return redirect("/login")
 
 if __name__ == "__main__":
     app.run(debug=True)

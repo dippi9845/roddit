@@ -7,6 +7,9 @@ from cassandra.auth import PlainTextAuthProvider
 import re
 import html
 from hashlib import sha256
+from post_handling import *
+
+
 
 auth_provider = PlainTextAuthProvider(
     username="flask",
@@ -321,9 +324,9 @@ def ajax_get_posts_count():
     user_id = session.get("user_id")
 
     if query == "":
-        post_count = get_all_post_of_followed_subreddit_count(conn, user_id)
+        post_count = get_all_post_of_followed_subreddit_count(cassandra_session, user_id)
     else:
-        post_count = get_all_post_by_content_count(conn, query)
+        post_count = get_all_post_by_content_count(cassandra_session, query)
 
     return str(post_count)
 

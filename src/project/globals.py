@@ -2,6 +2,7 @@ from flask import session, request, make_response
 import uuid
 from os import path
 from datetime import datetime, timedelta, timezone
+from cassandra.cluster import Session as CassandraSession
 
 
 USER_ID_IN_SESSION = "userID"
@@ -60,3 +61,8 @@ def save_image(file):
         return "/" + path.replace("\\", "/")
     except:
         return False
+    
+def get_all_searched_users_count(cs : CassandraSession, searched_user):
+    rows = cs.execute("SELECT Nickname FROM users WHERE Nickname CONTAINS ?", (searched_user,))
+    count = sum(1 for _ in rows)
+    return count

@@ -9,6 +9,18 @@ USE roddit;
 CREATE ROLE flask WITH PASSWORD='cassandra123' AND LOGIN=true;
 GRANT ALL PERMISSIONS ON KEYSPACE ks TO roddit;
 
+CREATE TABLE subreddit (
+  Name text PRIMARY KEY,
+  Followers int
+);
+
+CREATE TABLE following (
+  Subreddit text,
+  User UUID,
+  PRIMARY KEY (Subreddit, User)
+);
+
+
 CREATE TABLE comment (
   ID UUID PRIMARY KEY,
   User text,
@@ -16,6 +28,9 @@ CREATE TABLE comment (
   entityType text, -- POST, COMMENTO
   entityID UUID
 );
+
+CREATE INDEX ON comment(entityID, entityType) USING 'StorageAttachedIndex';
+
 
 CREATE TABLE likes (
   User UUID,
@@ -31,8 +46,12 @@ CREATE TABLE notification (
   Inserimento timestamp,
 );
 
+CREATE INDEX ON notification(UserID) USING 'StorageAttachedIndex';
+
+
 CREATE TABLE post (
   ID UUID PRIMARY KEY,
+  Subreddit text,
   Creator text,
   Titolo text,
   Testo text,
@@ -41,6 +60,10 @@ CREATE TABLE post (
   PathToFile text,
   MediaType text -- Immagine, Video
 );
+
+CREATE INDEX ON post(Subreddit) USING 'StorageAttachedIndex';
+
+CREATE INDEX ON post(Creator) USING 'StorageAttachedIndex';
 
 CREATE CUSTOM INDEX ON post(Titolo)
 USING 'org.apache.cassandra.index.sasi.SASIIndex'
@@ -63,3 +86,6 @@ CREATE TABLE users (-- TODO trovare un modo per distribuire le immagini tra vari
   Salt text,
   ProfileImagePath text
 );
+
+CREATE INDEX ON users(Nickname) USING 'StorageAttachedIndex';
+CREATE INDEX ON users(Email, Password) USING 'StorageAttachedIndex';

@@ -309,6 +309,25 @@ def ajax_login():
 def ajax_comments():
     pass
 
+
+@app.route("/ajax/get-posts-count", methods=["GET"])
+def ajax_get_posts_count():
+    
+    if not is_user_logged_in(True):
+        redirect("/login")
+    
+    query = request.form.get("query", "")
+
+    user_id = session.get("user_id")
+
+    if query == "":
+        post_count = get_all_post_of_followed_subreddit_count(conn, user_id)
+    else:
+        post_count = get_all_post_by_content_count(conn, query)
+
+    return str(post_count)
+
+
 if __name__ == "__main__":
     app.run(debug=True)
 

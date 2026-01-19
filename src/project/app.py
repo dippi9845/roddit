@@ -8,7 +8,7 @@ import re
 import html
 from hashlib import sha256
 from post_handling import *
-
+from notify import *
 
 
 auth_provider = PlainTextAuthProvider(
@@ -343,6 +343,16 @@ def ajax_get_users_count():
         user_count = get_all_searched_users_count(cassandra_session, query)
     
     return user_count
+
+
+@app.route("/ajax/like-post", methods=["POST"])
+def ajax_like_post():
+    post_id = request.form.get("postID")
+    user_id = session.get("user_id")
+    cassandra_session.execute("INSERT INTO likes (User, Post) VALUES (?, ?)", (user_id, post_id,))
+    cassandra_session.execute("UPDATE post SET Likes = Likes + 1 WHERE ID = ?", (post_id,))
+    notify_user(cassandra_session, get_post_creator(cassandra_session, post_id), "New like", "a new user liked your post")
+
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -17,7 +17,7 @@ CREATE TABLE subreddit (
 CREATE TABLE following (
   Subreddit text,
   User UUID,
-  PRIMARY KEY (Subreddit, User)
+  PRIMARY KEY (User, Subreddit)
 );
 
 

@@ -331,6 +331,19 @@ def ajax_get_posts_count():
     return str(post_count)
 
 
+@app.route("/ajax/get-users-count", methods=["GET"])
+def ajax_get_users_count():
+    if not is_user_logged_in(True):
+        redirect("/login")
+    
+    query = request.form.get("query", "")
+
+    user_count = 0
+    if query != "":
+        user_count = get_all_searched_users_count(cassandra_session, query)
+    
+    return user_count
+
 if __name__ == "__main__":
     app.run(debug=True)
 

@@ -42,6 +42,18 @@ CREATE TABLE post (
   MediaType text -- Immagine, Video
 );
 
+CREATE CUSTOM INDEX ON post(Titolo)
+USING 'org.apache.cassandra.index.sasi.SASIIndex'
+WITH OPTIONS = {
+  'mode': 'CONTAINS'
+};
+
+CREATE CUSTOM INDEX ON post(Testo)
+USING 'org.apache.cassandra.index.sasi.SASIIndex'
+WITH OPTIONS = {
+  'mode': 'CONTAINS'
+};
+
 CREATE TABLE users (-- TODO trovare un modo per distribuire le immagini tra vari nodi
   ID UUID PRIMARY KEY,
   Nickname text,

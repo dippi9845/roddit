@@ -58,8 +58,9 @@ CREATE TABLE post (
   Likes int,
   Comments int,
   PathToFile text,
-  MediaType text -- Immagine, Video
-);
+  MediaType text, -- Immagine, Video
+  Creazione timestamp
+) WITH CLUSTERING ORDER BY (Creazione DESC);
 
 CREATE INDEX ON post(Subreddit) USING 'StorageAttachedIndex';
 

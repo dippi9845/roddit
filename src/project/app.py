@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, make_response
+from flask import Flask, render_template, request, redirect, session, make_response, jsonify
 import json
 from globals import *
 from user_getters import *
@@ -369,7 +369,22 @@ def ajax_logout():
 
 @app.route("/ajax/put-comment", methods=["POST"])
 def ajax_put_comment():
-    pass
+    if "user_id" in session and "text" in request.args and "postID" in request.args:
+        user_info = get_user_info(cassandra_session, session["user_id"])
+        testo = html.escape(request.args["text"])
+        cassandra_session.execute("INSERT INTO comment (ID, User, Testo, entityType, entityID) VALUES (uuid(), ?, ?, 'Post', ?)", (user_info["name"], testo, request.args["postID"],))
+        cassandra_session.execute("UPDATE post SET Comments=Comments + 1 WHERE ID = ?", (request.args["postID"],))
+        result = cassandra_session.execute(
+            "SELECT ProfileImagePath as ProfileImage, Nickname as User FROM users WHERE ID = ?",
+            (session["user_id"],)
+        )
+
+        row = result.one()
+
+        return jsonify({
+            "ProfileImage": row.profileimage,
+            "User": row.user
+        })
 
 
 @app.route("/ajax/unfollow", methods=["POST"])

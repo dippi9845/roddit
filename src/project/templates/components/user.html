@@ -1,0 +1,25 @@
+{% macro draw_user_card(userID, userName, userProfilePicture, currentUserID) %}
+
+<div class="d-flex justify-content-start">
+    <div class="p-2">
+        <a href="{{ url_for('profile', user=userID) }}">
+            <img src="{{ userProfilePicture }}" alt="..." class="img-thumbnail card-user-picutre">
+        </a>
+    </div>
+
+    <div class="p-2">
+        <div class="row mx-4">
+            <a href="{{ url_for('profile', user=userID) }}" class="link-dark text-decoration-none">
+                {{ userName }}
+            </a>
+        </div>
+    </div>
+
+    <div class="p-2">
+        {% if userID == currentUserID %}
+            {# Non mostrare nulla se è il proprio profilo #}
+        {% endif %}
+    </div>
+</div>
+
+{% endmacro %}

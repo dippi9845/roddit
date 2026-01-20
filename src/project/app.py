@@ -450,6 +450,31 @@ def post_drawer():
    
     return render_template_string(template, posts=posts)
 
+
+@app.route("/html-snippets/user-card-drawer", memthods=["POST"])
+def post_user_card_drawer():
+    query = request.form.get("query", "")
+
+    rows = cassandra_session.execute(
+        "SELECT * FROM users WHERE Nickname CONTAINS ?",
+        (query,)
+    )
+
+    users = [{
+        "id": row.ID,
+        "nickname": row.Nickname,
+        "photo": row.ProfileImagePath,
+        "current_uid": session[USER_ID_IN_SESSION]
+    } for row in rows]
+
+    template = """
+    {% from "user.html" import draw_user_card %}
+    {% for u in users %}
+        {{ draw_user_card( u['id'], u['nickname'], u['photo'], u['current_uid']) }}
+    """
+    
+    return render_template_string(template, users=users)
+    
 if __name__ == "__main__":
     app.run(debug=True)
 

@@ -472,6 +472,7 @@ def post_user_card_drawer():
     {% for u in users %}
         {{ draw_user_card( u['id'], u['nickname'], u['photo'], u['current_uid']) }}
     {% endfor %}
+    <script src="/static/assets/js/btn-ajax-form.js"></script>
     """
     
     return render_template_string(template, users=users)

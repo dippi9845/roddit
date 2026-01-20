@@ -387,10 +387,10 @@ def ajax_put_comment():
         })
 
 
-@app.route("/ajax/unfollow", methods=["POST", "GET"])
+@app.route("/ajax/unfollow", methods=["GET"])
 def ajax_unfollow():
-    if USER_ID_IN_SESSION in session:# TODO passare come parametro il subreddit da cui disiscriversi
-        cassandra_session.execute("DELETE FROM following WHERE Used = ? AND Subreddit = ?", (session[USER_ID_IN_SESSION],))
+    if USER_ID_IN_SESSION in session:
+        cassandra_session.execute("DELETE FROM following WHERE Used = ? AND Subreddit = ?", (session[USER_ID_IN_SESSION], request.args["subreddit"],))
 
 if __name__ == "__main__":
     app.run(debug=True)

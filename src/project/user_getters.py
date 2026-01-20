@@ -22,6 +22,10 @@ def get_user_photo_by_nickname(cs: Session, nickname):
     row = cs.execute("SELECT ProfileImagePath FROM users WHERE Nickname = ?", (nickname,))
     return row.ProfileImagePath
 
+def get_user_id_by_nickname(cs: Session, nickname):
+    row = cs.execute("SELECT ID FROM users WHERE Nickname = ?", (nickname,))
+    return row.ID
+
 def is_post_liked_by(cs: Session, post_id, user_id):
     row = cs.execute("SELECT * FROM likes WHERE User = ? AND Post = ?", (user_id, post_id))
     if row:

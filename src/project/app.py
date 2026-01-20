@@ -471,6 +471,7 @@ def post_user_card_drawer():
     {% from "user.html" import draw_user_card %}
     {% for u in users %}
         {{ draw_user_card( u['id'], u['nickname'], u['photo'], u['current_uid']) }}
+    {% endfor %}
     """
     
     return render_template_string(template, users=users)

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, make_response, jsonify
+from flask import Flask, render_template, render_template_string, request, redirect, session, make_response, jsonify
 import json
 from globals import *
 from user_getters import *
@@ -9,6 +9,7 @@ import html
 from hashlib import sha256
 from post_handling import *
 from notify import *
+from time import time
 
 
 auth_provider = PlainTextAuthProvider(
@@ -391,6 +392,63 @@ def ajax_put_comment():
 def ajax_unfollow():
     if USER_ID_IN_SESSION in session:
         cassandra_session.execute("DELETE FROM following WHERE Used = ? AND Subreddit = ?", (session[USER_ID_IN_SESSION], request.args["subreddit"],))
+
+
+@app.route("/html-snippets/post-drawer", memthods=["POST"])
+def post_drawer():
+    
+    query = request.form.get("query", "")
+    offset = int(request.form.get("offset", int(time())))
+    dt = datetime.fromtimestamp(offset, timezone.utc)
+    limit = int(request.form.get("limit", 10))
+    
+    if query == "":
+        subs = cassandra_session.execute("SELECT Subreddit FROM following WHERE User = ?", (session[USER_ID_IN_SESSION],))
+        
+        posts = []
+        for sub in subs:
+            rows = cassandra_session.execute("SELECT * FROM post WHERE Creazione < ? AND Subreddit = ? ORDER BY Creazione DESC LIMIT ?", (dt, sub.Subreddit, limit))
+        posts.extend([{
+            'id': row.ID ,
+            'sub' : row.Subreddit,
+            'creator_id': get_user_id_by_nickname(cassandra_session, row.Creator),
+            'creator_nickname' : row.Creator,
+            "ProfilePicture" : get_user_photo_by_nickname(cassandra_session, row.Creator),
+            "titolo" : row.Titolo,
+            "testo" : row.Testo,
+            "likes" : row.Likes,
+            "liked": is_post_liked_by(cassandra_session, row.ID, session[USER_ID_IN_SESSION]),
+            "comments" : row.Comments,
+            "file" : row.PathToFile
+            } for row in rows])
+    else:
+        rows = cassandra_session.execute(
+            "SELECT * FROM post WHERE ( Titolo CONTAINS ? OR Testo CONTAINS ?) AND Creazione < ? ORDER BY Creazione DESC LIMIT ?",
+            (query, query, dt, limit))
+        posts = [{ 
+                'id': row.ID ,
+                'sub' : row.Subreddit,
+                'creator_id': get_user_id_by_nickname(cassandra_session, row.Creator),
+                'creator_nickname' : row.Creator,
+                "ProfilePicture" : get_user_photo_by_nickname(cassandra_session, row.Creator),
+                "titolo" : row.Titolo,
+                "testo" : row.Testo,
+                "likes" : row.Likes,
+                "liked": is_post_liked_by(cassandra_session, row.ID, session[USER_ID_IN_SESSION]),
+                "comments" : row.Comments, 
+                "file" : row.PathToFile 
+                } for row in rows]
+    
+    
+    template = """
+    {% from "post.html" import drawPost %}
+    {% for p in posts %}
+        {{ drawPost( p['id'], p['creator_id'], p['creator_nickname'], p['ProfilePicture'], p['titolo'], p['testo'], p['likes'], p['liked'], p['comments'], p['file']) }}
+    {% endfor %}
+    """
+
+   
+    return render_template_string(template, posts=posts)
 
 if __name__ == "__main__":
     app.run(debug=True)

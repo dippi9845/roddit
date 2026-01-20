@@ -40,7 +40,7 @@ def profile():
     if not is_user_logged_in(True):
         return redirect("/login")
 
-    visited_user = request.args.get("user", session["userID"])
+    visited_user = request.args.get("user", session[USER_ID_IN_SESSION])
 
     if not user_exists(cassandra_session, visited_user):
         return redirect("/404")
@@ -50,7 +50,7 @@ def profile():
     posts = get_users_posts(cassandra_session, profile_data['name'])
 
     for p in posts:
-        p["liked"] = is_post_liked_by(cassandra_session, p["ID"], session["userID"])
+        p["liked"] = is_post_liked_by(cassandra_session, p["ID"], session[USER_ID_IN_SESSION])
 
     return render_template("profile.html", profile=profile_data, posts=posts)
 
@@ -147,13 +147,13 @@ def register():
 @app.route("/settings", methods=["GET", "POST"])
 def settings():
 
-    if "user_id" not in session:
+    if USER_ID_IN_SESSION not in session:
         return redirect("/login")
 
     err = False
     text_err = ""
 
-    user_id = session["user_id"]
+    user_id = session[USER_ID_IN_SESSION]
 
     # -------------------------
     # Cambio email
@@ -321,7 +321,7 @@ def ajax_get_posts_count():
     
     query = request.args.get("query", "")
 
-    user_id = session.get("user_id")
+    user_id = session.get(USER_ID_IN_SESSION)
 
     if query == "":
         post_count = get_all_post_of_followed_subreddit_count(cassandra_session, user_id)
@@ -348,7 +348,7 @@ def ajax_get_users_count():
 @app.route("/ajax/like-post", methods=["POST"])
 def ajax_like_post():
     post_id = request.form.get("postID")
-    user_id = session.get("user_id")
+    user_id = session.get(USER_ID_IN_SESSION)
     cassandra_session.execute("INSERT INTO likes (User, Post) VALUES (?, ?)", (user_id, post_id,))
     cassandra_session.execute("UPDATE post SET Likes = Likes + 1 WHERE ID = ?", (post_id,))
     notify_user(cassandra_session, get_post_creator(cassandra_session, post_id), "New like", "a new user liked your post")
@@ -367,16 +367,16 @@ def ajax_logout():
     return redirect("/login")
 
 
-@app.route("/ajax/put-comment", methods=["POST"])
+@app.route("/ajax/put-comment", methods=["GET"])
 def ajax_put_comment():
-    if "user_id" in session and "text" in request.args and "postID" in request.args:
-        user_info = get_user_info(cassandra_session, session["user_id"])
+    if USER_ID_IN_SESSION in session and "text" in request.args and "postID" in request.args:
+        user_info = get_user_info(cassandra_session, session[USER_ID_IN_SESSION])
         testo = html.escape(request.args["text"])
         cassandra_session.execute("INSERT INTO comment (ID, User, Testo, entityType, entityID) VALUES (uuid(), ?, ?, 'Post', ?)", (user_info["name"], testo, request.args["postID"],))
         cassandra_session.execute("UPDATE post SET Comments=Comments + 1 WHERE ID = ?", (request.args["postID"],))
         result = cassandra_session.execute(
             "SELECT ProfileImagePath as ProfileImage, Nickname as User FROM users WHERE ID = ?",
-            (session["user_id"],)
+            (session[USER_ID_IN_SESSION],)
         )
 
         row = result.one()
@@ -389,8 +389,8 @@ def ajax_put_comment():
 
 @app.route("/ajax/unfollow", methods=["POST", "GET"])
 def ajax_unfollow():
-    if "user_id" in session:# TODO passare come parametro il subreddit da cui disiscriversi
-        cassandra_session.execute("DELETE FROM following WHERE Used = ? AND Subreddit = ?", (session["user_id"],))
+    if USER_ID_IN_SESSION in session:# TODO passare come parametro il subreddit da cui disiscriversi
+        cassandra_session.execute("DELETE FROM following WHERE Used = ? AND Subreddit = ?", (session[USER_ID_IN_SESSION],))
 
 if __name__ == "__main__":
     app.run(debug=True)

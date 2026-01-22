@@ -283,7 +283,7 @@ def ajax_create_new_post():
     file_path = ""
     
     if title == "" or subreddit == "":
-        return 
+        return redirect("/new-post")
 
     if "file" in request.files and request.files["file"].filename != "":
         file = request.files["file"]
@@ -295,7 +295,7 @@ def ajax_create_new_post():
 
     row = cassandra_session.execute("SELECT * FROM subreddit WHERE Name = ?", (subreddit,))
     if not row:
-        return
+        return redirect("/new-post")
     
     user_info = get_user_info(cassandra_session, session[USER_ID_IN_SESSION])
 

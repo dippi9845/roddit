@@ -272,9 +272,39 @@ def not_found():
 def ajax_follow():
     if USER_ID_IN_SESSION in session:
         cassandra_session.execute("INSERT INTO following (User, Subreddit) VALUES (?, ?)", (session[USER_ID_IN_SESSION], request.args["subreddit"],))
+        cassandra_session.execute("UPDATE subreddit SET Followers = Followers + 1 WHERE Name = ?", (request.args["subreddit"],))
 
+@app.route("/ajax/create-new-post", methods=["POST"])
+def ajax_create_new_post():
+    
+    title = request.form.get("title", "")
+    text = request.form.get("text", "")
+    subreddit = request.form.get("subreddit", "")
+    file_path = ""
+    
+    if title == "" or subreddit == "":
+        return 
 
+    if "file" in request.files and request.files["file"].filename != "":
+        file = request.files["file"]
+        file_path = "/static/uploads/images/" + str(uuid.uuid4()) + file.filename.rsplit(".", 1)[1].lower()
+        file.save("." + file_path)
+    
+    else:
+        file_path = None
 
+    row = cassandra_session.execute("SELECT * FROM subreddit WHERE Name = ?", (subreddit,))
+    if not row:
+        return
+    
+    user_info = get_user_info(cassandra_session, session[USER_ID_IN_SESSION])
+
+    cassandra_session.execute(
+        "INSERT INTO post (ID, Subreddit, Creator, Titolo, Testo, PathToFile, Creazione, Likes, Comments) VALUES (uuid(), ?, ?, ?, ?, ?, toTimestamp(now()), 0, 0)",
+        (subreddit, user_info["name"], html.escape(title), html.escape(text), file_path)
+    )
+
+    return redirect("/")
 
 
 @app.route("/ajax/login", methods=["POST"])
@@ -402,7 +432,7 @@ def ajax_put_comment():
 def ajax_unfollow():
     if USER_ID_IN_SESSION in session:
         cassandra_session.execute("DELETE FROM following WHERE Used = ? AND Subreddit = ?", (session[USER_ID_IN_SESSION], request.args["subreddit"],))
-
+        cassandra_session.execute("UPDATE subreddit SET Followers = Followers - 1 WHERE Name = ?", (request.args["subreddit"],))
 
 @app.route("/html-snippets/post-drawer", memthods=["POST"])
 def post_drawer():

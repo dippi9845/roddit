@@ -267,6 +267,16 @@ def settings():
 def not_found():
     return render_template("404.html")
 
+
+@app.route("/ajax/follow", methods=["GET"])
+def ajax_follow():
+    if USER_ID_IN_SESSION in session:
+        cassandra_session.execute("INSERT INTO following (User, Subreddit) VALUES (?, ?)", (session[USER_ID_IN_SESSION], request.args["subreddit"],))
+
+
+
+
+
 @app.route("/ajax/login", methods=["POST"])
 def ajax_login():
     

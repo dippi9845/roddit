@@ -460,6 +460,11 @@ def ajax_dislike_post():
         cassandra_session.execute("UPDATE post SET Likes = Likes - 1 WHERE ID = ?", (post_id,))
 
 
+@app.route("/ajax/get-last-notification")
+def ajax_get_last_notification():
+    row = cassandra_session.execute("SELECT ID FROM notification WHERE Inserimento < toTimestamp(now()) LIMIT 1")
+    return jsonify({"ID": row.ID})
+
 
 @app.route("/ajax/unfollow", methods=["GET"])
 def ajax_unfollow():

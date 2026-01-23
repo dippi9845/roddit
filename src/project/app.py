@@ -466,6 +466,21 @@ def ajax_get_last_notification():
     return jsonify({"ID": row.ID})
 
 
+@app.route("/ajax/get-my-notification")
+def ajax_get_my_notification():
+    offset = int(request.form.get("o", int(time()))) # TODO qua vuole un timestamp non un int
+    dt = datetime.fromtimestamp(offset, timezone.utc)
+    limit = int(request.form.get("n", 5))
+    notifications = cassandra_session.execute("SELECT Titolo, Testo, Inserimento FROM notification WHERE UserID = ? AND Inserimento < ? LIMIT ?", (session[USER_ID_IN_SESSION], dt,limit,))
+    rtr = []
+    for n in notifications:
+        rtr.append({
+            "Title": n.Titolo,
+            "Message" : n.Testo,
+            "Inserimento" : n.Inserimento
+        })
+    return jsonify(rtr)
+
 @app.route("/ajax/unfollow", methods=["GET"])
 def ajax_unfollow():
     if USER_ID_IN_SESSION in session:

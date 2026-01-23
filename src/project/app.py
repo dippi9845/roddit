@@ -426,6 +426,32 @@ def ajax_put_comment():
         })
 
 
+@app.route("/ajax/comments", methods=["GET"])
+def ajax_comments():
+    post_id = request.args.get('post', "")
+        
+    if post_id == "":
+        return "{ \"Error\": \"No ID\" }"
+
+    rows = cassandra_session.execute("""
+        SELECT User, Testo
+        FROM comment
+        WHERE entityType='Post' AND entityID = ?
+        """, (post_id,))
+    
+    rtr = []
+
+    for row in rows:
+        result = cassandra_session.execute("SELECT ProfileImagePath AS ProfileImage FROM users WHERE Nickname = ?", (row.User,))
+        rtr.append({
+            "ProfileImage": result.ProfileImage,
+            "User" : row.User,
+            "Text" : row.Testo
+        })
+
+    return jsonify(rtr)
+
+
 @app.route("/ajax/unfollow", methods=["GET"])
 def ajax_unfollow():
     if USER_ID_IN_SESSION in session:

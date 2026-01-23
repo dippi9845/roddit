@@ -22,7 +22,7 @@ cassandra_session = cluster.connect("roddit")
 
 
 app = Flask(__name__)
-app.secret_key = "CAMBIA_QUESTA_CHIAVE"
+app.secret_key = "RODDIT_SOCIAL_MEDIA_123"
 
 @app.route("/")
 def index():

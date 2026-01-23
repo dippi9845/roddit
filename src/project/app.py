@@ -452,6 +452,15 @@ def ajax_comments():
     return jsonify(rtr)
 
 
+@app.route("/ajax/dislike-post", methods=["POST"])
+def ajax_dislike_post():
+    post_id = request.form.get("postID", "")
+    if post_id != "":
+        cassandra_session.execute("DELETE FROM likes WHERE User = ? AND Post = ?", (session[USER_ID_IN_SESSION], post_id,))
+        cassandra_session.execute("UPDATE post SET Likes = Likes - 1 WHERE ID = ?", (post_id,))
+
+
+
 @app.route("/ajax/unfollow", methods=["GET"])
 def ajax_unfollow():
     if USER_ID_IN_SESSION in session:

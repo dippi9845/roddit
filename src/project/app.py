@@ -234,11 +234,12 @@ def settings():
     if "new-photo" in request.files:
         file = request.files["new-photo"]
         if file and file.filename != "":
-            path = save_image(file)
-            if path:
+            file_path = "/static/uploads/images/" + str(uuid.uuid4()) + file.filename.rsplit(".", 1)[1].lower()
+            file.save("." + file_path)
+            if file_path:
                 cassandra_session.execute(
                     "UPDATE users SET ProfileImagePath = ? WHERE ID = ?",
-                    (path, user_id)
+                    (file_path, user_id)
                 )
 
     # -------------------------

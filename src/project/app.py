@@ -468,6 +468,7 @@ def ajax_get_last_notification():
 
 @app.route("/ajax/get-my-notification")
 def ajax_get_my_notification():
+    # TODO Si potrebbe aggiungere un campo "visto" così da restituire tutte le notifiche non ancora viste
     offset = int(request.form.get("o", int(time()))) # TODO qua vuole un timestamp non un int
     dt = datetime.fromtimestamp(offset, timezone.utc)
     limit = int(request.form.get("n", 5))

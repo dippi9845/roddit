@@ -467,6 +467,7 @@ def ajax_unfollow():
         cassandra_session.execute("DELETE FROM following WHERE Used = ? AND Subreddit = ?", (session[USER_ID_IN_SESSION], request.args["subreddit"],))
         cassandra_session.execute("UPDATE subreddit SET Followers = Followers - 1 WHERE Name = ?", (request.args["subreddit"],))
 
+
 @app.route("/html-snippets/post-drawer", memthods=["POST"])
 def post_drawer():
     
@@ -492,7 +493,8 @@ def post_drawer():
             "likes" : row.Likes,
             "liked": is_post_liked_by(cassandra_session, row.ID, session[USER_ID_IN_SESSION]),
             "comments" : row.Comments,
-            "file" : row.PathToFile
+            "file" : row.PathToFile,
+            "Creazione" : row.Creazione
             } for row in rows])
     else:
         rows = cassandra_session.execute(
@@ -509,7 +511,8 @@ def post_drawer():
                 "likes" : row.Likes,
                 "liked": is_post_liked_by(cassandra_session, row.ID, session[USER_ID_IN_SESSION]),
                 "comments" : row.Comments, 
-                "file" : row.PathToFile 
+                "file" : row.PathToFile,
+                "Creazione" : row.Creazione
                 } for row in rows]
     
     

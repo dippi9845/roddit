@@ -50,7 +50,7 @@ CREATE INDEX ON notification(UserID) USING 'StorageAttachedIndex';
 
 
 CREATE TABLE post (
-  ID UUID PRIMARY KEY,
+  ID UUID,
   Subreddit text,
   Creator text,
   Titolo text,
@@ -59,7 +59,8 @@ CREATE TABLE post (
   Comments int,
   PathToFile text,
   MediaType text, -- Immagine, Video
-  Creazione timestamp
+  Creazione timestamp,
+  PRIMARY KEY (ID, Creazione)
 ) WITH CLUSTERING ORDER BY (Creazione DESC);
 
 CREATE INDEX ON post(Subreddit) USING 'StorageAttachedIndex';

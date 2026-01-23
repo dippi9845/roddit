@@ -32,8 +32,6 @@ def index():
     
     query = request.args.get("query", "")
 
-    # TODO Qui puoi caricare i post dal DB
-
     return render_template("index.html", query=query)
 
 @app.route("/profile")

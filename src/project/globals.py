@@ -49,18 +49,6 @@ def is_user_logged_in(login_if_cookie_exists=False):
 
     return False
 
-
-def save_image(file):
-    UPLOAD_FOLDER = "static/uploads"
-    try:
-        img = Image.open(file)
-        ext = file.filename.split(".")[-1]
-        filename = uuid.uuid4().hex + "." + ext
-        path = path.join(UPLOAD_FOLDER, filename)
-        img.save(path)
-        return "/" + path.replace("\\", "/")
-    except:
-        return False
     
 def get_all_searched_users_count(cs : CassandraSession, searched_user):
     rows = cs.execute("SELECT Nickname FROM users WHERE Nickname CONTAINS ?", (searched_user,))

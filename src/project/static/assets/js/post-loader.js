@@ -7,20 +7,20 @@ $(document).ready( function() {
     window.visualizedUserCount = 0;
     window.cardsPerRequest = 5;
     let query = getUrlVars()['query'];
-    window.searchedUsersCount = ajaxGetRawOutput("/ajax/get-users-count.php", query);
+    window.searchedUsersCount = ajaxGetRawOutput("/ajax/get-users-count", query);
 
     cards = "";
 
     $.getScript('/static/assets/js/btn-ajax-form.js');
 
     if (window.searchedUsersCount > 0) {
-        cards += ajaxLoadCards("/html-snippets/user-card-drawer.php", query, window.visualizedUserCount, window.cardsPerRequest);
+        cards += ajaxLoadCards("/html-snippets/user-card-drawer", query, window.visualizedUserCount, window.cardsPerRequest);
         
         window.visualizedUserCount += window.searchedUsersCount;
     }
     
     if (window.visualizedUserCount <= window.cardsPerRequest) {
-        cards += ajaxLoadCards("/html-snippets/post-drawer.php", query, window.visualizedPostCount, window.cardsPerRequest-window.visualizedUserCount);
+        cards += ajaxLoadCards("/html-snippets/post-drawer", query, window.visualizedPostCount, window.cardsPerRequest-window.visualizedUserCount);
 
         window.visualizedPostCount += window.cardsPerRequest;
     }
@@ -43,19 +43,19 @@ $(window).scroll(function() {
         return;
     }
     let query = getUrlVars()['query'];
-    const postCount = ajaxGetRawOutput("/ajax/get-posts-count.php", query);
-    const userCount = ajaxGetRawOutput("/ajax/get-users-count.php", query);
+    const postCount = ajaxGetRawOutput("/ajax/get-posts-count", query);
+    const userCount = ajaxGetRawOutput("/ajax/get-users-count", query);
 
     cards = "";
 
     if (window.visualizedUserCount < userCount) {
-        cards += ajaxLoadCards("/html-snippets/user-card-drawer.php", query, window.visualizedUserCount, window.cardsPerRequest);
+        cards += ajaxLoadCards("/html-snippets/user-card-drawer", query, window.visualizedUserCount, window.cardsPerRequest);
 
         window.visualizedUserCount += window.cardsPerRequest;
     }
 
     if (window.visualizedPostCount < postCount) {
-        cards += ajaxLoadCards("/html-snippets/post-drawer.php", query, window.visualizedPostCount, window.cardsPerRequest);
+        cards += ajaxLoadCards("/html-snippets/post-drawer", query, window.visualizedPostCount, window.cardsPerRequest);
 
         window.visualizedPostCount += window.cardsPerRequest;
     }

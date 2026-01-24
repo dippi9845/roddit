@@ -11,7 +11,7 @@ $(document).ready( function() {
 
     cards = "";
 
-    $.getScript('assets/js/btn-ajax-form.js');
+    $.getScript('/static/assets/js/btn-ajax-form.js');
 
     if (window.searchedUsersCount > 0) {
         cards += ajaxLoadCards("/html-snippets/user-card-drawer.php", query, window.visualizedUserCount, window.cardsPerRequest);

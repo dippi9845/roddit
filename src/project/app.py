@@ -132,7 +132,7 @@ def registration():
                     email = html.escape(form["email"])
 
                     salt = uuid.uuid4().hex
-                    password_hash = sha256(form["password"] + salt).hexdigest()
+                    password_hash = sha256(form["password"].encode() + salt).hexdigest()
 
                     cassandra_session.execute(
                         "INSERT INTO users (Nickname, Email, Password, Salt, ProfileImagePath) VALUES (?, ?, ?, ?, \"/static/uploads/images/default_profile_picture.jpg\")",

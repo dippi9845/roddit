@@ -2,42 +2,72 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>Roddit</title>
-    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="assets/css/register.css">
+    <link rel="stylesheet" href="/static/assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+    <link rel="stylesheet" href="/static/assets/css/index.css">
+    <link rel="stylesheet" href="/static/assets/css/Navbar-Centered-Brand-icons.css">
+    <link rel="stylesheet" href="/static/assets/css/register.css">
+    <link rel="icon" type="image/x-icon" href="/static/fav.ico">
 </head>
 <body>
+
+<nav class="navbar navbar-light navbar-expand-md py-3">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="#">
+            <img src="fav.ico" alt="" width="50px">
+            <span onclick="window.location='/';">Roddit</span>
+        </a>
+        <div class="collapse navbar-collapse flex-grow-0 order-md-first" id="navcol-4">
+            <div class="d-none d-md-block">
+            </div>
+        </div>
+        <div class="d-none d-md-block">
+        </div>
+    </div>
+</nav>
 
 <div class="container">
 
     {% if err %}
-    <div class="alert alert-danger text-center">
-        {{ text_err }}
+    <div class="row">
+        <div class="col">
+            <div class="alert alert-danger text-center" role="alert">
+            <span> {{ text_err }}</span>
+            </div>
+        </div>
+       
     </div>
     {% endif %}
 
-    <h1 class="text-center">New Account</h1>
-
-    <form method="post">
-        <input class="form-control register" type="text" name="nickname" placeholder="Nickname" value="{{ form.nickname }}">
-        <input class="form-control register" type="email" name="email" placeholder="Email" value="{{ form.email }}">
-        <input class="form-control register" type="password" name="password" placeholder="Password" value="{{ form.password }}">
-        <input class="form-control register" type="password" name="pass_conf" placeholder="Confirm Password" value="{{ form.pass_conf }}">
-
-        <input type="hidden" name="first" value="Data">
-
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="privacy-policy" value="accept">
-            <label class="form-check-label">Accept privacy policy</label>
+    <div class="row">
+        <div class="col">
+            <h1 style="text-align: center;">New Account</h1>
         </div>
+    </div>
+    <div class="row d-xxl-flex">
+    <div class="col d-md-flex d-lg-flex d-xl-flex d-xxl-flex justify-content-md-center justify-content-lg-center justify-content-xl-center justify-content-xxl-center">
+        <form method="post">
+            <input class="form-control register" type="text" name="nickname" placeholder="Nickname" value="{{ form.nickname }}">
+            <input class="form-control register" type="email" name="email" placeholder="Email" value="{{ form.email }}">
+            <input class="form-control register" type="password" name="password" placeholder="Password" value="{{ form.password }}">
+            <input class="form-control register" type="password" name="pass_conf" placeholder="Confirm Password" value="{{ form.pass_conf }}">
 
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="terms-conditions" value="accept">
-            <label class="form-check-label">Accept terms and conditions</label>
-        </div>
+            <input type="hidden" name="first" value="Data">
 
-        <button class="btn btn-danger" type="submit">Register</button>
-    </form>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="privacy-policy" name="privacy-policy" value="accept">
+                <label class="form-check-label" for="formCheck-2">Accept privacy policy</label>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="terms-conditions" name="terms-conditions" value="accept">
+                 <label class="form-check-label" for="formCheck-1">Accept terms and conditions</label>
+            </div>
+
+            <button class="btn btn-danger" id="submit" type="submit">Register</button>
+        </form>
 </div>
 
 </body>

@@ -348,10 +348,6 @@ def ajax_login():
     else:
         return redirect("/login")
 
-@app.route("/ajax/comments", methods=["POST"])
-def ajax_comments():
-    pass
-
 
 @app.route("/ajax/get-posts-count", methods=["GET"])
 def ajax_get_posts_count():
@@ -490,7 +486,7 @@ def ajax_unfollow():
         cassandra_session.execute("UPDATE subreddit SET Followers = Followers - 1 WHERE Name = ?", (request.args["subreddit"],))
 
 
-@app.route("/html-snippets/post-drawer", memthods=["POST"])
+@app.route("/html-snippets/post-drawer", methods=["POST"])
 def post_drawer():
     
     query = request.form.get("query", "")
@@ -549,7 +545,7 @@ def post_drawer():
     return render_template_string(template, posts=posts)
 
 
-@app.route("/html-snippets/user-card-drawer", memthods=["POST"])
+@app.route("/html-snippets/user-card-drawer", methods=["POST"])
 def post_user_card_drawer():
     query = request.form.get("query", "")
 

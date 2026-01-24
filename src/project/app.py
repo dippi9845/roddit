@@ -336,7 +336,6 @@ def ajax_login():
             print("Invalid credentials")
             return False, None
 
-        print("User", user_id, type(user_id), "logged in successfully")
         create_session(user_id)
 
         response = make_response()

@@ -125,6 +125,10 @@ def registration():
                     err = True
                     text_err = "Nickname already taken"
                 
+                row = cassandra_session.execute("SELECT * FROM users WHERE Email = %s", (form["email"],))
+                if row: 
+                    err = True
+                    text_err = "Email already registered"
                 
                 if not err:
 
@@ -314,7 +318,8 @@ def ajax_login():
         return 'email' in request.form and 'password' in request.form
 
     def get_user_id(email, password):
-        row = cassandra_session.execute("SELECT ID FROM users WHERE Email = %s AND Password = %s", (email, password))
+        salt = cassandra_session.execute("SELECT Salt FROM users WHERE Email = %s", (email,)).Salt
+        row = cassandra_session.execute("SELECT ID FROM users WHERE Email = %s AND Password = %s", (email, sha256(password.encode() + salt.encode()).hexdigest(),))
 
         if not row:
             return None

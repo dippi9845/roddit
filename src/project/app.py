@@ -318,24 +318,25 @@ def ajax_login():
         return 'email' in request.form and 'password' in request.form
 
     def get_user_id(email, password):
-        salt = cassandra_session.execute("SELECT Salt FROM users WHERE Email = %s", (email,)).Salt
+        salt = cassandra_session.execute("SELECT Salt FROM users WHERE Email = %s", (email,))[0].salt
         row = cassandra_session.execute("SELECT ID FROM users WHERE Email = %s AND Password = %s", (email, sha256(password.encode() + salt.encode()).hexdigest(),))
 
         if not row:
             return None
         else:
-            return row.ID
+            return row[0].id
     
     def main():
         if not is_form_valid():
             print("Invalid form")
             return False, None
 
-        user_id = get_user_id(request.form['email'], request.form['password'])
+        user_id = str(get_user_id(request.form['email'], request.form['password']))
         if not user_id:
             print("Invalid credentials")
             return False, None
 
+        print("User", user_id, type(user_id), "logged in successfully")
         create_session(user_id)
 
         response = make_response()

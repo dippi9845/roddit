@@ -132,10 +132,10 @@ def registration():
                     email = html.escape(form["email"])
 
                     salt = uuid.uuid4().hex
-                    password_hash = sha256(form["password"].encode() + salt).hexdigest()
+                    password_hash = sha256(form["password"].encode() + salt.encode()).hexdigest()
 
                     cassandra_session.execute(
-                        "INSERT INTO users (Nickname, Email, Password, Salt, ProfileImagePath) VALUES (?, ?, ?, ?, \"/static/uploads/images/default_profile_picture.jpg\")",
+                        "INSERT INTO users (ID, Nickname, Email, Password, Salt, ProfileImagePath) VALUES (uuid(), %s, %s, %s, %s, '/static/uploads/images/default_profile_picture.jpg')",
                         (nickname, email, password_hash, salt)
                     )
 
@@ -163,7 +163,7 @@ def settings():
         if re.match(r"[^@]+@[^@]+\.[^@]+", new_email):
             new_email = html.escape(new_email)
             cassandra_session.execute(
-                "UPDATE users SET Email = ? WHERE ID = ?",
+                "UPDATE users SET Email = %s WHERE ID = %s",
                 (new_email, user_id)
             )
         else:
@@ -185,7 +185,7 @@ def settings():
             new_nickname = html.escape(new_nickname)
             
             row = cassandra_session.execute(
-                "SELECT * FROM users WHERE Nickname = ?",
+                "SELECT * FROM users WHERE Nickname = %s",
                 (new_nickname,)
             )
             
@@ -195,7 +195,7 @@ def settings():
             
             else:    
                 cassandra_session.execute(
-                    "UPDATE users SET Nickname = ? WHERE ID = ?",
+                    "UPDATE users SET Nickname = %s WHERE ID = %s",
                     (new_nickname, user_id)
                 )
 
@@ -214,7 +214,7 @@ def settings():
             password_hash = sha256(new_password + salt).hexdigest()
 
             cassandra_session.execute(
-                "UPDATE users SET Password = ?, Salt = ? WHERE ID = ?",
+                "UPDATE users SET Password = %s, Salt = %s WHERE ID = %s",
                 (password_hash, salt, user_id)
             )
 
@@ -225,7 +225,7 @@ def settings():
     if new_bio:
         new_bio = html.escape(new_bio)
         cassandra_session.execute(
-            "UPDATE users SET Bio=? WHERE ID=?",
+            "UPDATE users SET Bio=%s WHERE ID=%s",
             (new_bio, user_id)
         )
 
@@ -239,7 +239,7 @@ def settings():
             file.save("." + file_path)
             if file_path:
                 cassandra_session.execute(
-                    "UPDATE users SET ProfileImagePath = ? WHERE ID = ?",
+                    "UPDATE users SET ProfileImagePath = %s WHERE ID = %s",
                     (file_path, user_id)
                 )
 
@@ -247,7 +247,7 @@ def settings():
     # Recupera dati utente
     # -------------------------
     data = cassandra_session.execute(
-        "SELECT ProfileImagePath, Email, Nickname, Bio FROM users WHERE ID = ?",
+        "SELECT ProfileImagePath, Email, Nickname, Bio FROM users WHERE ID = %s",
         (user_id,)
     )
 
@@ -271,8 +271,8 @@ def not_found():
 @app.route("/ajax/follow", methods=["GET"])
 def ajax_follow():
     if USER_ID_IN_SESSION in session:
-        cassandra_session.execute("INSERT INTO following (User, Subreddit) VALUES (?, ?)", (session[USER_ID_IN_SESSION], request.args["subreddit"],))
-        cassandra_session.execute("UPDATE subreddit SET Followers = Followers + 1 WHERE Name = ?", (request.args["subreddit"],))
+        cassandra_session.execute("INSERT INTO following (User, Subreddit) VALUES (%s, %s)", (session[USER_ID_IN_SESSION], request.args["subreddit"],))
+        cassandra_session.execute("UPDATE subreddit SET Followers = Followers + 1 WHERE Name = %s", (request.args["subreddit"],))
 
 @app.route("/ajax/create-new-post", methods=["POST"])
 def ajax_create_new_post():
@@ -293,14 +293,14 @@ def ajax_create_new_post():
     else:
         file_path = None
 
-    row = cassandra_session.execute("SELECT * FROM subreddit WHERE Name = ?", (subreddit,))
+    row = cassandra_session.execute("SELECT * FROM subreddit WHERE Name = %s", (subreddit,))
     if not row:
         return redirect("/new-post")
     
     user_info = get_user_info(cassandra_session, session[USER_ID_IN_SESSION])
 
     cassandra_session.execute(
-        "INSERT INTO post (ID, Subreddit, Creator, Titolo, Testo, PathToFile, Creazione, Likes, Comments) VALUES (uuid(), ?, ?, ?, ?, ?, toTimestamp(now()), 0, 0)",
+        "INSERT INTO post (ID, Subreddit, Creator, Titolo, Testo, PathToFile, Creazione, Likes, Comments) VALUES (uuid(), %s, %s, %s, %s, %s, toTimestamp(now()), 0, 0)",
         (subreddit, user_info["name"], html.escape(title), html.escape(text), file_path)
     )
 
@@ -314,7 +314,7 @@ def ajax_login():
         return 'email' in request.form and 'password' in request.form
 
     def get_user_id(email, password):
-        row = cassandra_session.execute("SELECT ID FROM users WHERE Email = ? AND Password = ?", (email, password))
+        row = cassandra_session.execute("SELECT ID FROM users WHERE Email = %s AND Password = %s", (email, password))
 
         if not row:
             return None
@@ -386,8 +386,8 @@ def ajax_get_users_count():
 def ajax_like_post():
     post_id = request.form.get("postID")
     user_id = session.get(USER_ID_IN_SESSION)
-    cassandra_session.execute("INSERT INTO likes (User, Post) VALUES (?, ?)", (user_id, post_id,))
-    cassandra_session.execute("UPDATE post SET Likes = Likes + 1 WHERE ID = ?", (post_id,))
+    cassandra_session.execute("INSERT INTO likes (User, Post) VALUES (%s, %s)", (user_id, post_id,))
+    cassandra_session.execute("UPDATE post SET Likes = Likes + 1 WHERE ID = %s", (post_id,))
     notify_user(cassandra_session, get_post_creator(cassandra_session, post_id), "New like", "a new user liked your post")
 
 
@@ -409,10 +409,10 @@ def ajax_put_comment():
     if USER_ID_IN_SESSION in session and "text" in request.args and "postID" in request.args:
         user_info = get_user_info(cassandra_session, session[USER_ID_IN_SESSION])
         testo = html.escape(request.args["text"])
-        cassandra_session.execute("INSERT INTO comment (ID, User, Testo, entityType, entityID) VALUES (uuid(), ?, ?, 'Post', ?)", (user_info["name"], testo, request.args["postID"],))
-        cassandra_session.execute("UPDATE post SET Comments=Comments + 1 WHERE ID = ?", (request.args["postID"],))
+        cassandra_session.execute("INSERT INTO comment (ID, User, Testo, entityType, entityID) VALUES (uuid(), %s, %s, 'Post', %s)", (user_info["name"], testo, request.args["postID"],))
+        cassandra_session.execute("UPDATE post SET Comments=Comments + 1 WHERE ID = %s", (request.args["postID"],))
         result = cassandra_session.execute(
-            "SELECT ProfileImagePath as ProfileImage, Nickname as User FROM users WHERE ID = ?",
+            "SELECT ProfileImagePath as ProfileImage, Nickname as User FROM users WHERE ID = %s",
             (session[USER_ID_IN_SESSION],)
         )
 

@@ -29,7 +29,7 @@ CREATE TABLE comment (
   entityID UUID
 );
 
-CREATE INDEX ON comment(entityID, entityType) USING 'StorageAttachedIndex';
+CREATE INDEX ON comment(entityID) USING 'StorageAttachedIndex';
 
 
 CREATE TABLE likes (
@@ -78,4 +78,5 @@ CREATE TABLE users (-- TODO trovare un modo per distribuire le immagini tra vari
 );
 
 CREATE INDEX ON users(Nickname) USING 'StorageAttachedIndex';
-CREATE INDEX ON users(Email, Password) USING 'StorageAttachedIndex';
+CREATE INDEX ON users(Email) USING 'StorageAttachedIndex';
+CREATE INDEX ON users(Password) USING 'StorageAttachedIndex';

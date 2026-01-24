@@ -119,7 +119,8 @@ def registration():
                     err = True
                     text_err = "Nickname provided is not valid, (only numbers, letters and underscore)"
                 
-                row = cassandra_session.execute("SELECT * FROM users WHERE Nickname = ?", (form["nickname"]))
+                
+                row = cassandra_session.execute("SELECT * FROM users WHERE Nickname = %s", (form["nickname"],))
                 if row:
                     err = True
                     text_err = "Nickname already taken"

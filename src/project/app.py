@@ -434,13 +434,13 @@ def ajax_comments():
     rows = cassandra_session.execute("""
         SELECT User, Testo
         FROM comment
-        WHERE entityType='Post' AND entityID = ?
+        WHERE entityType='Post' AND entityID = %s
         """, (post_id,))
     
     rtr = []
 
     for row in rows:
-        result = cassandra_session.execute("SELECT ProfileImagePath AS ProfileImage FROM users WHERE Nickname = ?", (row.User,))
+        result = cassandra_session.execute("SELECT ProfileImagePath AS ProfileImage FROM users WHERE Nickname = %s", (row.User,))
         rtr.append({
             "ProfileImage": result.ProfileImage,
             "User" : row.User,
@@ -454,8 +454,8 @@ def ajax_comments():
 def ajax_dislike_post():
     post_id = request.form.get("postID", "")
     if post_id != "":
-        cassandra_session.execute("DELETE FROM likes WHERE User = ? AND Post = ?", (session[USER_ID_IN_SESSION], post_id,))
-        cassandra_session.execute("UPDATE post SET Likes = Likes - 1 WHERE ID = ?", (post_id,))
+        cassandra_session.execute("DELETE FROM likes WHERE User = %s AND Post = %s", (session[USER_ID_IN_SESSION], post_id,))
+        cassandra_session.execute("UPDATE post SET Likes = Likes - 1 WHERE ID = %s", (post_id,))
 
 
 @app.route("/ajax/get-last-notification")
@@ -470,7 +470,7 @@ def ajax_get_my_notification():
     offset = int(request.form.get("o", int(time()))) # TODO qua vuole un timestamp non un int
     dt = datetime.fromtimestamp(offset, timezone.utc)
     limit = int(request.form.get("n", 5))
-    notifications = cassandra_session.execute("SELECT Titolo, Testo, Inserimento FROM notification WHERE UserID = ? AND Inserimento < ? LIMIT ?", (session[USER_ID_IN_SESSION], dt,limit,))
+    notifications = cassandra_session.execute("SELECT Titolo, Testo, Inserimento FROM notification WHERE UserID = %s AND Inserimento < %s LIMIT %s", (session[USER_ID_IN_SESSION], dt,limit,))
     rtr = []
     for n in notifications:
         rtr.append({
@@ -483,8 +483,8 @@ def ajax_get_my_notification():
 @app.route("/ajax/unfollow", methods=["GET"])
 def ajax_unfollow():
     if USER_ID_IN_SESSION in session:
-        cassandra_session.execute("DELETE FROM following WHERE Used = ? AND Subreddit = ?", (session[USER_ID_IN_SESSION], request.args["subreddit"],))
-        cassandra_session.execute("UPDATE subreddit SET Followers = Followers - 1 WHERE Name = ?", (request.args["subreddit"],))
+        cassandra_session.execute("DELETE FROM following WHERE User = %s AND Subreddit = %s", (session[USER_ID_IN_SESSION], request.args["subreddit"],))
+        cassandra_session.execute("UPDATE subreddit SET Followers = Followers - 1 WHERE Name = %s", (request.args["subreddit"],))
 
 
 @app.route("/html-snippets/post-drawer", methods=["POST"])
@@ -496,11 +496,11 @@ def post_drawer():
     limit = int(request.form.get("limit", 10))
     
     if query == "":
-        subs = cassandra_session.execute("SELECT Subreddit FROM following WHERE User = ?", (session[USER_ID_IN_SESSION],))
+        subs = cassandra_session.execute("SELECT Subreddit FROM following WHERE User = %s", (session[USER_ID_IN_SESSION],))
         
         posts = []
         for sub in subs:
-            rows = cassandra_session.execute("SELECT * FROM post WHERE Creazione < ? AND Subreddit = ? ORDER BY Creazione DESC LIMIT ?", (dt, sub.Subreddit, limit))
+            rows = cassandra_session.execute("SELECT * FROM post WHERE Creazione < %s AND Subreddit = %s ORDER BY Creazione DESC LIMIT %s", (dt, sub.Subreddit, limit))
         posts.extend([{
             'id': row.ID ,
             'sub' : row.Subreddit,
@@ -517,7 +517,7 @@ def post_drawer():
             } for row in rows])
     else:
         rows = cassandra_session.execute(
-            "SELECT * FROM post WHERE ( Titolo CONTAINS ? OR Testo CONTAINS ?) AND Creazione < ? ORDER BY Creazione DESC LIMIT ?",
+            "SELECT * FROM post WHERE ( Titolo CONTAINS %s OR Testo CONTAINS %s) AND Creazione < %s ORDER BY Creazione DESC LIMIT %s",
             (query, query, dt, limit))
         posts = [{ 
                 'id': row.ID ,
@@ -551,7 +551,7 @@ def post_user_card_drawer():
     query = request.form.get("query", "")
 
     rows = cassandra_session.execute(
-        "SELECT * FROM users WHERE Nickname CONTAINS ?",
+        "SELECT * FROM users WHERE Nickname CONTAINS %s",
         (query,)
     )
 

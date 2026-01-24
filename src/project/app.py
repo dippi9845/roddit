@@ -67,8 +67,8 @@ def new_post():
     
     return render_template("new-post.html")
 
-@app.route("/register", methods=["GET", "POST"])
-def register():
+@app.route("/registration", methods=["GET", "POST"])
+def registration():
     err = False
     text_err = ""
 

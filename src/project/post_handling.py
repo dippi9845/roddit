@@ -1,7 +1,7 @@
 from cassandra.cluster import Session as CassandraSession
 
 def get_all_post_of_followed_subreddit_count(cs : CassandraSession, user_id):
-    subs = cs.execute("SELECT Subreddit FROM following WHERE User = ?" (user_id,))
+    subs = cs.execute("SELECT Subreddit FROM following WHERE User = ?", (user_id,))
     
     count = 0
     for sub in subs :

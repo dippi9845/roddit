@@ -4,7 +4,7 @@ let currentCommentButton = null;
 function getComments(postId) {
     
     $.ajax({
-        url: "ajax/comments.php",
+        url: "ajax/comments",
         type: 'GET',
         data: {post: postId},
         dataType: 'json',
@@ -39,7 +39,7 @@ $('#send-comment').on('click', function (e) {
 
     let IDpost = $('#post-id-for-comment').val();
     $.ajax({
-        url: "ajax/put-comment.php",
+        url: "ajax/put-comment",
         type: 'GET',
         data: {text: testo, postID: IDpost},
         dataType: 'json',

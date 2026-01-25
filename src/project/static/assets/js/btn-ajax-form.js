@@ -15,14 +15,14 @@ $(".btn-ajax-form-like").click(function() {
                 // mette like
                 let n = Number(button.text());
                 button.html(blankHeart + " " + String(n - 1));
-                button.closest("form").attr('action', 'ajax/like-post.php');
+                button.closest("form").attr('action', 'ajax/like-post');
                 
             }
             else {
                 // toglie like
                 let n = Number(button.text());
                 button.html(redHeart + " " + String(n + 1));
-                button.closest("form").attr('action', 'ajax/dislike-post.php');
+                button.closest("form").attr('action', 'ajax/dislike-post');
             }
         }
     });

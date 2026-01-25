@@ -103,7 +103,7 @@ function getLatest() {
     var latest_r = null;
     $.ajax({
         async: false,
-        url: 'ajax/get-last-notification.php',
+        url: 'ajax/get-last-notification',
         type: 'GET',
         dataType: 'json',
         success: function (data) {
@@ -120,7 +120,7 @@ function show(offset = 0, limit = 5) {
     var rdata = null;
     $.ajax({
         async: false,
-        url: 'ajax/get-my-notification.php',
+        url: 'ajax/get-my-notification',
         type: 'GET',
         data : { o : offset, n : limit },
         dataType: 'json',

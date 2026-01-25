@@ -541,7 +541,7 @@ def post_drawer():
     
     
     template = """
-    {% from "post.html" import drawPost %}
+    {% from "coponents/post.html" import drawPost %}
     {% for p in posts %}
         {{ drawPost( p['id'], p['creator_id'], p['creator_nickname'], p['ProfilePicture'], p['titolo'], p['testo'], p['likes'], p['liked'], p['comments'], p['file']) }}
     {% endfor %}
@@ -568,7 +568,7 @@ def post_user_card_drawer():
     } for row in rows]
 
     template = """
-    {% from "user.html" import draw_user_card %}
+    {% from "components/user.html" import draw_user_card %}
     {% for u in users %}
         {{ draw_user_card( u['id'], u['nickname'], u['photo'], u['current_uid']) }}
     {% endfor %}

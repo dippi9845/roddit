@@ -521,9 +521,13 @@ def post_drawer():
                 "Creazione" : row.Creazione
                 } for row in rows])
     else:
-        rows = cassandra_session.execute(
-            "SELECT * FROM post WHERE ( Titolo CONTAINS %s OR Testo CONTAINS %s) AND Creazione < %s ORDER BY Creazione DESC LIMIT %s",
-            (query, query, dt, limit))
+        rows_title = cassandra_session.execute(
+            "SELECT * FROM post WHERE Titolo = %s AND Creazione < %s LIMIT %s ALLOW FILTERING",
+            (query, dt, limit))
+        rows_text = cassandra_session.execute(
+            "SELECT * FROM post WHERE Testo = %s AND Creazione < %s LIMIT %s ALLOW FILTERING",
+            (query, dt, limit))
+        
         posts = [{ 
                 'id': row.ID ,
                 'sub' : row.Subreddit,
@@ -537,7 +541,22 @@ def post_drawer():
                 "comments" : row.Comments, 
                 "file" : row.PathToFile,
                 "Creazione" : row.Creazione
-                } for row in rows]
+                } for row in rows_title]
+        
+        posts.extend([{ 
+                'id': row.ID ,
+                'sub' : row.Subreddit,
+                'creator_id': get_user_id_by_nickname(cassandra_session, row.Creator),
+                'creator_nickname' : row.Creator,
+                "ProfilePicture" : get_user_photo_by_nickname(cassandra_session, row.Creator),
+                "titolo" : row.Titolo,
+                "testo" : row.Testo,
+                "likes" : row.Likes,
+                "liked": is_post_liked_by(cassandra_session, row.ID, session[USER_ID_IN_SESSION]),
+                "comments" : row.Comments, 
+                "file" : row.PathToFile,
+                "Creazione" : row.Creazione
+                } for row in rows_text])
     
     
     template = """

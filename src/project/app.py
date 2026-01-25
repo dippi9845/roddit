@@ -501,25 +501,25 @@ def post_drawer():
     limit = int(request.form.get("limit", 10))
     
     if query == "":
-        subs = cassandra_session.execute("SELECT Subreddit FROM following WHERE User = %s", (session[USER_ID_IN_SESSION],))
+        subs = cassandra_session.execute("SELECT Subreddit FROM following WHERE User = %s", (uuid.UUID(session[USER_ID_IN_SESSION]),))
         
         posts = []
         for sub in subs:
             rows = cassandra_session.execute("SELECT * FROM post WHERE Creazione < %s AND Subreddit = %s ORDER BY Creazione DESC LIMIT %s", (dt, sub.Subreddit, limit))
-        posts.extend([{
-            'id': row.ID ,
-            'sub' : row.Subreddit,
-            'creator_id': get_user_id_by_nickname(cassandra_session, row.Creator),
-            'creator_nickname' : row.Creator,
-            "ProfilePicture" : get_user_photo_by_nickname(cassandra_session, row.Creator),
-            "titolo" : row.Titolo,
-            "testo" : row.Testo,
-            "likes" : row.Likes,
-            "liked": is_post_liked_by(cassandra_session, row.ID, session[USER_ID_IN_SESSION]),
-            "comments" : row.Comments,
-            "file" : row.PathToFile,
-            "Creazione" : row.Creazione
-            } for row in rows])
+            posts.extend([{
+                'id': row.ID ,
+                'sub' : row.Subreddit,
+                'creator_id': get_user_id_by_nickname(cassandra_session, row.Creator),
+                'creator_nickname' : row.Creator,
+                "ProfilePicture" : get_user_photo_by_nickname(cassandra_session, row.Creator),
+                "titolo" : row.Titolo,
+                "testo" : row.Testo,
+                "likes" : row.Likes,
+                "liked": is_post_liked_by(cassandra_session, row.ID, session[USER_ID_IN_SESSION]),
+                "comments" : row.Comments,
+                "file" : row.PathToFile,
+                "Creazione" : row.Creazione
+                } for row in rows])
     else:
         rows = cassandra_session.execute(
             "SELECT * FROM post WHERE ( Titolo CONTAINS %s OR Testo CONTAINS %s) AND Creazione < %s ORDER BY Creazione DESC LIMIT %s",

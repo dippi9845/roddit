@@ -1,7 +1,8 @@
 from cassandra.cluster import Session
+from uuid import UUID
 
 def user_exists(cs : Session, user_id):
-    row = cs.execute("SELECT * FROM users WHERE ID = %s", (user_id))
+    row = cs.execute("SELECT * FROM users WHERE ID = %s", (UUID(user_id)))
     
     if row:
         return True
@@ -10,7 +11,7 @@ def user_exists(cs : Session, user_id):
 
 
 def get_user_info(cs: Session, user_id):
-    row = cs.execute("SELECT * FROM users WHERE ID = %s", user_id)
+    row = cs.execute("SELECT * FROM users WHERE ID = %s", (UUID(user_id),))
     return {
         "id": row.ID,
         "name": row.Nickname,
@@ -27,7 +28,7 @@ def get_user_id_by_nickname(cs: Session, nickname):
     return row.ID
 
 def is_post_liked_by(cs: Session, post_id, user_id):
-    row = cs.execute("SELECT * FROM likes WHERE User = %s AND Post = %s", (user_id, post_id))
+    row = cs.execute("SELECT * FROM likes WHERE User = %s AND Post = %s", (UUID(user_id), UUID(post_id)))
     if row:
         return True
     else:

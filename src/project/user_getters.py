@@ -2,7 +2,7 @@ from cassandra.cluster import Session
 from uuid import UUID
 
 def user_exists(cs : Session, user_id):
-    row = cs.execute("SELECT * FROM users WHERE ID = %s", (UUID(user_id)))
+    row = cs.execute("SELECT * FROM users WHERE ID = %s", (UUID(user_id),))
     
     if row:
         return True
@@ -13,10 +13,10 @@ def user_exists(cs : Session, user_id):
 def get_user_info(cs: Session, user_id):
     row = cs.execute("SELECT * FROM users WHERE ID = %s", (UUID(user_id),))
     return {
-        "id": row.ID,
-        "name": row.Nickname,
-        "bio": row.Bio,
-        "picture": row.ProfileImagePath
+        "id": row[0].id,
+        "name": row[0].nickname,
+        "bio": row[0].bio,
+        "picture": row[0].profileimagepath
     }
 
 def get_user_photo_by_nickname(cs: Session, nickname):

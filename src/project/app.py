@@ -373,18 +373,18 @@ def ajax_get_posts_count():
     return str(post_count)
 
 
-@app.route("/ajax/get-users-count", methods=["GET"])
+@app.route("/ajax/get-users-count", methods=["POST"])
 def ajax_get_users_count():
     if not is_user_logged_in(True):
         redirect("/login")
     
-    query = request.args.get("query", "")
+    query = request.form.get("query", "")
 
     user_count = 0
     if query != "":
         user_count = get_all_searched_users_count(cassandra_session, query)
     
-    return user_count
+    return str(user_count)
 
 
 @app.route("/ajax/like-post", methods=["POST"])
@@ -465,8 +465,8 @@ def ajax_dislike_post():
 
 @app.route("/ajax/get-last-notification")
 def ajax_get_last_notification():
-    row = cassandra_session.execute("SELECT ID FROM notification WHERE Inserimento < toTimestamp(now()) LIMIT 1")
-    return jsonify({"ID": row.ID})
+    row = cassandra_session.execute("SELECT ID FROM notification WHERE Inserimento < toTimestamp(now()) LIMIT 1 ALLOW FILTERING")
+    return jsonify({"ID": row[0].id} if row else {"ID": None})
 
 
 @app.route("/ajax/get-my-notification")

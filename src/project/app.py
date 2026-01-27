@@ -602,7 +602,7 @@ def post_drawer():
     template = """
     {% from "components/post.html" import drawPost %}
     {% for p in posts %}
-        {{ drawPost( p['id'], p['creator_id'], p['creator_nickname'], p['ProfilePicture'], p['titolo'], p['testo'], p['likes'], p['liked'], p['comments'], p['file']) }}
+        {{ drawPost( p['id'], p['creator_id'], p['creator_nickname'], p['ProfilePicture'], p['sub'], p['titolo'], p['testo'], p['likes'], p['liked'], p['comments'], p['file']) }}
     {% endfor %}
     """
 

@@ -1,4 +1,4 @@
-{% macro drawPost(post_id, profile_id, creator_nickname, profile_picture, title, text, likes, liked, comments, path_to_file) %}
+{% macro drawPost(post_id, profile_id, creator_nickname, profile_picture, subreddit, title, text, likes, liked, comments, path_to_file) %}
 <di1v class="row">
     <div class="col">
         <div class="card" style="margin-top: 25px;">
@@ -9,6 +9,7 @@
                     <div class="p-2"><a href="{{ url_for('profile', user=profile_id) }}" class="link-dark text-decoration-none">{{ creator_nickname }}</a></div>
                 </div>
                 
+                <h6 class="card-title">r/{{ subreddit }}</h6>
                 <h4 class="card-title">{{ title }}</h4>
                 <p class="card-text"> {{ text }} </p>
                 

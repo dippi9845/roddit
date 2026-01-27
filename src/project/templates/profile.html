@@ -64,7 +64,7 @@
     <hr>
     {% from "components/post.html" import drawPost %}
     {% for post in posts %}
-       {{ drawPost(post['id'], profile.id, post['creator'], profile.picture, post['titolo'], post['testo'], post['likes'], post['liked'], post['comments'], post['pathtofile']) }}
+       {{ drawPost(post['id'], profile.id, post['creator'], profile.picture, post['subreddit'], post['titolo'], post['testo'], post['likes'], post['liked'], post['comments'], post['pathtofile']) }}
     {% endfor %}
 </div>
 

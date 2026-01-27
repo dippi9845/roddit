@@ -1,5 +1,5 @@
 from flask import Flask, render_template, render_template_string, request, redirect, session, make_response, jsonify
-import json
+import os
 from globals import *
 from user_getters import *
 from cassandra.cluster import Cluster, Session as CassandraSession
@@ -120,12 +120,12 @@ def registration():
                     text_err = "Nickname provided is not valid, (only numbers, letters and underscore)"
                 
                 
-                row = cassandra_session.execute("SELECT * FROM users WHERE Nickname = %s", (form["nickname"],))
+                row = cassandra_session.execute("SELECT * FROM users WHERE Nickname = %s ALLOW FILTERING", (form["nickname"],))
                 if row:
                     err = True
                     text_err = "Nickname already taken"
                 
-                row = cassandra_session.execute("SELECT * FROM users WHERE Email = %s", (form["email"],))
+                row = cassandra_session.execute("SELECT * FROM users WHERE Email = %s ALLOW FILTERING", (form["email"],))
                 if row: 
                     err = True
                     text_err = "Email already registered"
@@ -168,7 +168,7 @@ def settings():
             new_email = html.escape(new_email)
             cassandra_session.execute(
                 "UPDATE users SET Email = %s WHERE ID = %s",
-                (new_email, user_id)
+                (new_email, UUID(user_id))
             )
         else:
             err = True
@@ -200,7 +200,7 @@ def settings():
             else:    
                 cassandra_session.execute(
                     "UPDATE users SET Nickname = %s WHERE ID = %s",
-                    (new_nickname, user_id)
+                    (new_nickname, UUID(user_id))
                 )
 
     # -------------------------
@@ -215,11 +215,11 @@ def settings():
             text_err = "Two passwords are different"
         else:
             salt = uuid.uuid4().hex
-            password_hash = sha256(new_password + salt).hexdigest()
+            password_hash = sha256(new_password.encode() + salt.encode()).hexdigest()
 
             cassandra_session.execute(
                 "UPDATE users SET Password = %s, Salt = %s WHERE ID = %s",
-                (password_hash, salt, user_id)
+                (password_hash, salt, UUID(user_id))
             )
 
     # -------------------------
@@ -230,7 +230,7 @@ def settings():
         new_bio = html.escape(new_bio)
         cassandra_session.execute(
             "UPDATE users SET Bio=%s WHERE ID=%s",
-            (new_bio, user_id)
+            (new_bio, UUID(user_id))
         )
 
     # -------------------------
@@ -238,30 +238,48 @@ def settings():
     # -------------------------
     if "new-photo" in request.files:
         file = request.files["new-photo"]
+        
+        print(request.files)
+
         if file and file.filename != "":
-            file_path = "/static/uploads/images/" + str(uuid.uuid4()) + file.filename.rsplit(".", 1)[1].lower()
-            file.save("." + file_path)
-            if file_path:
-                cassandra_session.execute(
-                    "UPDATE users SET ProfileImagePath = %s WHERE ID = %s",
-                    (file_path, user_id)
-                )
+            ext = file.filename.rsplit(".", 1)[1].lower()
+            filename = f"{uuid.uuid4()}.{ext}"
+            
+            print(file)
+            print(file.filename)
+
+            upload_dir = os.getcwd() + "src/project/static/uploads/images"
+            os.makedirs(upload_dir, exist_ok=True)
+            
+            file_path = os.path.join(upload_dir, filename)
+
+            file.save(file_path)
+            
+            print(os.getcwd())
+
+            db_path = "/static/uploads/images/" + filename
+            cassandra_session.execute(
+                "UPDATE users SET ProfileImagePath = %s WHERE ID = %s",
+                (db_path, UUID(user_id))
+            )
 
     # -------------------------
     # Recupera dati utente
     # -------------------------
     data = cassandra_session.execute(
         "SELECT ProfileImagePath, Email, Nickname, Bio FROM users WHERE ID = %s",
-        (user_id,)
+        (UUID(user_id),)
     )
+
+    data = data.one()
 
     return render_template(
     "settings.html",
     user={
-        "photo": data.ProfileImagePath,
-        "email": data.Email,
-        "nickname": data.Nickname,
-        "bio": data.Bio
+        "photo": data.profileimagepath,
+        "email": data.email,
+        "nickname": data.nickname,
+        "bio": data.bio
     },
     err=err,
     text_err=text_err
@@ -318,8 +336,8 @@ def ajax_login():
         return 'email' in request.form and 'password' in request.form
 
     def get_user_id(email, password):
-        salt = cassandra_session.execute("SELECT Salt FROM users WHERE Email = %s", (email,))[0].salt
-        row = cassandra_session.execute("SELECT ID FROM users WHERE Email = %s AND Password = %s", (email, sha256(password.encode() + salt.encode()).hexdigest(),))
+        salt = cassandra_session.execute("SELECT Salt FROM users WHERE Email = %s  ALLOW FILTERING", (email,))[0].salt
+        row = cassandra_session.execute("SELECT ID FROM users WHERE Email = %s AND Password = %s ALLOW FILTERING", (email, sha256(password.encode() + salt.encode()).hexdigest(),))
 
         if not row:
             return None

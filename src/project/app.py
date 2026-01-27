@@ -469,6 +469,7 @@ def ajax_put_comment():
             "ProfileImage": row.profileimage,
             "User": row.user
         })
+    return jsonify({"Error": "Invalid request"})
 
 
 @app.route("/ajax/comments", methods=["GET"])

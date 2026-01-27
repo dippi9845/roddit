@@ -28,7 +28,14 @@ def get_user_id_by_nickname(cs: Session, nickname):
     return row.ID
 
 def is_post_liked_by(cs: Session, post_id, user_id):
-    row = cs.execute("SELECT * FROM likes WHERE User = %s AND Post = %s", (UUID(user_id), UUID(post_id)))
+    
+    if type(user_id) is str:
+        user_id = UUID(user_id)
+    
+    if type(post_id) is str:
+        post_id = UUID(post_id)
+
+    row = cs.execute("SELECT * FROM likes WHERE User = %s AND Post = %s", (user_id, post_id,))
     if row:
         return True
     else:

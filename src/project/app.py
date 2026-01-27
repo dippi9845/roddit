@@ -294,18 +294,27 @@ def ajax_create_new_post():
     title = request.form.get("title", "")
     text = request.form.get("text", "")
     subreddit = request.form.get("subreddit", "")
-    file_path = ""
+    db_path = ""
     
     if title == "" or subreddit == "":
         return redirect("/new-post")
 
     if "file" in request.files and request.files["file"].filename != "":
         file = request.files["file"]
-        file_path = "/static/uploads/images/" + str(uuid.uuid4()) + file.filename.rsplit(".", 1)[1].lower()
-        file.save("." + file_path)
+        ext = file.filename.rsplit(".", 1)[1].lower()
+        filename = f"{uuid.uuid4()}.{ext}"
+
+        upload_dir = os.getcwd() + "/src/project/static/uploads/images"
+        os.makedirs(upload_dir, exist_ok=True)
+        
+        file_path = os.path.join(upload_dir, filename)
+
+        file.save(file_path)
+        
+        db_path = "/static/uploads/images/" + filename
     
     else:
-        file_path = None
+        db_path = None
 
     row = cassandra_session.execute("SELECT * FROM subreddit WHERE Name = %s", (subreddit,))
     if not row:
@@ -315,7 +324,7 @@ def ajax_create_new_post():
 
     cassandra_session.execute(
         "INSERT INTO post (ID, Subreddit, Creator, Titolo, Testo, PathToFile, Creazione, Likes, Comments) VALUES (uuid(), %s, %s, %s, %s, %s, toTimestamp(now()), 0, 0)",
-        (subreddit, user_info["name"], html.escape(title), html.escape(text), file_path)
+        (subreddit, user_info["name"], html.escape(title), html.escape(text), db_path)
     )
 
     return redirect("/")

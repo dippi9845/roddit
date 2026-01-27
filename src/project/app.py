@@ -335,12 +335,12 @@ def ajax_create_new_post():
     )
     
     cassandra_session.execute(
-        "INSERT INTO post_like (ID) VALUES (%s)",
+        "INSERT INTO post_like (post) VALUES (%s)",
         (post_id,)
     )
     
     cassandra_session.execute(
-        "INSERT INTO post_comment (ID) VALUES (%s)",
+        "INSERT INTO post_comment (post) VALUES (%s)",
         (post_id,)
     )
 

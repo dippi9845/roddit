@@ -248,7 +248,7 @@ def settings():
             print(file)
             print(file.filename)
 
-            upload_dir = os.getcwd() + "src/project/static/uploads/images"
+            upload_dir = os.getcwd() + "/src/project/static/uploads/images"
             os.makedirs(upload_dir, exist_ok=True)
             
             file_path = os.path.join(upload_dir, filename)

@@ -429,12 +429,14 @@ def ajax_get_users_count():
 
 @app.route("/ajax/like-post", methods=["POST"])
 def ajax_like_post():
-    post_id = request.form.get("postID")
+    post_id = request.form.get("post_id")
     user_id = session.get(USER_ID_IN_SESSION)
-    cassandra_session.execute("INSERT INTO likes (User, Post) VALUES (%s, %s)", (user_id, post_id,))
-    cassandra_session.execute("UPDATE post SET Likes = Likes + 1 WHERE ID = %s", (post_id,))
-    notify_user(cassandra_session, get_post_creator(cassandra_session, post_id), "New like", "a new user liked your post")
-
+    print(type(post_id))
+    print(type(user_id))
+    cassandra_session.execute("INSERT INTO likes (User, Post) VALUES (%s, %s)", (UUID(user_id), UUID(post_id),))
+    cassandra_session.execute("UPDATE post SET Likes = Likes + 1 WHERE ID = %s", (UUID(post_id),))
+    notify_user(cassandra_session, get_post_creator(cassandra_session, UUID(post_id)), "New like", "a new user liked your post")
+    return "", 200
 
 @app.route("/ajax/logout")
 def ajax_logout():
@@ -497,10 +499,11 @@ def ajax_comments():
 
 @app.route("/ajax/dislike-post", methods=["POST"])
 def ajax_dislike_post():
-    post_id = request.form.get("postID", "")
+    post_id = request.form.get("post_id", "")
     if post_id != "":
-        cassandra_session.execute("DELETE FROM likes WHERE User = %s AND Post = %s", (session[USER_ID_IN_SESSION], post_id,))
-        cassandra_session.execute("UPDATE post SET Likes = Likes - 1 WHERE ID = %s", (post_id,))
+        cassandra_session.execute("DELETE FROM likes WHERE User = %s AND Post = %s", (UUID(session[USER_ID_IN_SESSION]), UUID(post_id),))
+        cassandra_session.execute("UPDATE post SET Likes = Likes - 1 WHERE ID = %s", (UUID(post_id),))
+    return "", 200
 
 
 @app.route("/ajax/get-last-notification")

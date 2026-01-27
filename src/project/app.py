@@ -49,7 +49,7 @@ def profile():
     posts = get_users_posts(cassandra_session, profile_data['name'])
 
     for p in posts:
-        p["liked"] = is_post_liked_by(cassandra_session, p["ID"], session[USER_ID_IN_SESSION])
+        p["liked"] = is_post_liked_by(cassandra_session, p["id"], session[USER_ID_IN_SESSION])
 
     return render_template("profile.html", profile=profile_data, posts=posts)
 

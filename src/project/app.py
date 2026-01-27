@@ -238,15 +238,9 @@ def settings():
     # -------------------------
     if "new-photo" in request.files:
         file = request.files["new-photo"]
-        
-        print(request.files)
-
         if file and file.filename != "":
             ext = file.filename.rsplit(".", 1)[1].lower()
             filename = f"{uuid.uuid4()}.{ext}"
-            
-            print(file)
-            print(file.filename)
 
             upload_dir = os.getcwd() + "/src/project/static/uploads/images"
             os.makedirs(upload_dir, exist_ok=True)
@@ -254,8 +248,6 @@ def settings():
             file_path = os.path.join(upload_dir, filename)
 
             file.save(file_path)
-            
-            print(os.getcwd())
 
             db_path = "/static/uploads/images/" + filename
             cassandra_session.execute(

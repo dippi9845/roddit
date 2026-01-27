@@ -277,6 +277,11 @@ def settings():
     text_err=text_err
 )
 
+@app.route("/new-subreddit")
+def create_new_subreddit():
+    return render_template("new-subreddit.html")
+
+
 @app.route("/404")
 def not_found():
     return render_template("404.html")
@@ -328,6 +333,22 @@ def ajax_create_new_post():
     )
 
     return redirect("/")
+
+
+@app.route("/ajax/create-new-subreddit", methods=["POST"])
+def ajax_create_new_subreddit():
+    subreddit = request.form.get("subreddit", "")
+    if subreddit != "":
+        result = cassandra_session.execute("SELECT * FROM subreddit WHERE Name = %s", (subreddit,))
+        
+        if result:
+            return redirect("/new-subreddit")
+        
+        cassandra_session.execute("INSERT INTO subreddit (Name, Followers) VALUES (%s, 0)", (subreddit,))
+        return redirect("/")
+    
+    else:
+        return redirect("/new-subreddit")
 
 
 @app.route("/ajax/login", methods=["POST"])

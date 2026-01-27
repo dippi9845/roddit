@@ -36,6 +36,7 @@
             <div class="col">
                 <h1 class="text-center">Create new post</h1>
                 <form class="mx-auto" action="/ajax/create-new-post" method="post" enctype="multipart/form-data">
+                    <input class="form-control form-element font-weight-bold bold-input my-2" type="text" name="subreddit" placeholder="Subreddit" required />
                     <input class="form-control form-element font-weight-bold bold-input my-2" type="text" name="title" placeholder="Post Title" required />
                     <textarea class="form-control form-element my-2" name="text" placeholder="Post Text" required></textarea>
                     <input class="form-control form-element my-2" name="file" type="file" accept="image/*" />

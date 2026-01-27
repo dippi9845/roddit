@@ -55,8 +55,6 @@ CREATE TABLE post (
   Creator text,
   Titolo text,
   Testo text,
-  Likes int,
-  Comments int,
   PathToFile text,
   MediaType text, -- Immagine, Video
   Creazione timestamp,
@@ -66,6 +64,16 @@ CREATE TABLE post (
 CREATE INDEX ON post(Subreddit) USING 'StorageAttachedIndex';
 
 CREATE INDEX ON post(Creator) USING 'StorageAttachedIndex';
+
+CREATE TABLE post_like (
+  post UUID PRIMARY KEY,
+  likes counter
+);
+
+CREATE TABLE post_comment (
+  post UUID PRIMARY KEY,
+  comments counter
+);
 
 CREATE TABLE users (-- TODO trovare un modo per distribuire le immagini tra vari nodi
   ID UUID PRIMARY KEY,

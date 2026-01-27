@@ -436,7 +436,7 @@ def ajax_like_post():
     cassandra_session.execute("INSERT INTO likes (User, Post) VALUES (%s, %s)", (UUID(user_id), UUID(post_id),))
     cassandra_session.execute("UPDATE post SET Likes = Likes + 1 WHERE ID = %s", (UUID(post_id),))
     notify_user(cassandra_session, get_post_creator(cassandra_session, UUID(post_id)), "New like", "a new user liked your post")
-    return "", 200
+    return jsonify({"status": "ok"})
 
 @app.route("/ajax/logout")
 def ajax_logout():
@@ -503,7 +503,7 @@ def ajax_dislike_post():
     if post_id != "":
         cassandra_session.execute("DELETE FROM likes WHERE User = %s AND Post = %s", (UUID(session[USER_ID_IN_SESSION]), UUID(post_id),))
         cassandra_session.execute("UPDATE post SET Likes = Likes - 1 WHERE ID = %s", (UUID(post_id),))
-    return "", 200
+    return jsonify({"status": "ok"})
 
 
 @app.route("/ajax/get-last-notification")

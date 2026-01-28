@@ -292,6 +292,7 @@ def ajax_follow():
     if USER_ID_IN_SESSION in session:
         cassandra_session.execute("INSERT INTO following (User, Subreddit) VALUES (%s, %s)", (session[USER_ID_IN_SESSION], request.args["subreddit"],))
         cassandra_session.execute("UPDATE subreddit SET Followers = Followers + 1 WHERE Name = %s", (request.args["subreddit"],))
+    return jsonify({"status": "ok"})
 
 @app.route("/ajax/create-new-post", methods=["POST"])
 def ajax_create_new_post():
@@ -437,8 +438,9 @@ def ajax_like_post():
     print(type(user_id))
     cassandra_session.execute("INSERT INTO likes (User, Post) VALUES (%s, %s)", (UUID(user_id), UUID(post_id),))
     cassandra_session.execute("UPDATE post_like SET likes = likes + 1 WHERE post = %s", (UUID(post_id),))
-    notify_user(cassandra_session, get_post_creator(cassandra_session, UUID(post_id)), "New like", "a new user liked your post")
+    notify_user(cassandra_session, get_post_creator(cassandra_session, UUID(post_id)), "New like", "A user liked your post")
     return jsonify({"status": "ok"})
+
 
 @app.route("/ajax/logout")
 def ajax_logout():
@@ -536,6 +538,7 @@ def ajax_unfollow():
     if USER_ID_IN_SESSION in session:
         cassandra_session.execute("DELETE FROM following WHERE User = %s AND Subreddit = %s", (session[USER_ID_IN_SESSION], request.args["subreddit"],))
         cassandra_session.execute("UPDATE subreddit SET Followers = Followers - 1 WHERE Name = %s", (request.args["subreddit"],))
+    return jsonify({"status": "ok"})
 
 
 @app.route("/html-snippets/post-drawer", methods=["POST"])

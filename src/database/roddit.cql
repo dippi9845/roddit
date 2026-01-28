@@ -11,7 +11,7 @@ GRANT ALL PERMISSIONS ON KEYSPACE ks TO roddit;
 
 CREATE TABLE subreddit (
   Name text PRIMARY KEY,
-  Followers int
+  Followers counter
 );
 
 CREATE TABLE following (
@@ -39,12 +39,13 @@ CREATE TABLE likes (
 );
 
 CREATE TABLE notification (
-  ID UUID PRIMARY KEY,
+  ID UUID,
   UserID UUID,
   Titolo text,
   Testo text,
   Inserimento timestamp,
-);
+  PRIMARY KEY (ID, Inserimento)
+) WITH CLUSTERING ORDER BY (Inserimento DESC);
 
 CREATE INDEX ON notification(UserID) USING 'StorageAttachedIndex';
 

@@ -546,7 +546,7 @@ def ajax_unfollow():
 def post_drawer():
     
     query = request.form.get("query", "")
-    offset = int(request.form.get("offset", int(time())))
+    offset = int(request.form.get("offset", time()))
     dt = datetime.fromtimestamp(offset, timezone.utc)
     limit = int(request.form.get("limit", 10))
     
@@ -564,9 +564,9 @@ def post_drawer():
                 "ProfilePicture" : get_user_photo_by_nickname(cassandra_session, row.creator),
                 "titolo" : row.titolo,
                 "testo" : row.testo,
-                "likes" : row.likes,
+                "likes" : get_post_likes_count(cassandra_session, row.id),
                 "liked": is_post_liked_by(cassandra_session, row.id, session[USER_ID_IN_SESSION]),
-                "comments" : row.comments,
+                "comments" : get_post_comments_count(cassandra_session, row.id),
                 "file" : row.pathtofile,
                 "Creazione" : row.creazione
                 } for row in rows])
@@ -579,33 +579,33 @@ def post_drawer():
             (query, dt, limit))
         
         posts = [{ 
-                'id': row.ID ,
-                'sub' : row.Subreddit,
-                'creator_id': get_user_id_by_nickname(cassandra_session, row.Creator),
-                'creator_nickname' : row.Creator,
-                "ProfilePicture" : get_user_photo_by_nickname(cassandra_session, row.Creator),
-                "titolo" : row.Titolo,
-                "testo" : row.Testo,
-                "likes" : row.Likes,
-                "liked": is_post_liked_by(cassandra_session, row.ID, session[USER_ID_IN_SESSION]),
-                "comments" : row.Comments, 
-                "file" : row.PathToFile,
-                "Creazione" : row.Creazione
+                'id': row.id ,
+                'sub' : row.subreddit,
+                'creator_id': get_user_id_by_nickname(cassandra_session, row.creator),
+                'creator_nickname' : row.creator,
+                "ProfilePicture" : get_user_photo_by_nickname(cassandra_session, row.creator),
+                "titolo" : row.titolo,
+                "testo" : row.testo,
+                "likes" : get_post_likes_count(cassandra_session, row.id),
+                "liked": is_post_liked_by(cassandra_session, row.id, session[USER_ID_IN_SESSION]),
+                "comments" : get_post_comments_count(cassandra_session, row.id),
+                "file" : row.pathtofile,
+                "Creazione" : row.creazione
                 } for row in rows_title]
         
         posts.extend([{ 
-                'id': row.ID ,
-                'sub' : row.Subreddit,
-                'creator_id': get_user_id_by_nickname(cassandra_session, row.Creator),
-                'creator_nickname' : row.Creator,
-                "ProfilePicture" : get_user_photo_by_nickname(cassandra_session, row.Creator),
-                "titolo" : row.Titolo,
-                "testo" : row.Testo,
-                "likes" : row.Likes,
-                "liked": is_post_liked_by(cassandra_session, row.ID, session[USER_ID_IN_SESSION]),
-                "comments" : row.Comments, 
-                "file" : row.PathToFile,
-                "Creazione" : row.Creazione
+                'id': row.id ,
+                'sub' : row.subreddit,
+                'creator_id': get_user_id_by_nickname(cassandra_session, row.creator),
+                'creator_nickname' : row.creator,
+                "ProfilePicture" : get_user_photo_by_nickname(cassandra_session, row.creator),
+                "titolo" : row.titolo,
+                "testo" : row.testo,
+                "likes" :  get_post_likes_count(cassandra_session, row.id),
+                "liked": is_post_liked_by(cassandra_session, row.id, session[USER_ID_IN_SESSION]),
+                "comments" : get_post_comments_count(cassandra_session, row.id), 
+                "file" : row.pathtofile,
+                "Creazione" : row.creazione
                 } for row in rows_text])
     
     

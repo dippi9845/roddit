@@ -523,13 +523,13 @@ def ajax_get_my_notification():
     offset = int(request.form.get("o", int(time()))) # TODO qua vuole un timestamp non un int
     dt = datetime.fromtimestamp(offset, timezone.utc)
     limit = int(request.form.get("n", 5))
-    notifications = cassandra_session.execute("SELECT Titolo, Testo, Inserimento FROM notification WHERE UserID = %s AND Inserimento < %s LIMIT %s", (session[USER_ID_IN_SESSION], dt,limit,))
+    notifications = cassandra_session.execute("SELECT Titolo, Testo, Inserimento FROM notification WHERE UserID = %s AND Inserimento < %s LIMIT %s ALLOW FILTERING", (UUID(session[USER_ID_IN_SESSION]), dt,limit,))
     rtr = []
     for n in notifications:
         rtr.append({
-            "Title": n.Titolo,
-            "Message" : n.Testo,
-            "Inserimento" : n.Inserimento
+            "Title": n.titolo,
+            "Message" : n.testo,
+            "Inserimento" : n.inserimento
         })
     return jsonify(rtr)
 

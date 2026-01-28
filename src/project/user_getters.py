@@ -21,11 +21,11 @@ def get_user_info(cs: Session, user_id):
 
 def get_user_photo_by_nickname(cs: Session, nickname):
     row = cs.execute("SELECT ProfileImagePath FROM users WHERE Nickname = %s", (nickname,))
-    return row.ProfileImagePath
+    return row[0].profileimagepath
 
 def get_user_id_by_nickname(cs: Session, nickname):
     row = cs.execute("SELECT ID FROM users WHERE Nickname = %s", (nickname,))
-    return row.ID
+    return row[0].id
 
 def is_post_liked_by(cs: Session, post_id, user_id):
     

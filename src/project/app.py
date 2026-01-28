@@ -290,7 +290,7 @@ def not_found():
 @app.route("/ajax/follow", methods=["GET"])
 def ajax_follow():
     if USER_ID_IN_SESSION in session:
-        cassandra_session.execute("INSERT INTO following (User, Subreddit) VALUES (%s, %s)", (session[USER_ID_IN_SESSION], request.args["subreddit"],))
+        cassandra_session.execute("INSERT INTO following (User, Subreddit) VALUES (%s, %s)", (UUID(session[USER_ID_IN_SESSION]), request.args["subreddit"],))
         cassandra_session.execute("UPDATE subreddit SET Followers = Followers + 1 WHERE Name = %s", (request.args["subreddit"],))
     return jsonify({"status": "ok"})
 
@@ -347,7 +347,8 @@ def ajax_create_new_subreddit():
         if result:
             return redirect("/new-subreddit")
         
-        cassandra_session.execute("INSERT INTO subreddit (Name, Followers) VALUES (%s, 0)", (subreddit,))
+        cassandra_session.execute("INSERT INTO following (User, Subreddit) VALUES (%s, %s)", (UUID(session[USER_ID_IN_SESSION]), subreddit,))
+        cassandra_session.execute("UPDATE subreddit SET Followers = Followers + 1 WHERE Name = %s", (subreddit,))
         return redirect("/")
     
     else:
@@ -536,7 +537,7 @@ def ajax_get_my_notification():
 @app.route("/ajax/unfollow", methods=["GET"])
 def ajax_unfollow():
     if USER_ID_IN_SESSION in session:
-        cassandra_session.execute("DELETE FROM following WHERE User = %s AND Subreddit = %s", (session[USER_ID_IN_SESSION], request.args["subreddit"],))
+        cassandra_session.execute("DELETE FROM following WHERE User = %s AND Subreddit = %s", (UUID(session[USER_ID_IN_SESSION]), request.args["subreddit"],))
         cassandra_session.execute("UPDATE subreddit SET Followers = Followers - 1 WHERE Name = %s", (request.args["subreddit"],))
     return jsonify({"status": "ok"})
 
@@ -550,24 +551,24 @@ def post_drawer():
     limit = int(request.form.get("limit", 10))
     
     if query == "":
-        subs = cassandra_session.execute("SELECT Subreddit FROM following WHERE User = %s", (uuid.UUID(session[USER_ID_IN_SESSION]),))
+        subs = cassandra_session.execute("SELECT Subreddit FROM following WHERE User = %s", (UUID(session[USER_ID_IN_SESSION]),))
         
         posts = []
         for sub in subs:
-            rows = cassandra_session.execute("SELECT * FROM post WHERE Creazione < %s AND Subreddit = %s ORDER BY Creazione DESC LIMIT %s", (dt, sub.Subreddit, limit))
+            rows = cassandra_session.execute("SELECT * FROM post WHERE Creazione < %s AND Subreddit = %s LIMIT %s ALLOW FILTERING", (dt, sub.subreddit, limit))
             posts.extend([{
-                'id': row.ID ,
-                'sub' : row.Subreddit,
-                'creator_id': get_user_id_by_nickname(cassandra_session, row.Creator),
-                'creator_nickname' : row.Creator,
-                "ProfilePicture" : get_user_photo_by_nickname(cassandra_session, row.Creator),
-                "titolo" : row.Titolo,
-                "testo" : row.Testo,
-                "likes" : row.Likes,
-                "liked": is_post_liked_by(cassandra_session, row.ID, session[USER_ID_IN_SESSION]),
-                "comments" : row.Comments,
-                "file" : row.PathToFile,
-                "Creazione" : row.Creazione
+                'id': row.id ,
+                'sub' : row.subreddit,
+                'creator_id': get_user_id_by_nickname(cassandra_session, row.creator),
+                'creator_nickname' : row.creator,
+                "ProfilePicture" : get_user_photo_by_nickname(cassandra_session, row.creator),
+                "titolo" : row.titolo,
+                "testo" : row.testo,
+                "likes" : row.likes,
+                "liked": is_post_liked_by(cassandra_session, row.id, session[USER_ID_IN_SESSION]),
+                "comments" : row.comments,
+                "file" : row.pathtofile,
+                "Creazione" : row.creazione
                 } for row in rows])
     else:
         rows_title = cassandra_session.execute(

@@ -334,16 +334,6 @@ def ajax_create_new_post():
         (post_id, subreddit, user_info["name"], html.escape(title), html.escape(text), db_path,)
     )
     
-    cassandra_session.execute(
-        "INSERT INTO post_like (post) VALUES (%s)",
-        (post_id,)
-    )
-    
-    cassandra_session.execute(
-        "INSERT INTO post_comment (post) VALUES (%s)",
-        (post_id,)
-    )
-
     return redirect("/")
 
 
@@ -446,7 +436,7 @@ def ajax_like_post():
     print(type(post_id))
     print(type(user_id))
     cassandra_session.execute("INSERT INTO likes (User, Post) VALUES (%s, %s)", (UUID(user_id), UUID(post_id),))
-    cassandra_session.execute("UPDATE post_like SET likes = likes + 1 WHERE ID = %s", (UUID(post_id),))
+    cassandra_session.execute("UPDATE post_like SET likes = likes + 1 WHERE post = %s", (UUID(post_id),))
     notify_user(cassandra_session, get_post_creator(cassandra_session, UUID(post_id)), "New like", "a new user liked your post")
     return jsonify({"status": "ok"})
 
@@ -468,11 +458,11 @@ def ajax_put_comment():
     if USER_ID_IN_SESSION in session and "text" in request.args and "postID" in request.args:
         user_info = get_user_info(cassandra_session, session[USER_ID_IN_SESSION])
         testo = html.escape(request.args["text"])
-        cassandra_session.execute("INSERT INTO comment (ID, User, Testo, entityType, entityID) VALUES (uuid(), %s, %s, 'Post', %s)", (user_info["name"], testo, request.args["postID"],))
-        cassandra_session.execute("UPDATE post_comment SET comments=comments + 1 WHERE ID = %s", (request.args["postID"],))
+        cassandra_session.execute("INSERT INTO comment (ID, User, Testo, entityType, entityID) VALUES (uuid(), %s, %s, 'Post', %s)", (user_info["name"], testo, UUID(request.args["postID"]),))
+        cassandra_session.execute("UPDATE post_comment SET comments=comments + 1 WHERE post = %s", (UUID(request.args["postID"]),))
         result = cassandra_session.execute(
             "SELECT ProfileImagePath as ProfileImage, Nickname as User FROM users WHERE ID = %s",
-            (session[USER_ID_IN_SESSION],)
+            (UUID(session[USER_ID_IN_SESSION]),)
         )
 
         row = result.one()
@@ -494,17 +484,17 @@ def ajax_comments():
     rows = cassandra_session.execute("""
         SELECT User, Testo
         FROM comment
-        WHERE entityType='Post' AND entityID = %s
-        """, (post_id,))
+        WHERE entityType='Post' AND entityID = %s ALLOW FILTERING
+        """, (UUID(post_id),))
     
     rtr = []
 
     for row in rows:
-        result = cassandra_session.execute("SELECT ProfileImagePath AS ProfileImage FROM users WHERE Nickname = %s", (row.User,))
+        result = cassandra_session.execute("SELECT ProfileImagePath AS ProfileImage FROM users WHERE Nickname = %s", (row.user,))
         rtr.append({
-            "ProfileImage": result.ProfileImage,
-            "User" : row.User,
-            "Text" : row.Testo
+            "ProfileImage": result[0].profileimage,
+            "User" : row.user,
+            "Text" : row.testo
         })
 
     return jsonify(rtr)
@@ -515,7 +505,7 @@ def ajax_dislike_post():
     post_id = request.form.get("post_id", "")
     if post_id != "":
         cassandra_session.execute("DELETE FROM likes WHERE User = %s AND Post = %s", (UUID(session[USER_ID_IN_SESSION]), UUID(post_id),))
-        cassandra_session.execute("UPDATE post_like SET likes = likes - 1 WHERE ID = %s", (UUID(post_id),))
+        cassandra_session.execute("UPDATE post_like SET likes = likes - 1 WHERE post = %s", (UUID(post_id),))
     return jsonify({"status": "ok"})
 
 

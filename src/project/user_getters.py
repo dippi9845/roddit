@@ -42,5 +42,13 @@ def is_post_liked_by(cs: Session, post_id, user_id):
         return False
     
 def get_users_posts(cs : Session, nickname : str):
-    result = cs.execute("SELECT ID, Subreddit, Creator, Titolo, Testo, Likes, Comments, PathToFile, MediaType FROM post WHERE Creator = %s", (nickname,))
-    return [row._asdict() for row in result]
+    result = cs.execute("SELECT ID, Subreddit, Creator, Titolo, Testo, PathToFile, MediaType FROM post WHERE Creator = %s", (nickname,))
+    rtr = []
+    for row in result:
+        tmp = row._asdict()
+        likes = cs.execute("SELECT likes FROM post_like WHERE post = %s", (row.id,))
+        comments = cs.execute("SELECT comments FROM post_comment WHERE post = %s", (row.id,))
+        tmp["likes"] = likes[0].likes if likes else 0
+        tmp["comments"] = comments[0].comments if comments else 0
+        rtr.append(tmp)
+    return rtr

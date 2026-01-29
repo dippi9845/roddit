@@ -10,7 +10,7 @@ def get_all_post_of_followed_subreddit_count(cs : CassandraSession, user_id):
     
     count = 0
     for sub in subs :
-        posts = cs.execute("SELECT ID FROM posts WHERE subreddit = %s", (sub,))
+        posts = cs.execute("SELECT ID FROM post WHERE Subreddit = %s", (sub.subreddit,))
         count += sum(1 for _ in posts)
     
     return count

@@ -51,6 +51,6 @@ def is_user_logged_in(login_if_cookie_exists=False):
 
     
 def get_all_searched_users_count(cs : CassandraSession, searched_user):
-    rows = cs.execute("SELECT Nickname FROM users WHERE Nickname CONTAINS %s", (searched_user,))
+    rows = cs.execute("SELECT Nickname FROM users WHERE Nickname = %s", (searched_user,))
     count = sum(1 for _ in rows)
     return count

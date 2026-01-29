@@ -631,7 +631,7 @@ def post_user_card_drawer():
     query = request.form.get("query", "")
 
     rows = cassandra_session.execute(
-        "SELECT * FROM users WHERE Nickname CONTAINS %s",
+        "SELECT * FROM users WHERE Nickname = %s",
         (query,)
     )
 

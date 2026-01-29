@@ -399,7 +399,7 @@ def ajax_login():
         return redirect("/login")
 
 
-@app.route("/ajax/get-posts-count", methods=["GET"])
+@app.route("/ajax/get-posts-count", methods=["POST"])
 def ajax_get_posts_count():
     
     if not is_user_logged_in(True):
@@ -525,13 +525,14 @@ def ajax_get_last_notification():
 @app.route("/ajax/get-my-notification")
 def ajax_get_my_notification():
     # TODO Si potrebbe aggiungere un campo "visto" così da restituire tutte le notifiche non ancora viste
-    offset = int(request.form.get("o", int(time()))) # TODO qua vuole un timestamp non un int
+    offset = int(request.form.get("o", time())) # TODO qua vuole un timestamp non un int
     dt = datetime.fromtimestamp(offset, timezone.utc)
     limit = int(request.form.get("n", 5))
-    notifications = cassandra_session.execute("SELECT Titolo, Testo, Inserimento FROM notification WHERE UserID = %s AND Inserimento < %s LIMIT %s ALLOW FILTERING", (UUID(session[USER_ID_IN_SESSION]), dt,limit,))
+    notifications = cassandra_session.execute("SELECT ID, Titolo, Testo, Inserimento FROM notification WHERE UserID = %s AND Inserimento < %s LIMIT %s ALLOW FILTERING", (UUID(session[USER_ID_IN_SESSION]), dt,limit,))
     rtr = []
     for n in notifications:
         rtr.append({
+            "ID": n.id,
             "Title": n.titolo,
             "Message" : n.testo,
             "Inserimento" : n.inserimento

@@ -29,6 +29,7 @@ if (getCookie('latest') != "") {
 
 let showed = 0;
 let badge = false;
+var showedIds = new Set();
 $('#noti-drop > span').hide();
 let notificationList = $('#notification-list');
 
@@ -44,14 +45,14 @@ $('#noti-drop').on('show.bs.dropdown', function () {
         latest = tmp;
         setCookie('latest', latest, 7);
         nty = show(0);
-        console.log(nty);
+        //console.log(nty);
     }
 
-    else if (latest < tmp) {
+    else if (latest != tmp) {
         // here, means there are new notifications
         // start from the latest notification 0,
         // and take the difference that must be 
-        nty = show(0, tmp - latest);
+        nty = show(0, 5);
         latest = tmp;
         setCookie('latest', latest, 7);
     }
@@ -68,7 +69,7 @@ setInterval(function () {
     if (latest == null) return;
     var tmp = getLatest();
     
-    if (latest < tmp) {
+    if (latest != tmp) {
         badge = true;
         $('#noti-drop > span').show();
     }
@@ -88,13 +89,19 @@ setInterval(function () {
 function drawNotifications(nty, preppend = true) {
     if (preppend) {
         for (var i = nty.length - 1; i >= 0 ; i--) {
-            $('#notification-list').prepend('<li class="dropdown-item"><h5>' + nty[i]['Title'] + '</h5><p>' + nty[i]['Message'] + '<br><span style="font-size:10px">' + nty[i]['Inserimento'] + '</span></p></li>');
+            if (!showedIds.has(nty[i]['ID'])) {
+                $('#notification-list').prepend('<li class="dropdown-item"><h5>' + nty[i]['Title'] + '</h5><p>' + nty[i]['Message'] + '<br><span style="font-size:10px">' + nty[i]['Inserimento'] + '</span></p></li>');
+                showedIds.add(nty[i]['ID']);
+            }
         }
     }
     
     else {
         for (var i = 0; i < nty.length; i++) {
-            $('#notification-list').append('<li class="dropdown-item"><h5>' + nty[i]['Title'] + '</h5><p>' + nty[i]['Message'] + '<br><span style="font-size:10px">' + nty[i]['Inserimento'] + '</span></p></li>');
+            if (!showedIds.has(nty[i]['ID'])) {
+                $('#notification-list').append('<li class="dropdown-item"><h5>' + nty[i]['Title'] + '</h5><p>' + nty[i]['Message'] + '<br><span style="font-size:10px">' + nty[i]['Inserimento'] + '</span></p></li>');
+                showedIds.add(nty[i]['ID']);
+            }
         }
     }
 }

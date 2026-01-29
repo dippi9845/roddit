@@ -44,14 +44,14 @@ $('#noti-drop').on('show.bs.dropdown', function () {
         latest = tmp;
         setCookie('latest', latest, 7);
         nty = show(0);
-        console.log(nty);
+        //console.log(nty);
     }
 
-    else if (latest < tmp) {
+    else if (latest != tmp) {
         // here, means there are new notifications
         // start from the latest notification 0,
         // and take the difference that must be 
-        nty = show(0, tmp - latest);
+        nty = show(0, 5);
         latest = tmp;
         setCookie('latest', latest, 7);
     }
@@ -68,7 +68,7 @@ setInterval(function () {
     if (latest == null) return;
     var tmp = getLatest();
     
-    if (latest < tmp) {
+    if (latest != tmp) {
         badge = true;
         $('#noti-drop > span').show();
     }

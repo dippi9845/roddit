@@ -29,6 +29,7 @@ if (getCookie('latest') != "") {
 
 let showed = 0;
 let badge = false;
+var showedIds = new Set();
 $('#noti-drop > span').hide();
 let notificationList = $('#notification-list');
 
@@ -88,13 +89,19 @@ setInterval(function () {
 function drawNotifications(nty, preppend = true) {
     if (preppend) {
         for (var i = nty.length - 1; i >= 0 ; i--) {
-            $('#notification-list').prepend('<li class="dropdown-item"><h5>' + nty[i]['Title'] + '</h5><p>' + nty[i]['Message'] + '<br><span style="font-size:10px">' + nty[i]['Inserimento'] + '</span></p></li>');
+            if (!showedIds.has(nty[i]['ID'])) {
+                $('#notification-list').prepend('<li class="dropdown-item"><h5>' + nty[i]['Title'] + '</h5><p>' + nty[i]['Message'] + '<br><span style="font-size:10px">' + nty[i]['Inserimento'] + '</span></p></li>');
+                showedIds.add(nty[i]['ID']);
+            }
         }
     }
     
     else {
         for (var i = 0; i < nty.length; i++) {
-            $('#notification-list').append('<li class="dropdown-item"><h5>' + nty[i]['Title'] + '</h5><p>' + nty[i]['Message'] + '<br><span style="font-size:10px">' + nty[i]['Inserimento'] + '</span></p></li>');
+            if (!showedIds.has(nty[i]['ID'])) {
+                $('#notification-list').append('<li class="dropdown-item"><h5>' + nty[i]['Title'] + '</h5><p>' + nty[i]['Message'] + '<br><span style="font-size:10px">' + nty[i]['Inserimento'] + '</span></p></li>');
+                showedIds.add(nty[i]['ID']);
+            }
         }
     }
 }

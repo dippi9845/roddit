@@ -10,6 +10,7 @@ from hashlib import sha256
 from post_handling import *
 from notify import *
 from time import time
+from urllib.parse import unquote_plus
 
 
 auth_provider = PlainTextAuthProvider(
@@ -545,7 +546,7 @@ def ajax_unfollow():
 @app.route("/html-snippets/post-drawer", methods=["POST"])
 def post_drawer():
     
-    query = request.form.get("query", "")
+    query = unquote_plus(request.form.get("query", ""))
     offset = int(request.form.get("offset", time()))
     dt = datetime.fromtimestamp(offset, timezone.utc)
     limit = int(request.form.get("limit", 10))

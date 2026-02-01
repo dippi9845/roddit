@@ -9,8 +9,9 @@ import html
 from hashlib import sha256
 from post_handling import *
 from notify import *
-from time import time
+from time import time, sleep
 from urllib.parse import unquote_plus
+
 
 
 auth_provider = PlainTextAuthProvider(
@@ -18,7 +19,10 @@ auth_provider = PlainTextAuthProvider(
     password="cassandra123"
 )
 
-cluster = Cluster(["127.0.0.1"], auth_provider=auth_provider)
+cassandra_host = os.getenv("CASSANDRA_HOST", "localhost")
+cassandra_port = int(os.getenv("CASSANDRA_PORT", 9042))
+
+cluster = Cluster([cassandra_host], port=cassandra_port, auth_provider=auth_provider)
 cassandra_session = cluster.connect("roddit")
 
 

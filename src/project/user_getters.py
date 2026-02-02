@@ -20,11 +20,11 @@ def get_user_info(cs: Session, user_id):
     }
 
 def get_user_photo_by_nickname(cs: Session, nickname):
-    row = cs.execute("SELECT ProfileImagePath FROM users WHERE Nickname = %s", (nickname,))
+    row = cs.execute("SELECT ProfileImagePath FROM users WHERE Nickname = %s ALLOW FILTERING", (nickname,))
     return row[0].profileimagepath
 
 def get_user_id_by_nickname(cs: Session, nickname):
-    row = cs.execute("SELECT ID FROM users WHERE Nickname = %s", (nickname,))
+    row = cs.execute("SELECT ID FROM users WHERE Nickname = %s ALLOW FILTERING", (nickname,))
     return row[0].id
 
 def is_post_liked_by(cs: Session, post_id, user_id):
@@ -35,14 +35,14 @@ def is_post_liked_by(cs: Session, post_id, user_id):
     if type(post_id) is str:
         post_id = UUID(post_id)
 
-    row = cs.execute("SELECT * FROM likes WHERE User = %s AND Post = %s", (user_id, post_id,))
+    row = cs.execute("SELECT * FROM likes WHERE User = %s AND Post = %s ALLOW FILTERING", (user_id, post_id,))
     if row:
         return True
     else:
         return False
     
 def get_users_posts(cs : Session, nickname : str):
-    result = cs.execute("SELECT ID, Subreddit, Creator, Titolo, Testo, PathToFile, MediaType FROM post WHERE Creator = %s", (nickname,))
+    result = cs.execute("SELECT ID, Subreddit, Creator, Titolo, Testo, PathToFile, MediaType FROM post WHERE Creator = %s ALLOW FILTERING", (nickname,))
     rtr = []
     for row in result:
         tmp = row._asdict()

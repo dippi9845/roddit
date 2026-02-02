@@ -194,7 +194,7 @@ def settings():
             new_nickname = html.escape(new_nickname)
             
             row = cassandra_session.execute(
-                "SELECT * FROM users WHERE Nickname = %s",
+            "SELECT * FROM users WHERE Nickname = %s ALLOW FILTERING",
                 (new_nickname,)
             )
             
@@ -502,7 +502,7 @@ def ajax_comments():
     rtr = []
 
     for row in rows:
-        result = cassandra_session.execute("SELECT ProfileImagePath AS ProfileImage FROM users WHERE Nickname = %s", (row.user,))
+        result = cassandra_session.execute("SELECT ProfileImagePath AS ProfileImage FROM users WHERE Nickname = %s ALLOW FILTERING", (row.user,))
         rtr.append({
             "ProfileImage": result[0].profileimage,
             "User" : row.user,
@@ -635,7 +635,7 @@ def post_user_card_drawer():
     query = request.form.get("query", "")
 
     rows = cassandra_session.execute(
-        "SELECT * FROM users WHERE Nickname = %s",
+        "SELECT * FROM users WHERE Nickname = %s ALLOW FILTERING",
         (query,)
     )
 

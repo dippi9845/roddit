@@ -22,14 +22,15 @@ CREATE TABLE following (
 
 
 CREATE TABLE comment (
-  ID UUID PRIMARY KEY,
+  ID UUID,
   User text,
   Testo text,
   entityType text, -- POST, COMMENTO
-  entityID UUID
+  entityID UUID,
+  PRIMARY KEY (ID)
 );
 
-CREATE INDEX ON comment(entityID) USING 'StorageAttachedIndex';
+-- CREATE INDEX ON comment(entityID) USING 'StorageAttachedIndex';
 
 
 CREATE TABLE likes (
@@ -47,7 +48,7 @@ CREATE TABLE notification (
   PRIMARY KEY (ID, Inserimento)
 ) WITH CLUSTERING ORDER BY (Inserimento DESC);
 
-CREATE INDEX ON notification(UserID) USING 'StorageAttachedIndex';
+-- CREATE INDEX ON notification(UserID) USING 'StorageAttachedIndex';
 
 
 CREATE TABLE post (
@@ -62,9 +63,9 @@ CREATE TABLE post (
   PRIMARY KEY (ID, Creazione)
 ) WITH CLUSTERING ORDER BY (Creazione DESC);
 
-CREATE INDEX ON post(Subreddit) USING 'StorageAttachedIndex';
+-- CREATE INDEX ON post(Subreddit) USING 'StorageAttachedIndex';
 
-CREATE INDEX ON post(Creator) USING 'StorageAttachedIndex';
+-- CREATE INDEX ON post(Creator) USING 'StorageAttachedIndex';
 
 CREATE TABLE post_like (
   post UUID PRIMARY KEY,
@@ -77,15 +78,16 @@ CREATE TABLE post_comment (
 );
 
 CREATE TABLE users (-- TODO trovare un modo per distribuire le immagini tra vari nodi
-  ID UUID PRIMARY KEY,
+  ID UUID,
   Nickname text,
   Email text,
   Bio text,
   Password text,
   Salt text,
-  ProfileImagePath text
+  ProfileImagePath text,
+  PRIMARY KEY (ID)
 );
 
-CREATE INDEX ON users(Nickname) USING 'StorageAttachedIndex';
-CREATE INDEX ON users(Email) USING 'StorageAttachedIndex';
-CREATE INDEX ON users(Password) USING 'StorageAttachedIndex';
+-- CREATE INDEX ON users(Nickname) USING 'StorageAttachedIndex';
+-- CREATE INDEX ON users(Email) USING 'StorageAttachedIndex';
+-- CREATE INDEX ON users(Password) USING 'StorageAttachedIndex';

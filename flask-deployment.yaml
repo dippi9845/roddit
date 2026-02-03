@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: flask
-        image: flask-app:1.0
+        image: dippi9845/flask-app:1.0
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 5000
@@ -23,3 +23,10 @@ spec:
           value: "cassandra"
         - name: CASSANDRA_PORT
           value: "9042"
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "128Mi"
+          limits:
+            cpu: "50m"
+            memory: "256Mi"

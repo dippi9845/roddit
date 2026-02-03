@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: flask
-        image: flask-app:1.0
+        image: dippi9845/flask-app:1.0
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 5000
@@ -25,8 +25,8 @@ spec:
           value: "9042"
         resources:
           requests:
-            cpu: "100m"
+            cpu: "50m"
             memory: "128Mi"
           limits:
-            cpu: "500m"
+            cpu: "50m"
             memory: "256Mi"

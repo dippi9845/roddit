@@ -466,51 +466,73 @@ def ajax_put_comment():
     if USER_ID_IN_SESSION in session and "text" in request.args and "postID" in request.args:
         user_info = get_user_info(cassandra_session, session[USER_ID_IN_SESSION])
         testo = html.escape(request.args["text"])
-        post_id = UUID(request.args["postID"])
-        cassandra_session.execute("INSERT INTO comment (ID, User, Testo, entityType, entityID) VALUES (uuid(), %s, %s, 'Post', %s)", (user_info["name"], testo, UUID(request.args["postID"]),))
-        cassandra_session.execute("UPDATE post_comment SET comments=comments + 1 WHERE post = %s", (post_id,))
+        target_id = UUID(request.args["postID"])
+        entity_type = request.args.get("type", "Post") 
+        cassandra_session.execute(
+            "INSERT INTO comment (ID, User, Testo, entityType, entityID) VALUES (uuid(), %s, %s, %s, %s)",
+            (user_info["name"], testo, entity_type, target_id)
+        )
+        if entity_type == "Post":
+            cassandra_session.execute("UPDATE post_comment SET comments=comments + 1 WHERE post = %s", (target_id,))
+            creator_id = get_post_creator(cassandra_session, target_id)
+            notify_user(cassandra_session, creator_id, "New Comment", "You received a new comment on your post")
+        else:
+            # notify_user(cassandra_session, creator_id, "New Reply", "Someone replied to your comment")
+            pass
         result = cassandra_session.execute(
             "SELECT ProfileImagePath as ProfileImage, Nickname as User FROM users WHERE ID = %s",
             (UUID(session[USER_ID_IN_SESSION]),)
         )
-
         row = result.one()
-
-        creator_id = get_post_creator(cassandra_session, post_id)
-        notify_user(cassandra_session, creator_id, "New Comment", "You recived a new comment to a post")
-
         return jsonify({
             "ProfileImage": row.profileimage,
-            "User": row.user
+            "User": row.user,
+            "Status": "Success"
         })
     return jsonify({"Error": "Invalid request"})
-
 
 @app.route("/ajax/comments", methods=["GET"])
 def ajax_comments():
     post_id = request.args.get('post', "")
-        
+
     if post_id == "":
         return "{ \"Error\": \"No ID\" }"
 
     rows = cassandra_session.execute("""
-        SELECT User, Testo
+        SELECT ID, User, Testo
         FROM comment
         WHERE entityType='Post' AND entityID = %s ALLOW FILTERING
-        """, (UUID(post_id),))
-    
+        """, (UUID(post_id),))    
+
     rtr = []
 
     for row in rows:
-        result = cassandra_session.execute("SELECT ProfileImagePath AS ProfileImage FROM users WHERE Nickname = %s ALLOW FILTERING", (row.user,))
+        res_user = cassandra_session.execute("SELECT ProfileImagePath AS ProfileImage FROM users WHERE Nickname = %s ALLOW FILTERING", (row.user,))
+        img = res_user[0].profileimage if res_user else "/static/uploads/images/default_profile_picture.jpg"
+        replies_rows = cassandra_session.execute("""
+            SELECT ID, User, Testo
+            FROM comment
+            WHERE entityType='Comment' AND entityID = %s ALLOW FILTERING
+            """, (row.id,))
+        
+        replies = []
+        for r_row in replies_rows:
+            res_r_user = cassandra_session.execute("SELECT ProfileImagePath AS ProfileImage FROM users WHERE Nickname = %s ALLOW FILTERING", (r_row.user,))
+            r_img = res_r_user[0].profileimage if res_r_user else "/static/uploads/images/default_profile_picture.jpg"
+            replies.append({
+                "ID": str(r_row.id),
+                "ProfileImage": r_img,
+                "User": r_row.user,
+                "Text": r_row.testo
+            })
         rtr.append({
-            "ProfileImage": result[0].profileimage,
+            "ID": str(row.id),
+            "ProfileImage": img,
             "User" : row.user,
-            "Text" : row.testo
+            "Text" : row.testo,
+            "Replies": replies
         })
-
     return jsonify(rtr)
-
 
 @app.route("/ajax/dislike-post", methods=["POST"])
 def ajax_dislike_post():

@@ -1,8 +1,53 @@
 let modal = new bootstrap.Modal("#modal-comment");
 let currentCommentButton = null;
 
+function showReplyForm(commentId) {
+    let container = $('#reply-form-container-' + commentId);
+    if (container.html() !== "") {
+        container.html("");
+        return;
+    }
+    let html = `
+        <div class="mt-2 ms-5">
+            <textarea id="reply-text-${commentId}" class="form-control" rows="2" placeholder="Scrivi una risposta..."></textarea>
+            <button class="btn btn-sm btn-primary mt-2" onclick="sendReply('${commentId}')">Invia Risposta</button>
+        </div>
+    `;
+    container.html(html);
+}
+
+function sendReply(parentCommentId) {
+    let testo = $('#reply-text-' + parentCommentId).val();
+    if (testo == '') return;
+
+    $.ajax({
+        url: "ajax/put-comment",
+        type: 'GET',
+        data: {
+            text: testo, 
+            postID: parentCommentId, 
+            type: 'Comment' 
+        },
+        dataType: 'json',
+        success: function (mydata) {
+            let replyHtml = `
+                <div class="d-flex align-items-center ms-5 mt-2 border-start ps-3">
+                    <div class="flex-shrink-0">
+                        <img class="mr-3" style="max-width: 40px;" src="${mydata.ProfileImage}" alt="Profile Image">
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h6 class="mt-0">${mydata.User}</h6>
+                        <small>${testo}</small>
+                    </div>
+                </div>
+            `;
+            $('#nested-replies-' + parentCommentId).append(replyHtml);
+            $('#reply-form-container-' + parentCommentId).html(""); 
+        }
+    });
+}
+
 function getComments(postId) {
-    
     $.ajax({
         url: "ajax/comments",
         type: 'GET',
@@ -11,19 +56,37 @@ function getComments(postId) {
         async: false,
         success: function (comments) {
             let html = '';
-            for (var i = 0; i < comments.length; i++) {
-                html += '<div class="d-flex align-items-center">';
-                html += '<div class="flex-shrink-0">';
-                html += '<img class="mr-3" style="max-width: 64px;" src="' + comments[i].ProfileImage + '" alt="Profile Image">';
-                html += '</div>';
-                html += '<div class="flex-grow-1 ms-3">';
-                html += '<h5 class="mt-0">' + comments[i].User + '</h5>';
-                html += comments[i].Text;
-                html += '</div>';
-                html += '</div>';
+    for (var i = 0; i < comments.length; i++) {
+        let cID = comments[i].ID;
+        html += '<div class="mb-4" id="comment-main-' + cID + '">';
+        html += '  <div class="d-flex align-items-center">';
+        html += '    <div class="flex-shrink-0"><img class="mr-3" style="max-width: 64px;" src="' + comments[i].ProfileImage + '"></div>';
+        html += '    <div class="flex-grow-1 ms-3">';
+        html += '      <h5 class="mt-0">' + comments[i].User + '</h5>';
+        html += '      <div>' + comments[i].Text + '</div>';
+        html += '      <button class="btn btn-sm btn-link p-0" onclick="showReplyForm(\'' + cID + '\')">Rispondi</button>';
+        html += '    </div>';
+        html += '  </div>';
+        html += '  <div id="reply-form-container-' + cID + '"></div>';
+        html += '  <div id="nested-replies-' + cID + '">';
+        
+        if (comments[i].Replies && comments[i].Replies.length > 0) {
+            for (var j = 0; j < comments[i].Replies.length; j++) {
+                let rep = comments[i].Replies[j];
+                html += `
+                    <div class="d-flex align-items-center ms-5 mt-2 border-start ps-3">
+                        <div class="flex-shrink-0"><img style="max-width: 40px;" src="${rep.ProfileImage}"></div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="mt-0">${rep.User}</h6>
+                            <small>${rep.Text}</small>
+                        </div>
+                    </div>`;
             }
-            $('#modal-comment-body > div').html(html);
         }
+        html += '  </div>';
+        html += '</div>';
+    }    
+    $('#modal-comment-body > div').html(html);}
     });
     currentCommentButton = $('#button-section-' + postId + ' > button');
 

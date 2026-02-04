@@ -468,17 +468,16 @@ def ajax_put_comment():
         testo = html.escape(request.args["text"])
         target_id = UUID(request.args["postID"])
         entity_type = request.args.get("type", "Post") 
+        root_post_id_str = request.args.get("rootPostID", request.args["postID"])
+        root_post_id = UUID(root_post_id_str)
         cassandra_session.execute(
             "INSERT INTO comment (ID, User, Testo, entityType, entityID) VALUES (uuid(), %s, %s, %s, %s)",
             (user_info["name"], testo, entity_type, target_id)
         )
-        if entity_type == "Post":
-            cassandra_session.execute("UPDATE post_comment SET comments=comments + 1 WHERE post = %s", (target_id,))
-            creator_id = get_post_creator(cassandra_session, target_id)
-            notify_user(cassandra_session, creator_id, "New Comment", "You received a new comment on your post")
-        else:
-            # notify_user(cassandra_session, creator_id, "New Reply", "Someone replied to your comment")
-            pass
+        cassandra_session.execute(
+            "UPDATE post_comment SET comments = comments + 1 WHERE post = %s", 
+            (root_post_id,)
+        )
         result = cassandra_session.execute(
             "SELECT ProfileImagePath as ProfileImage, Nickname as User FROM users WHERE ID = %s",
             (UUID(session[USER_ID_IN_SESSION]),)

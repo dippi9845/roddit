@@ -1,12 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: mongodb
+  name: shard1
 spec:
   clusterIP: None
   selector:
-    app: mongodb
+    app: shard1
   ports:
-  - name: mongo
-    port: 27017
-    targetPort: 27017
+  - port: 27018
+    targetPort: 27018

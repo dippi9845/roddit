@@ -22,7 +22,7 @@ spec:
           - "--replSet=shard1"
           - "--bind_ip_all"
         ports:
-          - containerPort: 27017
+          - containerPort: 27018
         volumeMounts:
           - name: data
             mountPath: /data/db

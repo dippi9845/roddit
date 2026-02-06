@@ -7,5 +7,6 @@ spec:
   selector:
     app: shard1
   ports:
-  - port: 27018
-    targetPort: 27018
+    - name: mongo
+      port: 27018
+      targetPort: 27018

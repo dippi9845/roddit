@@ -19,30 +19,34 @@ function showReplyForm(commentId) {
 function sendReply(parentCommentId) {
     let testo = $('#reply-text-' + parentCommentId).val();
     if (testo == '') return;
-
+    let rootPostId = $('#post-id-for-comment').val();
     $.ajax({
         url: "ajax/put-comment",
         type: 'GET',
         data: {
             text: testo, 
             postID: parentCommentId, 
-            type: 'Comment' 
+            rootPostID: rootPostId,
+            type: 'Comment'
         },
         dataType: 'json',
         success: function (mydata) {
             let replyHtml = `
                 <div class="d-flex align-items-center ms-5 mt-2 border-start ps-3">
                     <div class="flex-shrink-0">
-                        <img class="mr-3" style="max-width: 40px;" src="${mydata.ProfileImage}" alt="Profile Image">
+                        <img style="max-width: 40px;" src="${mydata.ProfileImage}">
                     </div>
                     <div class="flex-grow-1 ms-3">
                         <h6 class="mt-0">${mydata.User}</h6>
                         <small>${testo}</small>
                     </div>
-                </div>
-            `;
+                </div>`;
             $('#nested-replies-' + parentCommentId).append(replyHtml);
-            $('#reply-form-container-' + parentCommentId).html(""); 
+            $('#reply-form-container-' + parentCommentId).html("");
+
+            let num = Number(currentCommentButton.text());
+            let commentImage = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-fill" viewBox="0 0 16 16"><path d="M8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6-.097 1.016-.417 2.13-.771 2.966-.079.186.074.394.273.362 2.256-.37 3.597-.938 4.18-1.234A9.06 9.06 0 0 0 8 15z"></path></svg>';
+            currentCommentButton.html(commentImage + " " + String(num + 1));
         }
     });
 }

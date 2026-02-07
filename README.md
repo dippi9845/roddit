@@ -2,6 +2,11 @@
 
 We are glade to announce you our first *badass* social network!
 
-### Mockup
+### Installation
 
-If you are interested how our website was designed and want to see some mockups, you can visit the [TEMPLATE](./TEMPLATE.md) file.
+Firstly we create the mongosb shard
+
+```
+kubectl apply -f mongodb-shard.yaml
+```
+

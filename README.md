@@ -19,7 +19,7 @@ kubectl apply -f mongodb-service.yaml
 And then we need to connect the mongodb pods
 
 ```
-kubectl exec -it shard1-0 -- mongosh
+kubectl exec -it shard1-0 -- mongosh -port 27018
 ```
 
 And then in the mongo shell

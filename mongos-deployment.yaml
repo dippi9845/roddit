@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongos
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      role: mongos
+  template:
+    metadata:
+      labels:
+        role: mongos
+    spec:
+      containers:
+      - name: mongos
+        image: mongo:6
+        command:
+        - "mongos"
+        - "--configdb"
+        - "configRepl/configsvr-0.config-svc:27019"
+        - "--bind_ip_all"
+        ports:
+        - containerPort: 27017

@@ -46,6 +46,11 @@ rs.status()
 ```
 and then you have to see SECONDARY the the added pods and PRIMARY to the current pod
 
+Let's start the config server
+```
+kubectl apply -f mongo-configsvr.yaml
+```
+
 Now let's connect to the config server
 
 ```
@@ -62,6 +67,11 @@ rs.initiate({
     { _id: 0, host: "configsvr-0.config-svc:27019" }
   ]
 })
+```
+
+Let's start the mongos deployment
+```
+kubectl apply -f mongos-deployment.yaml
 ```
 
 now exit from the bash and let's get inside the mongos deployment

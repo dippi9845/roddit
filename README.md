@@ -44,4 +44,4 @@ for checking if is working type
 ```
 rs.status()
 ```
-and then you have to se SECONDARY the the added pods and PRIMARY to the current pod
+and then you have to see SECONDARY the the added pods and PRIMARY to the current pod

@@ -11,7 +11,7 @@ from post_handling import *
 from notify import *
 from time import time, sleep
 from urllib.parse import unquote_plus
-
+from prometheus_flask_exporter import PrometheusMetrics
 
 
 auth_provider = PlainTextAuthProvider(
@@ -28,6 +28,8 @@ cassandra_session = cluster.connect("roddit")
 
 app = Flask(__name__)
 app.secret_key = "RODDIT_SOCIAL_MEDIA_123"
+
+metrics = PrometheusMetrics(app)
 
 @app.route("/")
 def index():

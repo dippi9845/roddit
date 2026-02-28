@@ -1,0 +1,26 @@
+services:
+  # IL DATABASE
+  mongodb:
+    image: mongo:latest
+    container_name: roddit_db
+    restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password123
+      - MONGO_INITDB_DATABASE=roddit
+    volumes:
+      - ./data/db:/data/db 
+      - ./init-db.js:/docker-entrypoint-initdb.d/init-db.js:ro
+    ports:
+      - "27017:27017"
+
+  # LA TUA APP FLASK
+  web_app:
+    build: .
+    container_name: flask_app
+    depends_on:
+      - mongodb # Avvia prima il DB, poi l'app
+    environment:
+      - MONGO_URI=mongodb://flask:password123@mongodb:27017/roddit
+    ports:
+      - "5000:5000"

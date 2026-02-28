@@ -1,45 +1,26 @@
-from cassandra.cluster import Session as CassandraSession
-from uuid import UUID
-
-def get_all_post_of_followed_subreddit_count(cs : CassandraSession, user_id):
-    
-    if type(user_id) is str:
-        user_id = UUID(user_id)
-    
-    subs = cs.execute("SELECT Subreddit FROM following WHERE User = %s", (user_id,))
-    
-    count = 0
-    for sub in subs :
-        posts = cs.execute("SELECT ID FROM post WHERE Subreddit = %s ALLOW FILTERING", (sub.subreddit,))
-        count += sum(1 for _ in posts)
-    
+def get_all_post_of_followed_subreddit_count(db, user_id):
+    subs_cursor = db.following.find({"User": str(user_id)}, {"Subreddit": 1})
+    subs_list = [doc['Subreddit'] for doc in subs_cursor]
+    if not subs_list:
+        return 0
+    count = db.post.count_documents({"Subreddit": {"$in": subs_list}})
     return count
 
-
-def get_all_post_by_content_count(cs : CassandraSession, query):
-    rows = cs.execute("SELECT * FROM post WHERE Titolo CONTAINS %s OR Testo CONTAINS %s", (query,query,))
-    count = sum(1 for _ in rows)
+def get_all_post_by_content_count(db, query):
+    search_filter = {
+        "$or": [
+            {"Titolo": {"$regex": query, "$options": "i"}}, 
+            {"Testo": {"$regex": query, "$options": "i"}}
+        ]
+    }
+    count = db.post.count_documents(search_filter)
     return count
 
+# Non sono convinto che la conversione di questa query sia corretta, da ricontrollare.
+def get_post_likes_count(db, post_id):
+    count = db.post_like.count_documents({"post": str(post_id)})
+    return count
 
-def get_post_likes_count(cs : CassandraSession, post_id):
-    
-    if type(post_id) is str:
-        post_id = UUID(post_id)
-    
-    row = cs.execute("SELECT likes FROM post_like WHERE post = %s", (post_id,))
-    if row:
-        return row[0].likes
-    else:
-        return 0
-
-def get_post_comments_count(cs : CassandraSession, post_id):
-    
-    if type(post_id) is str:
-        post_id = UUID(post_id)
-    
-    row = cs.execute("SELECT comments FROM post_comment WHERE post = %s", (post_id,))
-    if row:
-        return row[0].comments
-    else:
-        return 0
+def get_post_comments_count(db, post_id):
+    count = db.post_comment.count_documents({"post": str(post_id)})
+    return count

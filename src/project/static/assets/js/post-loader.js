@@ -92,7 +92,7 @@ function ajaxLoadCards(phpUrl, queryData, offset, perPage) {
     return $.ajax({
         url: phpUrl,
         type: "POST",
-        data: {query: queryData, limit: perPage},
+        data: {query: queryData, limit: perPage, offset: offset},
         async: false
     }).responseText;
 }

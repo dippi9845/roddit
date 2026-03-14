@@ -38,19 +38,6 @@ def index():
 
     return render_template("index.html", query=query)
 
-#@app.route("/profile")
-#def profile():
-#    if not is_user_logged_in(True):
-#        return redirect("/login")
-#    visited_user = request.args.get("user", session[USER_ID_IN_SESSION])
-#    if not user_exists(cassandra_session, visited_user):
-#        return redirect("/404")
-#    profile_data = get_user_info(cassandra_session, visited_user)
-#    posts = get_users_posts(cassandra_session, profile_data['name'])
-#    for p in posts:
-#        p["liked"] = is_post_liked_by(cassandra_session, p["id"], session[USER_ID_IN_SESSION])
-#    return render_template("profile.html", profile=profile_data, posts=posts)
-# Versione fatta con Gemini in Quick (eventuale source di problemi [Causa errori nel get profile])
 @app.route("/profile")
 def profile():
     if not is_user_logged_in(True):
@@ -94,16 +81,13 @@ def registration():
         form["password"] = request.form.get("password", "")
         form["pass_conf"] = request.form.get("pass_conf", "")
         if "first" in request.form:
-            # Privacy policy
             if request.form.get("privacy-policy") != "accept":
                 err = True
                 text_err = "You must accept the privacy policy"
-            # Terms
             elif request.form.get("terms-conditions") != "accept":
                 err = True
                 text_err = "You must accept the terms and conditions"
             else:
-                # Controllo campi
                 if not all([form["nickname"], form["email"], form["password"], form["pass_conf"]]):
                     err = True
                     text_err = "You must fill all the fields"
@@ -393,9 +377,8 @@ def ajax_login():
 @app.route("/ajax/get-posts-count", methods=["POST"])
 def ajax_get_posts_count():
     if not is_user_logged_in(True):
-        return redirect("/login") 
-    
-    query = request.args.get("query", "")
+        return "0"
+    query = request.form.get("query", "") 
     user_id = session.get(USER_ID_IN_SESSION)
     if query == "":
         post_count = get_all_post_of_followed_subreddit_count(db, user_id)
@@ -405,13 +388,12 @@ def ajax_get_posts_count():
 
 @app.route("/ajax/get-users-count", methods=["POST"])
 def ajax_get_users_count():
-    if not is_user_logged_in(True):
-        redirect("/login")
     query = request.form.get("query", "")
-    user_count = 0
-    if query != "":
-        user_count = get_all_searched_users_count(cassandra_session, query)
-    return str(user_count)
+    if query == "":
+        count = db.users.count_documents({})
+    else:
+        count = db.users.count_documents({"Nickname": {"$regex": query, "$options": "i"}})
+    return str(count)
 
 @app.route("/ajax/like-post", methods=["POST"])
 def ajax_like_post():
@@ -446,39 +428,6 @@ def ajax_logout():
         path="/"
     )
     return redirect("/login")
-@app.route("/ajax/put-comment", methods=["GET"])
-def ajax_put_comment():
-    if USER_ID_IN_SESSION in session and "text" in request.args and "postID" in request.args:
-        user_id = str(session[USER_ID_IN_SESSION])
-        user_info = get_user_info(db, user_id)
-        if not user_info:
-            return jsonify({"Error": "User not found"}), 404
-        
-        testo = html.escape(request.args["text"])
-        target_id = str(request.args["postID"])
-        entity_type = request.args.get("type", "Post") 
-        root_post_id = str(request.args.get("rootPostID", target_id))
-        new_comment_id = str(uuid.uuid4())
-        db.comment.insert_one({
-            "ID": new_comment_id,
-            "User": user_info["name"],
-            "Testo": testo,
-            "entityType": entity_type,
-            "entityID": target_id
-        })
-        db.post_comment.update_one(
-            {"post": root_post_id},
-            {"$inc": {"comments": 1}},
-            upsert=True
-        )
-        user_row = db.users.find_one({"ID": user_id})
-        if user_row:
-            return jsonify({
-                "ProfileImage": user_row.get("ProfileImagePath", "/static/uploads/images/default_profile_picture.jpg"),
-                "User": user_row.get("Nickname", "Unknown"),
-                "Status": "Success"
-            })
-    return jsonify({"Error": "Invalid request"}), 400
 
 @app.route("/ajax/comments", methods=["GET"])
 def ajax_comments():
@@ -518,6 +467,45 @@ def ajax_comments():
         })
     return jsonify(rtr)
 
+@app.route("/ajax/put-comment", methods=["GET"])
+def ajax_put_comment():
+    if USER_ID_IN_SESSION in session and "text" in request.args and "postID" in request.args:
+        user_id = str(session[USER_ID_IN_SESSION])
+        user_info = get_user_info(db, user_id)
+        
+        if not user_info:
+            return jsonify({"Error": "User not found"}), 404
+        
+        testo = html.escape(request.args["text"])
+        target_id = str(request.args["postID"]) 
+        entity_type = request.args.get("type", "Post") 
+        root_post_id = request.args.get("rootPostID")
+        if not root_post_id or root_post_id == "undefined":
+            root_post_id = target_id
+        else:
+            root_post_id = str(root_post_id)
+
+        new_comment_id = str(uuid.uuid4())
+        db.comment.insert_one({
+            "ID": new_comment_id,
+            "User": user_info["name"],
+            "Testo": testo,
+            "entityType": entity_type,
+            "entityID": target_id
+        })
+        db.post_comment.update_one(
+            {"post": root_post_id},
+            {"$inc": {"comments": 1}},
+            upsert=True
+        )
+        user_row = db.users.find_one({"ID": user_id})
+        return jsonify({
+            "ProfileImage": user_row.get("ProfileImagePath", "/static/uploads/images/default_profile_picture.jpg"),
+            "User": user_row.get("Nickname", "Unknown"),
+            "Status": "Success"
+        })
+    return jsonify({"Error": "Invalid request"}), 400
+
 @app.route("/ajax/dislike-post", methods=["POST"])
 def ajax_dislike_post():
     post_id = request.form.get("post_id", "")
@@ -530,47 +518,33 @@ def ajax_dislike_post():
         )
     return jsonify({"status": "ok"})
 
-@app.route("/ajax/get-last-notification")
+@app.route("/ajax/get-last-notification", methods=["GET"])
 def ajax_get_last_notification():
     row = db.notification.find_one(
-        {"Inserimento": {"$lt": datetime.now(timezone.utc)}},
         sort=[("Inserimento", -1)]
     )
-    return jsonify({"ID": str(row["ID"])} if row else {"ID": None})
+    if row:
+        return jsonify([{"ID": str(row["ID"])}])
+    return jsonify([])
 
-#@app.route("/ajax/get-my-notification")
-#def ajax_get_my_notification():
-#    # TODO Si potrebbe aggiungere un campo "visto" così da restituire tutte le notifiche non ancora viste
-#    offset = int(request.form.get("o", time())) # TODO qua vuole un timestamp non un int
-#    dt = datetime.fromtimestamp(offset, timezone.utc)
-#    limit = int(request.form.get("n", 5))
-#    notifications = cassandra_session.execute("SELECT ID, Titolo, Testo, Inserimento FROM notification WHERE UserID = %s AND Inserimento < %s LIMIT %s ALLOW FILTERING", (UUID(session[USER_ID_IN_SESSION]), dt,limit,))
-#    rtr = []
-#    for n in notifications:
-#        rtr.append({
-#            "ID": n.id,
-#            "Title": n.titolo,
-#            "Message" : n.testo,
-#            "Inserimento" : n.inserimento
-#        })
-#    return jsonify(rtr)
-@app.route("/ajax/get-my-notification", methods=["POST"])
+@app.route("/ajax/get-my-notification", methods=["GET"])
 def ajax_get_my_notification():
     user_id = str(session.get(USER_ID_IN_SESSION))
-    offset = float(request.form.get("o", datetime.now().timestamp())) 
-    dt = datetime.fromtimestamp(offset, timezone.utc)
-    limit = int(request.form.get("n", 5))
+    # TODO Si potrebbe aggiungere un campo "visto" così da restituire tutte le notifiche non ancora viste
+    # TODO qua vuole un timestamp non un int
+    offset = int(request.args.get("o", 0)) 
+    limit = int(request.args.get("n", 5))
     notifications = db.notification.find({
-        "UserID": user_id,
-        "Inserimento": {"$lt": dt}
-    }).sort("Inserimento", -1).limit(limit)
+        "UserID": user_id
+    }).sort("Inserimento", -1).skip(offset).limit(limit)
+    
     rtr = []
     for n in notifications:
         rtr.append({
             "ID": str(n["ID"]),
             "Title": n["Titolo"],
             "Message" : n["Testo"],
-            "Inserimento" : n["Inserimento"].timestamp()
+            "Inserimento" : n["Inserimento"].strftime("%Y-%m-%d %H:%M")
         })
     return jsonify(rtr)
 
@@ -592,28 +566,28 @@ def ajax_unfollow():
 @app.route("/html-snippets/post-drawer", methods=["POST"])
 def post_drawer():
     query = unquote_plus(request.form.get("query", ""))
-    offset = int(request.form.get("offset", time()))
-    dt = datetime.fromtimestamp(offset, timezone.utc)
+    offset = int(request.form.get("offset", 0)) 
     limit = int(request.form.get("limit", 10))
+    
     posts_data = []
     if query == "":
         following_cursor = db.following.find({"User": session[USER_ID_IN_SESSION]})
         subreddits = [f['Subreddit'] for f in following_cursor]
 
         rows = db.post.find({
-            "Subreddit": {"$in": subreddits},
-            "Creazione": {"$lt": dt}
-        }).limit(limit).sort("Creazione", -1)
+            "Subreddit": {"$in": subreddits}
+        }).sort("Creazione", -1).skip(offset).limit(limit)
         posts_data = list(rows)
     else:
+        regex_query = {"$regex": query, "$options": "i"}
         rows = db.post.find({
             "$or": [
-                {"Titolo": query},
-                {"Testo": query}
-            ],
-            "Creazione": {"$lt": dt}
-        }).limit(limit).sort("Creazione", -1)
+                {"Titolo": regex_query},
+                {"Testo": regex_query}
+            ]
+        }).sort("Creazione", -1).skip(offset).limit(limit)
         posts_data = list(rows)
+
     posts = []
     for row in posts_data:
         posts.append({
@@ -627,8 +601,7 @@ def post_drawer():
             "likes": get_post_likes_count(db, row['ID']),
             "liked": is_post_liked_by(db, row['ID'], session[USER_ID_IN_SESSION]),
             "comments": get_post_comments_count(db, row['ID']),
-            "file": row.get('PathToFile'),
-            "Creazione": row['Creazione']
+            "file": row.get('PathToFile')
         })
     template = """
     {% from "components/post.html" import drawPost %}
@@ -641,16 +614,18 @@ def post_drawer():
 @app.route("/html-snippets/user-card-drawer", methods=["POST"])
 def post_user_card_drawer():
     query = request.form.get("query", "")
-    rows = cassandra_session.execute(
-        "SELECT * FROM users WHERE Nickname = %s ALLOW FILTERING",
-        (query,)
-    )
-    users = [{
-        "id": row.ID,
-        "nickname": row.Nickname,
-        "photo": row.ProfileImagePath,
-        "current_uid": session[USER_ID_IN_SESSION]
-    } for row in rows]
+    limit = int(request.form.get("limit", 5))
+    rows = db.users.find({
+        "Nickname": {"$regex": query, "$options": "i"}
+    }).limit(limit)
+    users = []
+    for row in rows:
+        users.append({
+            "id": str(row['ID']),
+            "nickname": row['Nickname'],
+            "photo": row.get('ProfileImagePath', "/static/uploads/images/default_profile_picture.jpg"),
+            "current_uid": session.get(USER_ID_IN_SESSION)
+        })
     template = """
     {% from "components/user.html" import draw_user_card %}
     {% for u in users %}
@@ -658,7 +633,7 @@ def post_user_card_drawer():
     {% endfor %}
     <script src="/static/assets/js/btn-ajax-form.js"></script>
     """
-    return render_template_string(template, users=users)
-    
+    return render_template_string(template, users=users) 
+   
 if __name__ == "__main__":
     app.run(debug=True)

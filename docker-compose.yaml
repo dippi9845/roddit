@@ -1,5 +1,4 @@
 services:
-  # IL DATABASE
   mongodb:
     image: mongo:latest
     container_name: roddit_db
@@ -14,12 +13,11 @@ services:
     ports:
       - "27017:27017"
 
-  # LA TUA APP FLASK
   web_app:
     build: .
     container_name: flask_app
     depends_on:
-      - mongodb # Avvia prima il DB, poi l'app
+      - mongodb 
     environment:
       - MONGO_URI=mongodb://flask:password123@mongodb:27017/roddit
     ports:

@@ -49,7 +49,7 @@ def get_users_posts(db, nickname: str):
             "pathtofile": row.get('PathToFile'),
             "mediatype": row.get('MediaType')
         }
-        tmp["likes"] = db.post_like.count_documents({"post": post_id})
-        tmp["comments"] = db.post_comment.count_documents({"post": post_id})
+        tmp["likes"] = db.post_like.find_one({"post": post_id})["likes"]
+        tmp["comments"] = db.post_comment.find_one({"post": post_id})["comments"]
         rtr.append(tmp)
     return rtr

@@ -17,8 +17,8 @@ def get_all_post_by_content_count(db, query):
     return count
 
 def get_post_likes_count(db, post_id):
-    count = db.post_like.count_documents({"post": str(post_id)})
-    return count
+    count = db.post_like.find_one({"post": str(post_id)})
+    return count["likes"]
 
 def get_post_comments_count(db, post_id):
     row = db.post_comment.find_one({"post": str(post_id)})

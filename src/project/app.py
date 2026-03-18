@@ -49,8 +49,7 @@ def profile():
         return redirect("/404")
     posts = get_users_posts(db, profile_data['name'])
     for p in posts:
-        p_id = p.get("ID") or str(p.get("_id"))
-        p["liked"] = is_post_liked_by(db, p_id, current_user_id)
+        p["liked"] = is_post_liked_by(db, p["id"], current_user_id)
     return render_template("profile.html", profile=profile_data, posts=posts)
 
 @app.route("/login")
@@ -611,29 +610,29 @@ def post_drawer():
     """
     return render_template_string(template, posts=posts)
 
-@app.route("/html-snippets/user-card-drawer", methods=["POST"])
-def post_user_card_drawer():
-    query = request.form.get("query", "")
-    limit = int(request.form.get("limit", 5))
-    rows = db.users.find({
-        "Nickname": {"$regex": query, "$options": "i"}
-    }).limit(limit)
-    users = []
-    for row in rows:
-        users.append({
-            "id": str(row['ID']),
-            "nickname": row['Nickname'],
-            "photo": row.get('ProfileImagePath', "/static/uploads/images/default_profile_picture.jpg"),
-            "current_uid": session.get(USER_ID_IN_SESSION)
-        })
-    template = """
-    {% from "components/user.html" import draw_user_card %}
-    {% for u in users %}
-        {{ draw_user_card( u['id'], u['nickname'], u['photo'], u['current_uid']) }}
-    {% endfor %}
-    <script src="/static/assets/js/btn-ajax-form.js"></script>
-    """
-    return render_template_string(template, users=users) 
+#@app.route("/html-snippets/user-card-drawer", methods=["POST"])
+#def post_user_card_drawer():
+#    query = request.form.get("query", "")
+#    limit = int(request.form.get("limit", 5))
+#    rows = db.users.find({
+#        "Nickname": {"$regex": query, "$options": "i"}
+#    }).limit(limit)
+#    users = []
+#    for row in rows:
+#        users.append({
+#            "id": str(row['ID']),
+#            "nickname": row['Nickname'],
+#            "photo": row.get('ProfileImagePath', "/static/uploads/images/default_profile_picture.jpg"),
+#            "current_uid": session.get(USER_ID_IN_SESSION)
+#        })
+#    template = """
+#    {% from "components/user.html" import draw_user_card %}
+#    {% for u in users %}
+#        {{ draw_user_card( u['id'], u['nickname'], u['photo'], u['current_uid']) }}
+#    {% endfor %}
+#    <script src="/static/assets/js/btn-ajax-form.js"></script>
+#    """
+#    return render_template_string(template, users=users) 
    
 if __name__ == "__main__":
     app.run(debug=True)

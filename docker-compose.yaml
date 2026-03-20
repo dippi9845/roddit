@@ -9,7 +9,7 @@ services:
       - MONGO_INITDB_DATABASE=roddit
     volumes:
       - ./data/db:/data/db 
-      - ./init-db.js:/docker-entrypoint-initdb.d/init-db.js:ro
+      - ./src/database/init-db.js:/docker-entrypoint-initdb.d/init-db.js:ro
     ports:
       - "27017:27017"
 

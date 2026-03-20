@@ -1,16 +1,15 @@
 FROM python:3.11-slim
 
-# directory di lavoro nel container
 WORKDIR /app
 
-# copia requirements e installa dipendenze
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# copia TUTTO il progetto (compresi templates e static)
 COPY . .
 
-# variabili Flask
 ENV FLASK_APP=src/project/app.py
 ENV FLASK_RUN_HOST=0.0.0.0
 ENV FLASK_RUN_PORT=5000

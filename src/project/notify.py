@@ -1,9 +1,21 @@
-from cassandra.cluster import Session as CassandraSession
+from datetime import datetime, timezone
+import uuid
 
-def notify_user(cs : CassandraSession, user_id, titolo, messaggio):
-    cs.execute("INSERT INTO notification (ID, UserID, Titolo, Testo, Inserimento) VALUES (uuid(), %s, %s, %s, toTimestamp(now()))", (user_id, titolo, messaggio,))
-
-def get_post_creator(cs : CassandraSession, post_id):
-    row_post = cs.execute("SELECT Creator FROM post WHERE ID = %s", (post_id,))
-    row_user = cs.execute("SELECT ID FROM users WHERE Nickname = %s ALLOW FILTERING", (row_post[0].creator,))
-    return row_user[0].id
+def notify_user(db, user_id, titolo, messaggio):
+    notification = {
+        "ID": str(uuid.uuid4()),
+        "UserID": str(user_id),
+        "Titolo": titolo,
+        "Testo": messaggio,
+        "Inserimento": datetime.now(timezone.utc) 
+    }
+    db.notification.insert_one(notification)
+    
+def get_post_creator(db, post_id):
+    post = db.post.find_one({"ID": str(post_id)}, {"Creator": 1})
+    if not post:
+        return None
+    user = db.users.find_one({"Nickname": post['Creator']}, {"ID": 1})
+    if not user:
+        return None
+    return str(user['ID'])

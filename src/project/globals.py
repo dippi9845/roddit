@@ -2,55 +2,36 @@ from flask import session, request, make_response
 import uuid
 from os import path
 from datetime import datetime, timedelta, timezone
-from cassandra.cluster import Session as CassandraSession
-
 
 USER_ID_IN_SESSION = "userID"
 USER_ID_IN_COOKIE = USER_ID_IN_SESSION
-
-
 def create_session(user_id):
     session[USER_ID_IN_SESSION] = user_id
-
-
 def create_cookie(user_id):
     expiration_time = datetime.now(timezone.utc) + timedelta(days=15)
     response = make_response()
-    
     response.set_cookie(
         USER_ID_IN_COOKIE,
-        user_id,
+        str(user_id),
         expires=expiration_time,
         path="/"
     )
-    
-
 
 def try_login_cookie():
-
     token = request.cookies.get(USER_ID_IN_COOKIE)
     if not token:
         return False
-
     session[USER_ID_IN_SESSION] = token
     return True
 
-
 def is_user_logged_in(login_if_cookie_exists=False):
-
-
     if USER_ID_IN_SESSION in session:
         return True
-
     if login_if_cookie_exists:
-
         if try_login_cookie():
             return True
-
     return False
 
-    
-def get_all_searched_users_count(cs : CassandraSession, searched_user):
-    rows = cs.execute("SELECT Nickname FROM users WHERE Nickname = %s ALLOW FILTERING", (searched_user,))
-    count = sum(1 for _ in rows)
+def get_all_searched_users_count(db, searched_user):
+    count = db.users.count_documents({"Nickname": searched_user})
     return count

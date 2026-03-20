@@ -17,12 +17,7 @@ from datetime import datetime, timezone
 
 mongo_uri = os.getenv("MONGO_URI", "mongodb://flask:password123@mongodb:27017/roddit")
 client = MongoClient(mongo_uri)
-db = client.roddit 
-
-cassandra_host = os.getenv("CASSANDRA_HOST", "localhost")
-cassandra_port = int(os.getenv("CASSANDRA_PORT", 9042))
-
-cassandra_session = client.roddit
+db = client.roddit
 
 app = Flask(__name__)
 app.secret_key = "RODDIT_SOCIAL_MEDIA_123"

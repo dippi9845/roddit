@@ -1,4 +1,3 @@
-import email
 from flask import Flask, render_template, render_template_string, request, redirect, session, make_response, jsonify
 import os
 from globals import *
@@ -11,8 +10,7 @@ from notify import *
 from time import time, sleep
 from urllib.parse import unquote_plus
 from prometheus_flask_exporter import PrometheusMetrics
-from pymongo import MongoClient
-from bson import uuid as bson_uuid 
+from pymongo import MongoClient 
 import uuid
 
 from datetime import datetime, timezone

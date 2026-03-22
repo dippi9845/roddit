@@ -1,10 +1,18 @@
 # Roddit
 
-We are glade to announce you our first *badass* social network!
+We are glade to announce you our first social network!
+
+
 
 ### Installation
 
-Firstly we create the mongosb shard
+Firstly we start kubernetes
+
+```
+minikube start
+```
+
+We create the mongosb shard
 
 ```
 kubectl apply -f mongodb-shard.yaml
@@ -86,4 +94,10 @@ and then add the shards
 sh.addShard("shard1/shard1-0.shard1.default.svc.cluster.local:27018")
 sh.addShard("shard1/shard1-1.shard1.default.svc.cluster.local:27018")
 sh.addShard("shard1/shard1-2.shard1.default.svc.cluster.local:27018")
+```
+
+For starting the deployment on port 5000 type
+
+```
+kubectl port-forward deployment/flask-app 5000:5000
 ```

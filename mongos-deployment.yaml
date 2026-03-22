@@ -12,6 +12,36 @@ spec:
       labels:
         role: mongos
     spec:
+      initContainers:
+      - name: wait-configsvr
+        image: mongo:6
+        command:
+        - bash
+        - -c
+        - |
+          # Aspetta che il configsvr abbia un primary
+          until [ "$(mongosh --host configsvr-0.config-svc --port 27019 --quiet --eval "try { rs.status().ok } catch(e) { 0 }")" = "1" ]; do
+            echo "Waiting for configsvr primary..."
+            sleep 3
+          done
+          echo "configsvr ready."
+
+      - name: wait-shard
+        image: mongo:6
+        command:
+        - bash
+        - -c
+        - |
+          # Aspetta che lo shard abbia un primary su uno dei 3 membri
+          until \
+            [ "$(mongosh --host shard1-0.shard1.default.svc.cluster.local --port 27018 --quiet --eval "try { rs.isMaster().ismaster } catch(e) { false }")" = "true" ] || \
+            [ "$(mongosh --host shard1-1.shard1.default.svc.cluster.local --port 27018 --quiet --eval "try { rs.isMaster().ismaster } catch(e) { false }")" = "true" ] || \
+            [ "$(mongosh --host shard1-2.shard1.default.svc.cluster.local --port 27018 --quiet --eval "try { rs.isMaster().ismaster } catch(e) { false }")" = "true" ]; do
+            echo "Waiting for shard1 primary..."
+            sleep 3
+          done
+          echo "shard1 ready."
+
       containers:
       - name: mongos
         image: mongo:6
@@ -22,3 +52,43 @@ spec:
         - "--bind_ip_all"
         ports:
         - containerPort: 27017
+        readinessProbe:
+          exec:
+            command:
+              - mongosh
+              - "--eval"
+              - "db.adminCommand('ping')"
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: add-shard
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: add-shard
+        image: mongo:6
+        command:
+        - bash
+        - -c
+        - |
+          # Aspetta che il mongos sia pronto
+          until mongosh --host mongos --port 27017 --eval "db.adminCommand('ping')" &>/dev/null; do
+            echo "Waiting for mongos..."
+            sleep 3
+          done
+
+          # Aggiungi lo shard solo se non già presente
+          SHARDS=$(mongosh --host mongos --port 27017 --quiet --eval "db.adminCommand('listShards').shards.length")
+          if [ "$SHARDS" = "0" ]; then
+            echo "Adding shard1..."
+            mongosh --host mongos --port 27017 --eval \
+              "sh.addShard('shard1/shard1-0.shard1.default.svc.cluster.local:27018,shard1-1.shard1.default.svc.cluster.local:27018,shard1-2.shard1.default.svc.cluster.local:27018')"
+            echo "Done."
+          else
+            echo "Shard already present, skipping."
+          fi

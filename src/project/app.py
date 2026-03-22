@@ -15,18 +15,15 @@ import uuid
 
 from datetime import datetime, timezone
 
-# Lista dei pod (hostname) + porta
 hosts = [
     "shard1-0.shard1.default.svc.cluster.local:27018",
     "shard1-1.shard1.default.svc.cluster.local:27018",
     "shard1-2.shard1.default.svc.cluster.local:27018"
 ]
 
-# Connection URI
 uri = f"mongodb://{','.join(hosts)}/?replicaSet=shard1"
 
 client = MongoClient(uri)
-print(client.admin.command("ping"))
 db = client.roddit
 
 app = Flask(__name__)

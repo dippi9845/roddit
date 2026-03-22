@@ -24,6 +24,26 @@ spec:
       labels:
         app: configsvr
     spec:
+      initContainers:
+      - name: init-replicaset
+        image: mongo:6
+        command:
+        - bash
+        - -c
+        - |
+          until mongosh --host configsvr-0.config-svc --port 27019 --eval "db.adminCommand('ping')" &>/dev/null; do
+            echo "Waiting for configsvr..."
+            sleep 3
+          done
+          STATUS=$(mongosh --host configsvr-0.config-svc --port 27019 --quiet --eval "try { rs.status().ok } catch(e) { 0 }")
+          if [ "$STATUS" != "1" ]; then
+            echo "Initializing configsvr replica set..."
+            mongosh --host configsvr-0.config-svc --port 27019 --eval \
+              "rs.initiate({_id:'configRepl',configsvr:true,members:[{_id:0,host:'configsvr-0.config-svc:27019'}]})"
+            echo "Done."
+          else
+            echo "Already initialized, skipping."
+          fi
       containers:
       - name: mongo
         image: mongo:6
@@ -33,3 +53,12 @@ spec:
           - "--replSet=configRepl"
           - "--port=27019"
           - "--bind_ip_all"
+        readinessProbe:
+          exec:
+            command:
+              - mongosh
+              - "--port=27019"
+              - "--eval"
+              - "db.adminCommand('ping')"
+          initialDelaySeconds: 5
+          periodSeconds: 5

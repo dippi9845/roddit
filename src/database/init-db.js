@@ -1,11 +1,4 @@
 db = db.getSiblingDB('roddit');
-if (!db.getUser("flask")) {
-    db.createUser({
-        user: "flask",
-        pwd: "password123",
-        roles: [{ role: "readWrite", db: "roddit" }]
-    });
-}
 
 db.users.createIndex({ "ID": 1 }, { unique: true });
 db.users.createIndex({ "Nickname": 1 }, { unique: true });

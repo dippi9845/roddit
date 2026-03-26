@@ -13,30 +13,40 @@ spec:
         role: mongos
     spec:
       initContainers:
+      # Aspetta che il replica set del configsvr sia eleggibile
+      # (il Job init-configrs l'avrà già inizializzato).
       - name: wait-configsvr
         image: mongo:6
         command:
         - bash
         - -c
         - |
-          # Aspetta che il configsvr abbia un primary
-          until [ "$(mongosh --host configsvr-0.config-svc --port 27019 --quiet --eval "try { rs.status().ok } catch(e) { 0 }")" = "1" ]; do
+          CONFIGSVR="configsvr-0.config-svc.default.svc.cluster.local"
+          until [ "$(mongosh --host "$CONFIGSVR" --port 27019 \
+            --quiet --eval \
+            "try { rs.status().ok } catch(e) { 0 }")" = "1" ]; do
             echo "Waiting for configsvr primary..."
             sleep 3
           done
           echo "configsvr ready."
 
+      # Aspetta che lo shard abbia un primary su almeno un membro.
       - name: wait-shard
         image: mongo:6
         command:
         - bash
         - -c
         - |
-          # Aspetta che lo shard abbia un primary su uno dei 3 membri
           until \
-            [ "$(mongosh --host shard1-0.shard1.default.svc.cluster.local --port 27018 --quiet --eval "try { rs.isMaster().ismaster } catch(e) { false }")" = "true" ] || \
-            [ "$(mongosh --host shard1-1.shard1.default.svc.cluster.local --port 27018 --quiet --eval "try { rs.isMaster().ismaster } catch(e) { false }")" = "true" ] || \
-            [ "$(mongosh --host shard1-2.shard1.default.svc.cluster.local --port 27018 --quiet --eval "try { rs.isMaster().ismaster } catch(e) { false }")" = "true" ]; do
+            [ "$(mongosh --host shard1-0.shard1.default.svc.cluster.local \
+              --port 27018 --quiet \
+              --eval "try { rs.isMaster().ismaster } catch(e) { false }")" = "true" ] || \
+            [ "$(mongosh --host shard1-1.shard1.default.svc.cluster.local \
+              --port 27018 --quiet \
+              --eval "try { rs.isMaster().ismaster } catch(e) { false }")" = "true" ] || \
+            [ "$(mongosh --host shard1-2.shard1.default.svc.cluster.local \
+              --port 27018 --quiet \
+              --eval "try { rs.isMaster().ismaster } catch(e) { false }")" = "true" ]; do
             echo "Waiting for shard1 primary..."
             sleep 3
           done
@@ -48,7 +58,7 @@ spec:
         command:
         - "mongos"
         - "--configdb"
-        - "configRepl/configsvr-0.config-svc:27019"
+        - "configRepl/configsvr-0.config-svc.default.svc.cluster.local:27019"
         - "--bind_ip_all"
         ports:
         - containerPort: 27017
@@ -76,14 +86,14 @@ spec:
         - bash
         - -c
         - |
-          # Aspetta che il mongos sia pronto
-          until mongosh --host mongos --port 27017 --eval "db.adminCommand('ping')" &>/dev/null; do
+          until mongosh --host mongos --port 27017 \
+            --eval "db.adminCommand('ping')" &>/dev/null; do
             echo "Waiting for mongos..."
             sleep 3
           done
 
-          # Aggiungi lo shard solo se non già presente
-          SHARDS=$(mongosh --host mongos --port 27017 --quiet --eval "db.adminCommand('listShards').shards.length")
+          SHARDS=$(mongosh --host mongos --port 27017 --quiet \
+            --eval "db.adminCommand('listShards').shards.length")
           if [ "$SHARDS" = "0" ]; then
             echo "Adding shard1..."
             mongosh --host mongos --port 27017 --eval \

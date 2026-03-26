@@ -24,26 +24,6 @@ spec:
       labels:
         app: configsvr
     spec:
-      initContainers:
-      - name: init-replicaset
-        image: mongo:6
-        command:
-        - bash
-        - -c
-        - |
-          until mongosh --host configsvr-0.config-svc --port 27019 --eval "db.adminCommand('ping')" &>/dev/null; do
-            echo "Waiting for configsvr..."
-            sleep 3
-          done
-          STATUS=$(mongosh --host configsvr-0.config-svc --port 27019 --quiet --eval "try { rs.status().ok } catch(e) { 0 }")
-          if [ "$STATUS" != "1" ]; then
-            echo "Initializing configsvr replica set..."
-            mongosh --host configsvr-0.config-svc --port 27019 --eval \
-              "rs.initiate({_id:'configRepl',configsvr:true,members:[{_id:0,host:'configsvr-0.config-svc:27019'}]})"
-            echo "Done."
-          else
-            echo "Already initialized, skipping."
-          fi
       containers:
       - name: mongo
         image: mongo:6
@@ -62,3 +42,40 @@ spec:
               - "db.adminCommand('ping')"
           initialDelaySeconds: 5
           periodSeconds: 5
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: init-configrs
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: init-configrs
+        image: mongo:6
+        command:
+        - bash
+        - -c
+        - |
+          CONFIGSVR="configsvr-0.config-svc.default.svc.cluster.local"
+          until mongosh --host "$CONFIGSVR" --port 27019 \
+            --eval "db.adminCommand('ping')" &>/dev/null; do
+            echo "Waiting for configsvr-0..."
+            sleep 3
+          done
+
+          STATUS=$(mongosh --host "$CONFIGSVR" --port 27019 \
+            --quiet --eval "try { rs.status().ok } catch(e) { 0 }")
+          if [ "$STATUS" != "1" ]; then
+            echo "Initializing configRepl..."
+            mongosh --host "$CONFIGSVR" --port 27019 --eval \
+              "rs.initiate({
+                _id: 'configRepl',
+                configsvr: true,
+                members: [{ _id: 0, host: '$CONFIGSVR:27019' }]
+              })"
+            echo "Done."
+          else
+            echo "configRepl already initialized, skipping."
+          fi

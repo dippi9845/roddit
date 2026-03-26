@@ -12,12 +12,6 @@ $(document).ready( function() {
     cards = "";
 
     $.getScript('/static/assets/js/btn-ajax-form.js');
-
-    //if (window.searchedUsersCount > 0) {
-    //    cards += ajaxLoadCards("/html-snippets/user-card-drawer", query, window.visualizedUserCount, window.cardsPerRequest);
-    //    
-    //    window.visualizedUserCount += window.searchedUsersCount;
-    //}
     
     if (window.visualizedUserCount <= window.cardsPerRequest) {
         cards += ajaxLoadCards("/html-snippets/post-drawer", query, window.visualizedPostCount, window.cardsPerRequest-window.visualizedUserCount);
@@ -47,12 +41,6 @@ $(window).scroll(function() {
     const userCount = ajaxGetRawOutput("/ajax/get-users-count", query);
 
     cards = "";
-
-    //if (window.visualizedUserCount < userCount) {
-    //    cards += ajaxLoadCards("/html-snippets/user-card-drawer", query, window.visualizedUserCount, window.cardsPerRequest);
-//
-    //    window.visualizedUserCount += window.cardsPerRequest;
-    //}
 
     if (window.visualizedPostCount < postCount) {
         cards += ajaxLoadCards("/html-snippets/post-drawer", query, window.visualizedPostCount, window.cardsPerRequest);

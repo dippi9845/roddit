@@ -639,6 +639,35 @@ def post_user_card_drawer():
         return render_template_string(template, users=users)
     else:
         return ""
+
+@app.route("/html-snippets/sub-drawer", methods=["POST"])
+def sub_drawer():
+    query = request.form.get("query", None)
+    limit = int(request.form.get("limit", 5))
+    if query:
+        rows = db.subreddit.find({
+            "Name": {"$regex": query, "$options": "i"}
+        }).limit(limit)
+        subs = []
+        for row in rows:
+            subs.append({
+                "name": row['Name'],
+                "followers": row['Followers'],
+                "is_following": db.following.find_one({
+                    "User": session.get(USER_ID_IN_SESSION),
+                    "Subreddit": row['Name']
+                }) is not None
+            })
+        template = """
+        {% from "components/subreddit.html" import draw_sub_card %}
+        {% for s in subs %}
+            {{ draw_sub_card(s['name'], s['followers'], s['is_following']) }}
+        {% endfor %}
+        <script src="/static/assets/js/btn-ajax-form.js"></script>
+        """
+        return render_template_string(template, subs=subs)
+    else:
+        return ""
    
 if __name__ == "__main__":
     app.run(debug=True)

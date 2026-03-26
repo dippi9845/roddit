@@ -1,0 +1,33 @@
+{% macro draw_sub_card(sub_name, followers, is_following) %}
+<div class="d-flex justify-content-start">
+    <div class="p-2">
+        <p>
+            r/{{ sub_name }}
+        </p>
+    </div>
+
+    <div class="p-2">
+        <div class="row mx-4">
+            <p>
+                {{ followers }}
+            </p>
+        </div>
+    </div>
+
+    <div class="p-2">
+        {% if is_following %}
+        <form action="/ajax/unfollow" method="get">
+            <input type="hidden" name="subreddit" value="{{ sub_name }}">
+            <button type="submit" class="btn btn-outline-primary">Unfollow</button>
+        </form>
+            
+        {% else %}
+            <form action="/ajax/follow" method="get">
+                <input type="hidden" name="subreddit" value="{{ sub_name }}">
+                <button type="submit" class="btn btn-primary">Follow</button>
+            </form>
+        {% endif %}
+    </div>
+</div>
+
+{% endmacro %}

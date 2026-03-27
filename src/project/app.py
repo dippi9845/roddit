@@ -390,10 +390,9 @@ def ajax_get_posts_count():
 
 @app.route("/ajax/get-users-count", methods=["POST"])
 def ajax_get_users_count():
-    query = request.form.get("query", "")
-    if query == "":
-        count = db.users.count_documents({})
-    else:
+    query = request.form.get("query", None)
+    count = 0
+    if query:
         count = db.users.count_documents({"Nickname": {"$regex": query, "$options": "i"}})
     return str(count)
 

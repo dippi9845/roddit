@@ -5,9 +5,11 @@
 $(document).ready( function() {
     window.visualizedPostCount = 0;
     window.visualizedUserCount = 0;
+    window.visualizedSubCount = 0;
     window.cardsPerRequest = 5;
     let query = getUrlVars()['query'];
     window.searchedUsersCount = ajaxGetRawOutput("/ajax/get-users-count", query);
+    window.searchedSubCount = ajaxGetRawOutput("/ajax/get-subs-count", query);
 
     cards = "";
 
@@ -23,6 +25,12 @@ $(document).ready( function() {
         cards += ajaxLoadCards("/html-snippets/post-drawer", query, window.visualizedPostCount, window.cardsPerRequest-window.visualizedUserCount);
 
         window.visualizedPostCount += window.cardsPerRequest;
+    }
+
+    if (window.searchedSubCount >= 0) {
+        cards += ajaxLoadCards("/html-snippets/sub-drawer", query, window.visualizedSubCount, window.cardsPerRequest);
+        
+        window.visualizedSubCount += window.cardsPerRequest;
     }
     
     if (cards == "") {
@@ -45,6 +53,7 @@ $(window).scroll(function() {
     let query = getUrlVars()['query'];
     const postCount = ajaxGetRawOutput("/ajax/get-posts-count", query);
     const userCount = ajaxGetRawOutput("/ajax/get-users-count", query);
+    const subCount = ajaxGetRawOutput("/ajax/get-subs-count", query);
 
     cards = "";
 
@@ -58,6 +67,12 @@ $(window).scroll(function() {
         cards += ajaxLoadCards("/html-snippets/post-drawer", query, window.visualizedPostCount, window.cardsPerRequest);
 
         window.visualizedPostCount += window.cardsPerRequest;
+    }
+
+    if (window.visualizedSubCount < subCount) {
+        cards += ajaxLoadCards("/html-snippets/sub-drawer", query, window.visualizedSubCount, window.cardsPerRequest);
+
+        window.visualizedSubCount += window.cardsPerRequest;
     }
 
     if (cards != "") {

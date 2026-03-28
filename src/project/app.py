@@ -616,10 +616,11 @@ def post_drawer():
 def post_user_card_drawer():
     query = request.form.get("query", None)
     limit = int(request.form.get("limit", 5))
+    offset = int(request.form.get("offset", 0))
     if query:
         rows = db.users.find({
             "Nickname": {"$regex": query, "$options": "i"}
-        }).limit(limit)
+        }).skip(offset).limit(limit)
         users = []
         for row in rows:
             users.append({
@@ -643,10 +644,11 @@ def post_user_card_drawer():
 def sub_drawer():
     query = request.form.get("query", None)
     limit = int(request.form.get("limit", 5))
+    offset = int(request.form.get("offset", 0))
     if query:
         rows = db.subreddit.find({
             "Name": {"$regex": query, "$options": "i"}
-        }).limit(limit)
+        }).skip(offset).limit(limit)
         subs = []
         for row in rows:
             subs.append({
@@ -667,6 +669,17 @@ def sub_drawer():
         return render_template_string(template, subs=subs)
     else:
         return ""
-   
+
+@app.route("/ajax/get-subs-count", methods=["POST"])
+def get_subs_count():
+    query = request.form.get("query", None)
+    if query:
+        count = db.subreddit.count_documents({
+            "Name": {"$regex": query, "$options": "i"}
+        })
+    else:
+        count = 0
+    return str(count)
+
 if __name__ == "__main__":
     app.run(debug=True)

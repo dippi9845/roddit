@@ -38,13 +38,13 @@ spec:
         - -c
         - |
           until \
-            [ "$(mongosh --host shard1-0.shard1.default.svc.cluster.local \
+            [ "$(mongosh --host shard1-0.shard1 \
               --port 27018 --quiet \
               --eval "try { rs.isMaster().ismaster } catch(e) { false }")" = "true" ] || \
-            [ "$(mongosh --host shard1-1.shard1.default.svc.cluster.local \
+            [ "$(mongosh --host shard1-1.shard1 \
               --port 27018 --quiet \
               --eval "try { rs.isMaster().ismaster } catch(e) { false }")" = "true" ] || \
-            [ "$(mongosh --host shard1-2.shard1.default.svc.cluster.local \
+            [ "$(mongosh --host shard1-2.shard1 \
               --port 27018 --quiet \
               --eval "try { rs.isMaster().ismaster } catch(e) { false }")" = "true" ]; do
             echo "Waiting for shard1 primary..."
@@ -97,7 +97,7 @@ spec:
           if [ "$SHARDS" = "0" ]; then
             echo "Adding shard1..."
             mongosh --host mongos --port 27017 --eval \
-              "sh.addShard('shard1/shard1-0.shard1.default.svc.cluster.local:27018,shard1-1.shard1.default.svc.cluster.local:27018,shard1-2.shard1.default.svc.cluster.local:27018')"
+              "sh.addShard('shard1/shard1-0.shard1:27018,shard1-1.shard1:27018,shard1-2.shard1:27018')"
             echo "Done."
           else
             echo "Shard already present, skipping."

@@ -1,3 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: shard1
+spec:
+  clusterIP: None
+  selector:
+    app: shard1
+  ports:
+    - port: 27018
+---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -21,6 +32,7 @@ spec:
           - "--shardsvr"
           - "--replSet=shard1"
           - "--bind_ip_all"
+          - "--port=27018"
         ports:
           - containerPort: 27018
         volumeMounts:
@@ -34,3 +46,46 @@ spec:
       resources:
         requests:
           storage: 10Gi
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: init-shard1rs
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: init-shard1rs
+        image: mongo:6
+        command:
+        - bash
+        - -c
+        - |
+          # Aspetta tutti e 3 i membri
+          for HOST in shard1-0.shard1 shard1-1.shard1 shard1-2.shard1; do
+            until mongosh --host "$HOST" --port 27018 \
+              --eval "db.adminCommand('ping')" &>/dev/null; do
+              echo "Waiting for $HOST..."
+              sleep 3
+            done
+            echo "$HOST is up."
+          done
+
+          STATUS=$(mongosh --host shard1-0.shard1 --port 27018 \
+            --quiet --eval "try { rs.status().ok } catch(e) { 0 }")
+          if [ "$STATUS" != "1" ]; then
+            echo "Initializing shard1 replica set..."
+            mongosh --host shard1-0.shard1 --port 27018 --eval \
+              "rs.initiate({
+                _id: 'shard1',
+                members: [
+                  { _id: 0, host: 'shard1-0.shard1:27018' },
+                  { _id: 1, host: 'shard1-1.shard1:27018' },
+                  { _id: 2, host: 'shard1-2.shard1:27018' }
+                ]
+              })" || { echo "rs.initiate failed, will retry..."; exit 1; }
+            echo "Done."
+          else
+            echo "shard1 already initialized, skipping."
+          fi

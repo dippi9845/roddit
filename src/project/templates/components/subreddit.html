@@ -20,13 +20,13 @@
 
                     <div class="p-2">
                         {% if is_following %}
-                        <form action="/ajax/unfollow" method="get">
+                        <form action="/unfollow" method="get">
                             <input type="hidden" name="subreddit" value="{{ sub_name }}">
                             <button type="submit" class="btn btn-outline-primary">Unfollow</button>
                         </form>
                             
                         {% else %}
-                            <form action="/ajax/follow" method="get">
+                            <form action="/follow" method="get">
                                 <input type="hidden" name="subreddit" value="{{ sub_name }}">
                                 <button type="submit" class="btn btn-primary">Follow</button>
                             </form>

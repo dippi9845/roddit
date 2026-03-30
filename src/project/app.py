@@ -248,7 +248,7 @@ def create_new_subreddit():
 def not_found():
     return render_template("404.html")
 
-@app.route("/ajax/follow", methods=["GET"])
+@app.route("/follow", methods=["GET"])
 def ajax_follow():
     if USER_ID_IN_SESSION in session:
         user_id = str(session[USER_ID_IN_SESSION])
@@ -263,7 +263,7 @@ def ajax_follow():
                 {"Name": subreddit_name},
                 {"$inc": {"Followers": 1}}
             )
-    return jsonify({"status": "ok"})
+    return redirect("/")
 
 @app.route("/ajax/create-new-post", methods=["POST"])
 def ajax_create_new_post():
@@ -549,7 +549,7 @@ def ajax_get_my_notification():
         })
     return jsonify(rtr)
 
-@app.route("/ajax/unfollow", methods=["GET"])
+@app.route("/unfollow", methods=["GET"])
 def ajax_unfollow():
     if USER_ID_IN_SESSION in session:
         user_id = str(session[USER_ID_IN_SESSION])
@@ -562,7 +562,7 @@ def ajax_unfollow():
             {"Name": subreddit_name},
             {"$inc": {"Followers": -1}}
         )
-    return jsonify({"status": "ok"})
+    return redirect("/")
 
 @app.route("/html-snippets/post-drawer", methods=["POST"])
 def post_drawer():

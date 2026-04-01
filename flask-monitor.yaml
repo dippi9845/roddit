@@ -1,0 +1,14 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: flask-app-monitor
+  labels:
+    release: my-release # Deve essere lo stesso nome usato nel comando 'helm install'
+spec:
+  selector:
+    matchLabels:
+      app: flask # Deve corrispondere alla label del Service sopra
+  endpoints:
+  - port: web # Il nome della porta definito nel Service
+    path: /metrics
+    interval: 15s

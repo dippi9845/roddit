@@ -1,0 +1,17 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: high-latency
+  namespace: default
+spec:
+  action: delay
+  mode: all
+  selector:
+    labelSelectors:
+      'app': flask
+  delay:
+    latency: '500ms'
+    correlation: '100'
+    jitter: '0ms'
+  direction: to # Applichiamo a ingresso e uscita per sicurezza
+  duration: '15m'

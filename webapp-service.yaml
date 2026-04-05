@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: flask-app-service
+  labels:
+    app: flask # Fondamentale per il passaggio successivo
+spec:
+  selector:
+    app: flask
+  ports:
+    - name: web
+      protocol: TCP
+      port: 5000
+      targetPort: 5000

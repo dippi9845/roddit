@@ -315,7 +315,7 @@ def ajax_create_new_subreddit():
     if subreddit_name != "":
         existing_sub = db.subreddit.find_one({"Name": subreddit_name})
         if existing_sub:
-            return redirect("/new-subreddit")
+            return render_template("new-subreddit.html", err="Subreddit name already taken")
         
         db.subreddit.insert_one({
             "Name": subreddit_name,
@@ -333,7 +333,7 @@ def ajax_create_new_subreddit():
         )
         return redirect("/")
     else:
-        return redirect("/new-subreddit")
+        return render_template("new-subreddit.html", err="Subreddit name is required")
 
 @app.route("/ajax/login", methods=["POST"])
 def ajax_login():

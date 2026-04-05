@@ -32,6 +32,11 @@
         </div>
     </nav>
     <div class="container">
+        {% if err %}
+        <div class="alert alert-danger" role="alert">
+            {{ err }}
+        </div>
+        {% endif %}
         <div class="row">
             <div class="col">
                 <h1 class="text-center">Create new subreddit</h1>

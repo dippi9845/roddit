@@ -12,7 +12,7 @@ Firstly we start kubernetes
 minikube start --container-runtime=containerd
 ```
 
-Install helm 
+Install helm with admin privileges
 ```
 choco install kubernetes-helm
 ```

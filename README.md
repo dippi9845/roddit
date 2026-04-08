@@ -12,7 +12,7 @@ Firstly we start kubernetes
 minikube start --container-runtime=containerd
 ```
 
-Install helm 
+Install helm with admin privileges
 ```
 choco install kubernetes-helm
 ```
@@ -51,7 +51,7 @@ kubectl apply -f mongos-deployment.yaml
 Set up the database
 ```
 kubectl cp src/database/init-db.js <pod_of_mongos_router>:/tmp/init-db.js
-kubectl exec -it <pod_of_mongos_router> mongosh /tmp/init-db.js
+kubectl exec -it <pod_of_mongos_router> -- mongosh /tmp/init-db.js
 ```
 
 Set up flask

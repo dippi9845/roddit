@@ -71,5 +71,11 @@ spec:
             echo "Waiting for mongos..."
             sleep 3
           done
-          echo "Adding shard1..."
-          mongosh --host mongos --port 27017 --eval "sh.addShard('shard1/shard1-0.shard1.default.svc.cluster.local:27018')"
+          SHARDS=$(mongosh --host mongos --port 27017 --quiet --eval "sh.status().shards.map(s=>s._id).join(',')")
+          if echo "$SHARDS" | grep -q "shard1"; then
+            echo "shard1 already registered, skipping."
+          else
+            echo "Adding shard1..."
+            mongosh --host mongos --port 27017 \
+              --eval "sh.addShard('shard1/shard1-0.shard1.default.svc.cluster.local:27018')"
+          fi

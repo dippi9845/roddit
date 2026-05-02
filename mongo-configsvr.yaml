@@ -33,7 +33,7 @@ spec:
           - "--replSet=configRepl"
           - "--port=27019"
           - "--bind_ip_all"
-        volumeMounts:              # ← qui, dentro il container
+        volumeMounts:
           - name: data
             mountPath: /data/configdb
         readinessProbe:
@@ -45,7 +45,7 @@ spec:
               - "db.adminCommand('ping')"
           initialDelaySeconds: 5
           periodSeconds: 5
-  volumeClaimTemplates:            # ← qui, fuori dal container, allo stesso livello di template
+  volumeClaimTemplates:
   - metadata:
       name: data
     spec:

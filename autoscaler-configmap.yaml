@@ -1,0 +1,291 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongodb-autoscaler-script
+  namespace: default
+data:
+  autoscaler.py: |
+    import os, time, logging
+    import requests
+    from pymongo import MongoClient
+    from kubernetes import client as k8s_client, config as k8s_config
+
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s [%(levelname)s] %(message)s"
+    )
+    log = logging.getLogger("mongodb-autoscaler")
+
+    # ── Configurazione da env ────────────────────────────────────────
+    PROMETHEUS_URL       = os.getenv("PROMETHEUS_URL")
+    STATEFULSET_NAME     = os.getenv("STATEFULSET_NAME", "shard1")
+    NAMESPACE            = os.getenv("NAMESPACE", "default")
+    REPLICA_SET_NAME     = os.getenv("REPLICA_SET_NAME", "shard1")
+    MONGO_SERVICE        = os.getenv("MONGO_SERVICE", "shard1")
+    MONGO_PORT           = int(os.getenv("MONGO_PORT", "27018"))
+    MIN_REPLICAS         = int(os.getenv("MIN_REPLICAS", "3"))
+    MAX_REPLICAS         = int(os.getenv("MAX_REPLICAS", "5"))
+    POLL_INTERVAL        = int(os.getenv("POLL_INTERVAL", "30"))
+
+    # Soglie metriche
+    SCALE_UP_CONNECTIONS    = int(os.getenv("SCALE_UP_CONNECTIONS", "80"))
+    SCALE_DOWN_CONNECTIONS  = int(os.getenv("SCALE_DOWN_CONNECTIONS", "20"))
+    SCALE_UP_CPU_PERCENT    = float(os.getenv("SCALE_UP_CPU_PERCENT", "70.0"))
+    SCALE_DOWN_CPU_PERCENT  = float(os.getenv("SCALE_DOWN_CPU_PERCENT", "20.0"))
+
+    # Anti-flapping: quanti cicli consecutivi prima di agire
+    SCALE_UP_COOLDOWN    = int(os.getenv("SCALE_UP_COOLDOWN", "3"))
+    SCALE_DOWN_COOLDOWN  = int(os.getenv("SCALE_DOWN_COOLDOWN", "5"))
+
+    # ── Stato interno ────────────────────────────────────────────────
+    consecutive_up   = 0
+    consecutive_down = 0
+
+    # ── Helper Prometheus ────────────────────────────────────────────
+    def query_prometheus(promql):
+        try:
+            r = requests.get(
+                PROMETHEUS_URL + "/api/v1/query",
+                params={"query": promql},
+                timeout=5
+            )
+            data = r.json()
+            if data["status"] == "success" and data["data"]["result"]:
+                return float(data["data"]["result"][0]["value"][1])
+        except Exception as e:
+            log.warning("Prometheus query fallita (" + promql[:60] + "...): " + str(e))
+        return None
+
+    # ── Helper Kubernetes ────────────────────────────────────────────
+    def get_k8s_clients():
+        k8s_config.load_incluster_config()
+        return k8s_client.AppsV1Api(), k8s_client.CoreV1Api()
+
+    def get_current_replicas():
+        apps_v1, _ = get_k8s_clients()
+        sts = apps_v1.read_namespaced_stateful_set(STATEFULSET_NAME, NAMESPACE)
+        return sts.spec.replicas
+
+    def patch_statefulset_replicas(new_count):
+        apps_v1, _ = get_k8s_clients()
+        apps_v1.patch_namespaced_stateful_set(
+            STATEFULSET_NAME, NAMESPACE,
+            {"spec": {"replicas": new_count}}
+        )
+        log.info("StatefulSet " + STATEFULSET_NAME + " -> " + str(new_count) + " replicas")
+
+    def wait_for_pod_ready(pod_name, timeout=120):
+        """Attende che un pod sia in stato Running/Ready."""
+        _, core_v1 = get_k8s_clients()
+        deadline = time.time() + timeout
+        while time.time() < deadline:
+            try:
+                pod = core_v1.read_namespaced_pod(pod_name, NAMESPACE)
+                conditions = pod.status.conditions or []
+                if any(c.type == "Ready" and c.status == "True" for c in conditions):
+                    log.info("Pod " + pod_name + " e' Ready")
+                    return True
+            except Exception:
+                pass
+            log.info("Attendo pod " + pod_name + "...")
+            time.sleep(5)
+        log.error("Timeout attesa pod " + pod_name)
+        return False
+
+    def delete_pvc(index):
+        """Elimina il PVC del membro rimosso (rimane dopo scale-down StatefulSet)."""
+        _, core_v1 = get_k8s_clients()
+        pvc_name = "data-" + STATEFULSET_NAME + "-" + str(index)
+        try:
+            core_v1.delete_namespaced_persistent_volume_claim(pvc_name, NAMESPACE)
+            log.info("PVC " + pvc_name + " eliminato")
+        except Exception as e:
+            log.warning("Impossibile eliminare PVC " + pvc_name + ": " + str(e))
+
+    # ── Helper MongoDB ───────────────────────────────────────────────
+    def get_primary_host(current_replicas):
+        """Trova il primary del replica set provando tutti i membri."""
+        for i in range(current_replicas):
+            host = (STATEFULSET_NAME + "-" + str(i) + "."
+                    + MONGO_SERVICE + "." + NAMESPACE
+                    + ".svc.cluster.local:" + str(MONGO_PORT))
+            try:
+                mc = MongoClient(
+                    "mongodb://" + host + "/?directConnection=true",
+                    serverSelectionTimeoutMS=3000
+                )
+                is_master = mc.admin.command("isMaster")
+                mc.close()
+                if is_master.get("ismaster"):
+                    log.info("Primary trovato: " + host)
+                    return host
+            except Exception:
+                continue
+        return None
+
+    def mongo_rs_add(new_index, current_replicas):
+        """Scale UP: aggiunge il nuovo membro al replica set."""
+        pod_name = STATEFULSET_NAME + "-" + str(new_index)
+        new_host = (pod_name + "." + MONGO_SERVICE + "."
+                    + NAMESPACE + ".svc.cluster.local:" + str(MONGO_PORT))
+
+        if not wait_for_pod_ready(pod_name, timeout=120):
+            log.error("Pod " + pod_name + " non Ready, rollback StatefulSet")
+            patch_statefulset_replicas(current_replicas)
+            return False
+
+        primary = get_primary_host(current_replicas)
+        if not primary:
+            log.error("Primary non trovato, rollback StatefulSet")
+            patch_statefulset_replicas(current_replicas)
+            return False
+
+        try:
+            mc = MongoClient(
+                "mongodb://" + primary + "/?directConnection=true",
+                serverSelectionTimeoutMS=5000
+            )
+            mc.admin.command("replSetAdd", {
+                "host": new_host,
+                "priority": 1,
+                "votes": 1
+            })
+            mc.close()
+            log.info("rs.add(" + new_host + ") -> successo")
+            return True
+        except Exception as e:
+            log.error("rs.add fallito: " + str(e) + " -> rollback StatefulSet")
+            patch_statefulset_replicas(current_replicas)
+            return False
+
+    def mongo_rs_remove(index_to_remove, current_replicas):
+        """Scale DOWN: rimuove il membro PRIMA di scalare il StatefulSet."""
+        host_to_remove = (STATEFULSET_NAME + "-" + str(index_to_remove)
+                          + "." + MONGO_SERVICE + "." + NAMESPACE
+                          + ".svc.cluster.local:" + str(MONGO_PORT))
+
+        primary = get_primary_host(current_replicas)
+        if not primary:
+            log.error("Primary non trovato, scala annullato")
+            return False
+
+        # Se il membro da rimuovere e' il primary, forza stepDown
+        if primary.split(".")[0].endswith(str(index_to_remove)):
+            log.warning("Il membro " + str(index_to_remove) + " e' il primary, forzo stepDown...")
+            try:
+                mc = MongoClient(
+                    "mongodb://" + primary + "/?directConnection=true",
+                    serverSelectionTimeoutMS=3000
+                )
+                mc.admin.command("replSetStepDown", 60)
+                mc.close()
+                time.sleep(10)
+                primary = get_primary_host(current_replicas)
+                if not primary:
+                    log.error("Nuovo primary non eletto dopo stepDown, annullo")
+                    return False
+            except Exception as e:
+                log.error("stepDown fallito: " + str(e))
+                return False
+
+        try:
+            mc = MongoClient(
+                "mongodb://" + primary + "/?directConnection=true",
+                serverSelectionTimeoutMS=5000
+            )
+            mc.admin.command("replSetRemove", host_to_remove)
+            mc.close()
+            log.info("rs.remove(" + host_to_remove + ") -> successo")
+            time.sleep(10)
+            return True
+        except Exception as e:
+            log.error("rs.remove fallito: " + str(e))
+            return False
+
+    # ── Loop principale ──────────────────────────────────────────────
+    def evaluate_scaling():
+        global consecutive_up, consecutive_down
+
+        # Connessioni correnti — metrica reale di percona/mongodb_exporter:0.40
+        # conn_type="current" = connessioni attive in quel momento
+        query_conns = (
+            "sum(mongodb_ss_connections"
+            "{conn_type=\"current\",namespace=\"" + NAMESPACE + "\"})"
+        )
+
+        # CPU media dei container MongoDB del replica set (%)
+        query_cpu = (
+            "100 * avg(rate(container_cpu_usage_seconds_total"
+            "{pod=~\"" + STATEFULSET_NAME + "-.*\","
+            "container=\"mongo\","
+            "namespace=\"" + NAMESPACE + "\"}[2m]))"
+        )
+
+        conns = query_prometheus(query_conns)
+        cpu   = query_prometheus(query_cpu)
+
+        if conns is None or cpu is None:
+            log.warning("Metriche non disponibili, skip ciclo")
+            consecutive_up = consecutive_down = 0
+            return
+
+        log.info("Metriche -> connessioni: " + str(int(conns)) + ", CPU: " + str(round(cpu, 1)) + "%")
+
+        need_up   = (conns > SCALE_UP_CONNECTIONS or cpu > SCALE_UP_CPU_PERCENT)
+        need_down = (conns < SCALE_DOWN_CONNECTIONS and cpu < SCALE_DOWN_CPU_PERCENT)
+
+        if need_up and not need_down:
+            consecutive_up   += 1
+            consecutive_down  = 0
+            log.info("Pressione HIGH: cicli consecutivi up=" + str(consecutive_up) + "/" + str(SCALE_UP_COOLDOWN))
+        elif need_down and not need_up:
+            consecutive_down += 1
+            consecutive_up    = 0
+            log.info("Pressione LOW: cicli consecutivi down=" + str(consecutive_down) + "/" + str(SCALE_DOWN_COOLDOWN))
+        else:
+            consecutive_up = consecutive_down = 0
+            log.info("Carico nella norma, nessuna azione")
+            return
+
+        current = get_current_replicas()
+
+        if consecutive_up >= SCALE_UP_COOLDOWN:
+            if current < MAX_REPLICAS:
+                new_count = current + 1
+                log.info(">>> SCALE UP: " + str(current) + " -> " + str(new_count) + " <<<")
+                patch_statefulset_replicas(new_count)
+                if mongo_rs_add(new_count - 1, current):
+                    log.info("Scale UP completato: ora " + str(new_count) + " membri")
+                consecutive_up = 0
+            else:
+                log.warning("MAX_REPLICAS (" + str(MAX_REPLICAS) + ") raggiunto, scale up bloccato")
+                consecutive_up = 0
+
+        elif consecutive_down >= SCALE_DOWN_COOLDOWN:
+            if current > MIN_REPLICAS:
+                new_count = current - 1
+                index_to_remove = current - 1
+                log.info(">>> SCALE DOWN: " + str(current) + " -> " + str(new_count)
+                         + " (rimuovo indice " + str(index_to_remove) + ") <<<")
+                if mongo_rs_remove(index_to_remove, current):
+                    patch_statefulset_replicas(new_count)
+                    delete_pvc(index_to_remove)
+                    log.info("Scale DOWN completato: ora " + str(new_count) + " membri")
+                consecutive_down = 0
+            else:
+                log.warning("MIN_REPLICAS (" + str(MIN_REPLICAS) + ") raggiunto, scale down bloccato")
+                consecutive_down = 0
+
+    if __name__ == "__main__":
+        log.info(
+            "MongoDB Autoscaler avviato | RS=" + REPLICA_SET_NAME
+            + " | min=" + str(MIN_REPLICAS)
+            + " max=" + str(MAX_REPLICAS)
+            + " | poll=" + str(POLL_INTERVAL) + "s"
+        )
+        while True:
+            try:
+                evaluate_scaling()
+            except Exception as e:
+                log.error("Errore nel ciclo principale: " + str(e), exc_info=True)
+            time.sleep(POLL_INTERVAL)

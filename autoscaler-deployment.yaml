@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb-autoscaler
+  namespace: default
+  labels:
+    app: mongodb-autoscaler
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb-autoscaler
+  template:
+    metadata:
+      labels:
+        app: mongodb-autoscaler
+    spec:
+      serviceAccountName: mongodb-autoscaler
+      containers:
+        - name: autoscaler
+          image: python:3.11-slim
+          command: ["sh", "-c"]
+          args:
+            - |
+              pip install requests pymongo kubernetes --quiet && \
+              python /scripts/autoscaler.py
+          env:
+            # URL Prometheus — con release "my-release" in namespace default
+            - name: PROMETHEUS_URL
+              value: "http://my-release-kube-prometheus-prometheus.default.svc.cluster.local:9090"
+            # Nomi dal tuo mongodb-shard.yaml
+            - name: STATEFULSET_NAME
+              value: "shard1"
+            - name: MONGO_SERVICE
+              value: "shard1"
+            - name: REPLICA_SET_NAME
+              value: "shard1"
+            - name: MONGO_PORT
+              value: "27018"
+            - name: NAMESPACE
+              value: "default"
+            # Limiti di scaling
+            - name: MIN_REPLICAS
+              value: "3"
+            - name: MAX_REPLICAS
+              value: "5"
+            # Soglie — da calibrare con il tuo carico reale
+            - name: SCALE_UP_CONNECTIONS
+              value: "80"
+            - name: SCALE_DOWN_CONNECTIONS
+              value: "20"
+            - name: SCALE_UP_CPU_PERCENT
+              value: "70.0"
+            - name: SCALE_DOWN_CPU_PERCENT
+              value: "20.0"
+            # Anti-flapping (cicli * POLL_INTERVAL = secondi di attesa)
+            - name: SCALE_UP_COOLDOWN
+              value: "3"    # 3 × 30s = 90s di pressione prima di scalare su
+            - name: SCALE_DOWN_COOLDOWN
+              value: "5"    # 5 × 30s = 150s di carico basso prima di scalare giù
+            - name: POLL_INTERVAL
+              value: "30"
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "100m"
+              memory: "128Mi"
+          volumeMounts:
+            - name: script
+              mountPath: /scripts
+      volumes:
+        - name: script
+          configMap:
+            name: mongodb-autoscaler-script

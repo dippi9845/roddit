@@ -15,15 +15,12 @@ import uuid
 
 from datetime import datetime, timezone
 
-hosts = [
-    "shard1-0.shard1.default.svc.cluster.local:27018",
-    "shard1-1.shard1.default.svc.cluster.local:27018",
-    "shard1-2.shard1.default.svc.cluster.local:27018"
-]
-
-uri = f"mongodb://{','.join(hosts)}/?replicaSet=shard1"
-
-client = MongoClient(uri)
+client = MongoClient("mongodb://mongos:27017/",
+    readPreference="secondaryPreferred",
+    serverSelectionTimeoutMS=30000,
+    retryWrites=True,
+    retryReads=True
+    )
 db = client.roddit
 
 app = Flask(__name__)

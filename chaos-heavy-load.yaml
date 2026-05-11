@@ -1,14 +1,15 @@
 apiVersion: chaos-mesh.org/v1alpha1
 kind: StressChaos
 metadata:
-  name: stress-cpu-hpa
+  name: stress-cpu-mongos
+  namespace: default
 spec:
   mode: one
   selector:
     labelSelectors:
-      'app': flask
+      'role': mongos
   stressors:
     cpu:
       workers: 4
-      load: 100 # Carica la CPU al 100%
+      load: 100
   duration: '10m'

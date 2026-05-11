@@ -1,15 +1,18 @@
 apiVersion: chaos-mesh.org/v1alpha1
 kind: Schedule
 metadata:
-  name: periodic-pod-kill
+  name: periodic-pod-kill-mongos
+  namespace: default
 spec:
-  schedule: '@every 2m' # La pianificazione va qui
+  schedule: '@every 2m'
   historyLimit: 5
   concurrencyPolicy: "Forbid"
-  type: 'PodChaos' # Specifichiamo che tipo di caos vogliamo schedulare
+  type: 'PodChaos'
   podChaos:
     action: pod-kill
     mode: one
     selector:
+      namespaces:
+        - default
       labelSelectors:
-        'app': flask # Assicurati che coincida con la label del tuo pod
+        'role': mongos

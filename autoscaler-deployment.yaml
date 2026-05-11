@@ -22,44 +22,43 @@ spec:
           command: ["sh", "-c"]
           args:
             - |
-              pip install requests pymongo kubernetes --quiet && \
+              pip install pymongo kubernetes --quiet && \
               python /scripts/autoscaler.py
           env:
-            # URL Prometheus — con release "my-release" in namespace default
-            - name: PROMETHEUS_URL
-              value: "http://my-release-kube-prometheus-prometheus.default.svc.cluster.local:9090"
-            # Nomi dal tuo mongodb-shard.yaml
-            - name: STATEFULSET_NAME
-              value: "shard1"
-            - name: MONGO_SERVICE
-              value: "shard1"
-            - name: REPLICA_SET_NAME
-              value: "shard1"
+            # Connessione mongos — router principale del cluster shardato
+            - name: MONGOS_HOST
+              value: "mongos.default.svc.cluster.local"
+            - name: MONGOS_PORT
+              value: "27017"
+            # Porta dei singoli shard (shardsvr)
             - name: MONGO_PORT
               value: "27018"
+            # Database applicativo da monitorare
+            - name: DATABASE_NAME
+              value: "roddit"
+            # Namespace Kubernetes
             - name: NAMESPACE
               value: "default"
-            # Limiti di scaling
-            - name: MIN_REPLICAS
-              value: "3"
-            - name: MAX_REPLICAS
+            # Soglia di storage: 50% di 500Mi = 262144000 bytes (250Mi) 30720
+            # Quando uno shard supera questa soglia, viene creato un nuovo shard
+            - name: SCALE_UP_THRESHOLD_BYTES
+              value: "10485760"
+            - name: SCALE_COOLDOWN_SECONDS
+              value: "300"   # 5 minuti — durante il test abbassalo a 120
+            # Storage allocato per ogni pod dei nuovi shard (deve coincidere
+            # con il volumeClaimTemplate del mongodb-shard.yaml)
+            - name: STORAGE_PER_POD
+              value: "500Mi"
+            # Numero massimo di shard creabili automaticamente
+            - name: MAX_SHARDS
               value: "5"
-            # Soglie — da calibrare con il tuo carico reale
-            - name: SCALE_UP_CONNECTIONS
-              value: "80"
-            - name: SCALE_DOWN_CONNECTIONS
-              value: "20"
-            - name: SCALE_UP_CPU_PERCENT
-              value: "70.0"
-            - name: SCALE_DOWN_CPU_PERCENT
-              value: "20.0"
-            # Anti-flapping (cicli * POLL_INTERVAL = secondi di attesa)
-            - name: SCALE_UP_COOLDOWN
-              value: "3"    # 3 × 30s = 90s di pressione prima di scalare su
-            - name: SCALE_DOWN_COOLDOWN
-              value: "5"    # 5 × 30s = 150s di carico basso prima di scalare giù
+            # Numero di membri (Primary + Secondary) per ogni nuovo shard
+            - name: MEMBERS_PER_SHARD
+              value: "3"
+            # Intervallo di polling in secondi
+            # 60s e' appropriato per metriche di storage (cambiano lentamente)
             - name: POLL_INTERVAL
-              value: "30"
+              value: "60"
           resources:
             requests:
               cpu: "50m"

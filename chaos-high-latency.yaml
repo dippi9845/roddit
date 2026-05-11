@@ -1,17 +1,18 @@
 apiVersion: chaos-mesh.org/v1alpha1
 kind: NetworkChaos
 metadata:
-  name: high-latency
+  name: high-latency-mongos
   namespace: default
 spec:
   action: delay
   mode: all
   selector:
     labelSelectors:
-      'app': flask
+      'role': mongos
   delay:
     latency: '500ms'
     correlation: '100'
     jitter: '0ms'
-  direction: to # Applichiamo a ingresso e uscita per sicurezza
+  direction: both  # colpisce sia il traffico in entrata (Flask→mongos)
+                   # che in uscita (mongos→shard) per simulare degrado reale
   duration: '15m'

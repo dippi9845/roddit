@@ -1,0 +1,425 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongodb-autoscaler-script
+  namespace: default
+data:
+  autoscaler.py: |
+    import os, time, logging
+    from pymongo import MongoClient
+    from kubernetes import client as k8s_client, config as k8s_config
+
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s [%(levelname)s] %(message)s"
+    )
+    log = logging.getLogger("shard-autoscaler")
+
+    # ── Configurazione ───────────────────────────────────────────────
+    NAMESPACE        = os.getenv("NAMESPACE", "default")
+    MONGOS_HOST      = os.getenv("MONGOS_HOST", "mongos.default.svc.cluster.local")
+    MONGOS_PORT      = int(os.getenv("MONGOS_PORT", "27017"))
+    MONGO_PORT       = int(os.getenv("MONGO_PORT", "27018"))
+    DATABASE_NAME    = os.getenv("DATABASE_NAME", "roddit")
+    POLL_INTERVAL    = int(os.getenv("POLL_INTERVAL", "60"))
+    MAX_SHARDS       = int(os.getenv("MAX_SHARDS", "5"))
+    MEMBERS_PER_SHARD = int(os.getenv("MEMBERS_PER_SHARD", "3"))
+    STORAGE_PER_POD  = os.getenv("STORAGE_PER_POD", "500Mi")
+
+    # Soglia: 50% di 500Mi = 250Mi in bytes
+    SCALE_UP_THRESHOLD_BYTES = int(os.getenv("SCALE_UP_THRESHOLD_BYTES", str(250 * 1024 * 1024)))
+
+    # Cooldown post-scaling: secondi minimi tra uno scale up e il successivo.
+    # Deve essere abbastanza lungo da permettere al balancer MongoDB
+    # di iniziare a redistribuire i chunk prima del prossimo controllo.
+    # Default: 300s (5 min). In produzione considera 600-900s.
+    SCALE_COOLDOWN_SECONDS = int(os.getenv("SCALE_COOLDOWN_SECONDS", "300"))
+
+    # Set dei nomi shard in fase di creazione (anti-loop)
+    shards_in_progress = set()
+
+    # Timestamp dell ultimo scale up eseguito con successo (0 = mai)
+    last_scale_time = 0
+
+    # ── Conversione storage string → bytes ───────────────────────────
+    def parse_storage_to_bytes(storage_str):
+        storage_str = storage_str.strip()
+        if storage_str.endswith("Gi"):
+            return int(storage_str[:-2]) * 1024 * 1024 * 1024
+        if storage_str.endswith("Mi"):
+            return int(storage_str[:-2]) * 1024 * 1024
+        if storage_str.endswith("Ki"):
+            return int(storage_str[:-2]) * 1024
+        return int(storage_str)
+
+    # ── Helper Kubernetes ────────────────────────────────────────────
+    def get_k8s_clients():
+        k8s_config.load_incluster_config()
+        apps_v1 = k8s_client.AppsV1Api()
+        core_v1 = k8s_client.CoreV1Api()
+        return apps_v1, core_v1
+
+    def statefulset_exists(shard_name):
+        apps_v1, _ = get_k8s_clients()
+        try:
+            apps_v1.read_namespaced_stateful_set(shard_name, NAMESPACE)
+            return True
+        except k8s_client.exceptions.ApiException as e:
+            if e.status == 404:
+                return False
+            raise
+
+    def service_exists(shard_name):
+        _, core_v1 = get_k8s_clients()
+        try:
+            core_v1.read_namespaced_service(shard_name, NAMESPACE)
+            return True
+        except k8s_client.exceptions.ApiException as e:
+            if e.status == 404:
+                return False
+            raise
+
+    def create_headless_service(shard_name):
+        _, core_v1 = get_k8s_clients()
+        if service_exists(shard_name):
+            log.info("Service " + shard_name + " esiste gia, skip")
+            return
+        svc = k8s_client.V1Service(
+            metadata=k8s_client.V1ObjectMeta(
+                name=shard_name,
+                namespace=NAMESPACE
+            ),
+            spec=k8s_client.V1ServiceSpec(
+                cluster_ip="None",
+                selector={"app": shard_name},
+                ports=[k8s_client.V1ServicePort(
+                    name="mongo",
+                    port=MONGO_PORT,
+                    target_port=MONGO_PORT
+                )]
+            )
+        )
+        core_v1.create_namespaced_service(NAMESPACE, svc)
+        log.info("Headless Service " + shard_name + " creato")
+
+    def create_statefulset(shard_name):
+        apps_v1, _ = get_k8s_clients()
+        if statefulset_exists(shard_name):
+            log.info("StatefulSet " + shard_name + " esiste gia, skip")
+            return
+
+        storage_bytes = parse_storage_to_bytes(STORAGE_PER_POD)
+        storage_quantity = STORAGE_PER_POD
+
+        sts = k8s_client.V1StatefulSet(
+            metadata=k8s_client.V1ObjectMeta(
+                name=shard_name,
+                namespace=NAMESPACE
+            ),
+            spec=k8s_client.V1StatefulSetSpec(
+                service_name=shard_name,
+                replicas=MEMBERS_PER_SHARD,
+                selector=k8s_client.V1LabelSelector(
+                    match_labels={"app": shard_name}
+                ),
+                template=k8s_client.V1PodTemplateSpec(
+                    metadata=k8s_client.V1ObjectMeta(
+                        labels={"app": shard_name}
+                    ),
+                    spec=k8s_client.V1PodSpec(
+                        containers=[k8s_client.V1Container(
+                            name="mongo",
+                            image="mongo:6",
+                            command=[
+                                "mongod",
+                                "--shardsvr",
+                                "--replSet=" + shard_name,
+                                "--bind_ip_all",
+                                "--port=" + str(MONGO_PORT)
+                            ],
+                            ports=[k8s_client.V1ContainerPort(
+                                container_port=MONGO_PORT
+                            )],
+                            volume_mounts=[k8s_client.V1VolumeMount(
+                                name="data",
+                                mount_path="/data/db"
+                            )],
+                            resources=k8s_client.V1ResourceRequirements(
+                                requests={"cpu": "100m", "memory": "256Mi"},
+                                limits={"cpu": "500m", "memory": "512Mi"}
+                            )
+                        )]
+                    )
+                ),
+                volume_claim_templates=[k8s_client.V1PersistentVolumeClaim(
+                    metadata=k8s_client.V1ObjectMeta(name="data"),
+                    spec=k8s_client.V1PersistentVolumeClaimSpec(
+                        access_modes=["ReadWriteOnce"],
+                        resources=k8s_client.V1ResourceRequirements(
+                            requests={"storage": storage_quantity}
+                        )
+                    )
+                )]
+            )
+        )
+        apps_v1.create_namespaced_stateful_set(NAMESPACE, sts)
+        log.info("StatefulSet " + shard_name + " creato con "
+                 + str(MEMBERS_PER_SHARD) + " repliche e storage " + storage_quantity)
+
+    def wait_for_all_pods_ready(shard_name, timeout=300):
+        _, core_v1 = get_k8s_clients()
+        deadline = time.time() + timeout
+        while time.time() < deadline:
+            pods = core_v1.list_namespaced_pod(
+                NAMESPACE,
+                label_selector="app=" + shard_name
+            )
+            ready_count = 0
+            for pod in pods.items:
+                conditions = pod.status.conditions or []
+                if any(c.type == "Ready" and c.status == "True" for c in conditions):
+                    ready_count += 1
+            log.info(shard_name + ": " + str(ready_count) + "/"
+                     + str(MEMBERS_PER_SHARD) + " pod Ready")
+            if ready_count >= MEMBERS_PER_SHARD:
+                log.info("Tutti i pod di " + shard_name + " sono Ready")
+                return True
+            time.sleep(10)
+        log.error("Timeout attesa pod " + shard_name)
+        return False
+
+    # ── Helper MongoDB ───────────────────────────────────────────────
+    def get_mongos_client():
+        uri = "mongodb://" + MONGOS_HOST + ":" + str(MONGOS_PORT) + "/"
+        return MongoClient(uri, serverSelectionTimeoutMS=5000)
+
+    def get_shard_primary(shard_name):
+        for i in range(MEMBERS_PER_SHARD):
+            host = (shard_name + "-" + str(i) + "."
+                    + shard_name + "." + NAMESPACE
+                    + ".svc.cluster.local:" + str(MONGO_PORT))
+            try:
+                mc = MongoClient(
+                    "mongodb://" + host + "/?directConnection=true",
+                    serverSelectionTimeoutMS=3000
+                )
+                result = mc.admin.command("isMaster")
+                mc.close()
+                if result.get("ismaster"):
+                    return host
+            except Exception:
+                continue
+        return None
+
+    def init_replica_set(shard_name):
+        primary_candidate = (shard_name + "-0." + shard_name + "."
+                             + NAMESPACE + ".svc.cluster.local:" + str(MONGO_PORT))
+        members = []
+        for i in range(MEMBERS_PER_SHARD):
+            host = (shard_name + "-" + str(i) + "."
+                    + shard_name + "." + NAMESPACE
+                    + ".svc.cluster.local:" + str(MONGO_PORT))
+            members.append({"_id": i, "host": host})
+
+        try:
+            mc = MongoClient(
+                "mongodb://" + primary_candidate + "/?directConnection=true",
+                serverSelectionTimeoutMS=5000
+            )
+            # Controlla se gia inizializzato
+            try:
+                status = mc.admin.command("replSetGetStatus")
+                mc.close()
+                if status.get("ok") == 1:
+                    log.info("Replica set " + shard_name + " gia inizializzato")
+                    return True
+            except Exception:
+                pass
+
+            mc.admin.command("replSetInitiate", {
+                "_id": shard_name,
+                "members": members
+            })
+            mc.close()
+            log.info("rs.initiate() su " + shard_name + " eseguito")
+            # Attende elezione primary
+            time.sleep(15)
+            return True
+        except Exception as e:
+            log.error("rs.initiate() fallito su " + shard_name + ": " + str(e))
+            return False
+
+    def add_shard_to_mongos(shard_name):
+        primary_host = (shard_name + "-0." + shard_name + "."
+                        + NAMESPACE + ".svc.cluster.local:" + str(MONGO_PORT))
+        shard_connection_string = shard_name + "/" + primary_host
+        try:
+            mc = get_mongos_client()
+            # Controlla se lo shard e' gia registrato
+            shards = mc.admin.command("listShards")
+            for s in shards.get("shards", []):
+                if s.get("_id") == shard_name:
+                    mc.close()
+                    log.info("Shard " + shard_name + " gia registrato su mongos")
+                    return True
+            mc.admin.command("addShard", shard_connection_string)
+            mc.close()
+            log.info("sh.addShard(" + shard_connection_string + ") eseguito con successo")
+            return True
+        except Exception as e:
+            log.error("addShard fallito per " + shard_name + ": " + str(e))
+            return False
+
+    def get_current_shards():
+        try:
+            mc = get_mongos_client()
+            result = mc.admin.command("listShards")
+            mc.close()
+            shard_names = [s["_id"] for s in result.get("shards", [])]
+            return shard_names
+        except Exception as e:
+            log.error("listShards fallito: " + str(e))
+            return []
+
+    def get_shard_data_size(shard_name):
+        primary = get_shard_primary(shard_name)
+        if not primary:
+            log.warning("Primary non trovato per " + shard_name)
+            return None
+        try:
+            mc = MongoClient(
+                "mongodb://" + primary + "/?directConnection=true",
+                serverSelectionTimeoutMS=3000
+            )
+            stats = mc.get_database(DATABASE_NAME).command("dbStats", 1)
+            mc.close()
+            # dataSize = dimensione logica dei dati
+            # storageSize = spazio effettivo su disco (include padding)
+            # Usiamo storageSize per confrontarci con il limite fisico del PVC
+            data_size = stats.get("dataSize", 0)
+            return data_size
+        except Exception as e:
+            log.warning("dbStats fallito su " + shard_name + ": " + str(e))
+            return None
+
+    # ── Creazione nuovo shard (orchestrazione completa) ──────────────
+    def provision_new_shard(shard_name):
+        log.info("=== Avvio provisioning " + shard_name + " ===")
+
+        log.info("[1/5] Creazione Headless Service...")
+        create_headless_service(shard_name)
+
+        log.info("[2/5] Creazione StatefulSet...")
+        create_statefulset(shard_name)
+
+        log.info("[3/5] Attesa pod Ready (timeout 5 min)...")
+        if not wait_for_all_pods_ready(shard_name, timeout=300):
+            log.error("Provisioning " + shard_name + " fallito: pod non Ready")
+            return False
+
+        log.info("[4/5] Inizializzazione replica set...")
+        if not init_replica_set(shard_name):
+            log.error("Provisioning " + shard_name + " fallito: rs.initiate() fallito")
+            return False
+
+        log.info("[5/5] Registrazione su mongos (sh.addShard)...")
+        if not add_shard_to_mongos(shard_name):
+            log.error("Provisioning " + shard_name + " fallito: addShard fallito")
+            return False
+
+        log.info("=== " + shard_name + " provisioning completato con successo ===")
+        log.info("Il balancer MongoDB redistribuira i chunk automaticamente")
+        return True
+
+    # ── Loop principale ──────────────────────────────────────────────
+    def evaluate_scaling():
+        global shards_in_progress, last_scale_time
+
+        # Cooldown: non valutare se e' passato troppo poco tempo dall ultimo scale up
+        elapsed = time.time() - last_scale_time
+        if last_scale_time > 0 and elapsed < SCALE_COOLDOWN_SECONDS:
+            remaining = int(SCALE_COOLDOWN_SECONDS - elapsed)
+            log.info("Cooldown attivo: attendo ancora " + str(remaining) + "s prima del prossimo controllo")
+            return
+
+        current_shards = get_current_shards()
+        if not current_shards:
+            log.warning("Nessuno shard rilevato da mongos, skip ciclo")
+            return
+
+        log.info("Shard attivi: " + str(current_shards))
+
+        # Raccoglie la dimensione di ogni shard e calcola la media del cluster.
+        # Usare la MEDIA invece del massimo evita di creare nuovi shard mentre
+        # il balancer sta ancora redistribuendo dati da uno shard sovraccarico:
+        # la media scende man mano che il bilanciamento procede, mentre il
+        # massimo resta alto fino al completamento della migrazione dei chunk.
+        threshold_mb = round(SCALE_UP_THRESHOLD_BYTES / (1024 * 1024), 2)
+        sizes = {}
+        for shard_name in current_shards:
+            size = get_shard_data_size(shard_name)
+            if size is not None:
+                sizes[shard_name] = size
+                size_mb = round(size / (1024 * 1024), 2)
+                log.info(shard_name + ": " + str(size_mb) + " MB")
+
+        if not sizes:
+            log.warning("Impossibile leggere storage da nessuno shard, skip")
+            return
+
+        num_shards = len(current_shards)
+        total_size = sum(sizes.values())
+        avg_size = total_size / num_shards
+        avg_size_mb = round(avg_size / (1024 * 1024), 2)
+        total_size_mb = round(total_size / (1024 * 1024), 2)
+
+        log.info("Cluster totale: " + str(total_size_mb) + " MB"
+                 + " | media per shard: " + str(avg_size_mb) + " MB"
+                 + " | soglia: " + str(threshold_mb) + " MB")
+
+        if avg_size > SCALE_UP_THRESHOLD_BYTES:
+            if num_shards >= MAX_SHARDS:
+                log.warning("Media " + str(avg_size_mb) + " MB > soglia "
+                            + str(threshold_mb) + " MB ma MAX_SHARDS ("
+                            + str(MAX_SHARDS) + ") raggiunto, impossibile scalare")
+                return
+
+            new_shard_index = num_shards + 1
+            new_shard_name = "shard" + str(new_shard_index)
+
+            if new_shard_name in shards_in_progress:
+                log.info(new_shard_name + " gia in fase di provisioning, attendo...")
+                return
+
+            log.info(">>> SCALE UP: media " + str(avg_size_mb) + " MB > soglia "
+                     + str(threshold_mb) + " MB, creo " + new_shard_name + " <<<")
+            shards_in_progress.add(new_shard_name)
+            try:
+                success = provision_new_shard(new_shard_name)
+                if success:
+                    last_scale_time = time.time()
+                    log.info("Shard " + new_shard_name
+                             + " aggiunto. Totale shard: " + str(num_shards + 1))
+                    log.info("Cooldown attivato: prossima valutazione tra "
+                             + str(SCALE_COOLDOWN_SECONDS) + "s")
+                else:
+                    log.error("Provisioning " + new_shard_name + " fallito")
+            finally:
+                shards_in_progress.discard(new_shard_name)
+        else:
+            log.info("Carico nella norma, nessun nuovo shard necessario")
+
+    if __name__ == "__main__":
+        log.info(
+            "Shard Autoscaler avviato | "
+            "db=" + DATABASE_NAME + " | "
+            "soglia=" + str(round(SCALE_UP_THRESHOLD_BYTES / (1024*1024), 1)) + "MB | "
+            "max_shard=" + str(MAX_SHARDS) + " | "
+            "poll=" + str(POLL_INTERVAL) + "s"
+        )
+        while True:
+            try:
+                evaluate_scaling()
+            except Exception as e:
+                log.error("Errore nel ciclo principale: " + str(e), exc_info=True)
+            time.sleep(POLL_INTERVAL)

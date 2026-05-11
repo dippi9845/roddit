@@ -2,11 +2,12 @@ apiVersion: chaos-mesh.org/v1alpha1
 kind: StressChaos
 metadata:
   name: stress-mongodb-shard
+  namespace: default
 spec:
-  mode: all                  # colpisce tutti i pod del replica set
+  mode: all
   selector:
     labelSelectors:
-      'app': shard1          # ← label dei tuoi pod MongoDB
+      'role': mongos   # ora targetta il mongos invece di shard1
   stressors:
     cpu:
       workers: 2

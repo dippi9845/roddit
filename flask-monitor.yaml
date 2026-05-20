@@ -3,12 +3,12 @@ kind: ServiceMonitor
 metadata:
   name: flask-app-monitor
   labels:
-    release: my-release # Deve essere lo stesso nome usato nel comando 'helm install'
+    release: my-release
 spec:
   selector:
     matchLabels:
-      app: flask # Deve corrispondere alla label del Service sopra
+      app: flask
   endpoints:
-  - port: web # Il nome della porta definito nel Service
+  - port: web
     path: /metrics
     interval: 15s

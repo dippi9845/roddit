@@ -1,0 +1,57 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-load-test
+  namespace: default
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: loader
+        image: mongo:6
+        command:
+        - bash
+        - -c
+        - |
+          echo "Inserimento dati di test..."
+          mongosh --host mongos --port 27017 --eval "
+            db = db.getSiblingDB('roddit');
+
+            // Conta i documenti gia presenti per evitare duplicate key
+            var existing = db.users.countDocuments();
+            print('Documenti esistenti: ' + existing);
+
+            var toInsert = 175000;
+            var start = existing;
+            var end = start + toInsert;
+            var batch = [];
+            var inserted = 0;
+
+            for (var i = start; i < end; i++) {
+              batch.push({
+                ID: 'user_' + i,
+                Nickname: 'testuser' + i,
+                Email: 'user' + i + '@test.com',
+                CreatedAt: new Date()
+              });
+              if (batch.length === 1000) {
+                db.users.insertMany(batch);
+                inserted += batch.length;
+                batch = [];
+                if (inserted % 25000 === 0) {
+                  print('Inseriti ' + inserted + '/' + toInsert + '...');
+                }
+              }
+            }
+            if (batch.length > 0) {
+              db.users.insertMany(batch);
+              inserted += batch.length;
+            }
+
+            print('Inserimento completato: ' + inserted + ' nuovi documenti');
+            var stats = db.stats();
+            print('dataSize: ' + Math.round(stats.dataSize / 1024 / 1024 * 100) / 100 + ' MB');
+            print('storageSize: ' + Math.round(stats.storageSize / 1024 / 1024 * 100) / 100 + ' MB');
+            print('Totale oggetti: ' + stats.objects);
+          "

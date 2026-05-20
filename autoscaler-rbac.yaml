@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: mongodb-autoscaler
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: mongodb-autoscaler-role
+  namespace: default
+rules:
+  # StatefulSet: reads existing ones and creates new ones for new shards.
+  - apiGroups: ["apps"]
+    resources: ["statefulsets"]
+    verbs: ["get", "list", "watch", "create", "patch", "update"]
+  # Service: creates new Headless Service for new shards.
+  - apiGroups: [""]
+    resources: ["services"]
+    verbs: ["get", "list", "watch", "create"]
+  # Pod: waits for new pods to be ready.
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+  # PVC: scan read
+  - apiGroups: [""]
+    resources: ["persistentvolumeclaims"]
+    verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: mongodb-autoscaler-binding
+  namespace: default
+subjects:
+  - kind: ServiceAccount
+    name: mongodb-autoscaler
+    namespace: default
+roleRef:
+  kind: Role
+  name: mongodb-autoscaler-role
+  apiGroup: rbac.authorization.k8s.io

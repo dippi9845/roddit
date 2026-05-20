@@ -15,8 +15,12 @@ import uuid
 
 from datetime import datetime, timezone
 
-
-client = MongoClient("mongodb://mongos:27017/")
+client = MongoClient("mongodb://mongos:27017/",
+    readPreference="secondaryPreferred",
+    serverSelectionTimeoutMS=30000,
+    retryWrites=True,
+    retryReads=True
+    )
 db = client.roddit
 
 app = Flask(__name__)

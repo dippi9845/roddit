@@ -16,6 +16,10 @@ Install helm with admin privileges
 ```
 choco install kubernetes-helm
 ```
+or with winget:
+```
+winget install Helm.Helm
+```
 
 Add required repos for prometheus/grafana and chaos mesh + update
 ```
@@ -29,21 +33,19 @@ Install the prometheus/grafana stack
 helm install my-release prometheus-community/kube-prometheus-stack
 ```
 
-create a seperate namespace for chaos mesh to preserve cluster integrity
-```
-kubectl create ns chaos-mesh
-```
-
-Install chaos mesh
+Creates a new namespace and installs chaos-mesh in it.
 ```
 helm install chaos-mesh chaos-mesh/chaos-mesh -n chaos-mesh --create-namespace --set chaosDaemon.runtime=containerd --set chaosDaemon.socketPath=/run/containerd/containerd.sock --version 2.6.3
 ```
 
-We create the mongosb shard
+We create the mongosb shard and autoscaler
 
 ```
 kubectl apply -f mongodb-service.yaml
 kubectl apply -f mongo-configsvr.yaml
+kubectl apply -f autoscaler-rbac.yaml
+kubectl apply -f autoscaler-configmap-avg.yaml
+kubectl apply -f autoscaler-deployment.yaml
 kubectl apply -f mongodb-shard.yaml
 kubectl apply -f mongos-deployment.yaml
 ```
@@ -109,14 +111,34 @@ minikube addons enable metrics-server
 
 Execution of the experiments(DO NOT EXECUTE ALL AT ONCE)
 ```
-kubectl apply -f chaos-high-latency.yaml
-kubectl apply -f chaos-heavy-load.yaml
-kubectl apply -f chaos-pod-termination.yaml
+kubectl apply -f chaos-high-latency-flask.yaml
+kubectl apply -f chaos-high-latency-mongos.yaml
+kubectl apply -f chaos-heavy-load-flask.yaml
+kubectl apply -f chaos-heavy-load-mongos.yaml
+kubectl apply -f chaos-pod-termination-flask.yaml
+kubectl apply -f chaos-pod-termination-mongos.yaml
 ```
 
-To check if experiments are working
+To check if experiments are working:
+for chaos-high-latency-flask.yaml:
 ```
-curl -o /dev/null -s -w "time_connect: %{time_connect}s\ntime_starttransfer: %{time_starttransfer}s\ntime_total: %{time_total}s\n" http://<IP-FLASK-APP>:<PORT>/ (for chaos-high-latency.yaml)
-kubectl get hpa -w (for chaos-heavy-load.yaml)
+minikube service flask-service --url
+curl -o nul -s -w "tempo_totale: %{time_total}s\n" <url obtained>
+```
+for chaos-high-latency-mongos.yaml:
+```
+kubectl exec -it <mongos pod> -- mongosh --quiet --eval "var s=Date.now(); db.getSiblingDB('roddit').users.findOne(); print('Tempo: '+(Date.now()-s)+'ms');"
+```
+for chaos-heavy-load-flask.yaml:
+```
+kubectl get hpa -w
+```
+for chaos-heavy-load-mongos.yaml
+```
+kubectl logs -f <mongos pod>
+kubectl logs -f deployment/mongodb-autoscaler
+```
+for both chaos-pod-termination-flask.yaml and chaos-pod-termination-mongos.yaml
+```
 kubectl get pods -w (for chaos-pod-termination.yaml)
 ```

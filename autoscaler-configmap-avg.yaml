@@ -15,7 +15,7 @@ data:
     )
     log = logging.getLogger("shard-autoscaler")
 
-    # ── Configurazione ───────────────────────────────────────────────
+    # Config 
     NAMESPACE        = os.getenv("NAMESPACE", "default")
     MONGOS_HOST      = os.getenv("MONGOS_HOST", "mongos.default.svc.cluster.local")
     MONGOS_PORT      = int(os.getenv("MONGOS_PORT", "27017"))
@@ -26,22 +26,15 @@ data:
     MEMBERS_PER_SHARD = int(os.getenv("MEMBERS_PER_SHARD", "3"))
     STORAGE_PER_POD  = os.getenv("STORAGE_PER_POD", "500Mi")
 
-    # Soglia: 50% di 500Mi = 250Mi in bytes
     SCALE_UP_THRESHOLD_BYTES = int(os.getenv("SCALE_UP_THRESHOLD_BYTES", str(250 * 1024 * 1024)))
 
-    # Cooldown post-scaling: secondi minimi tra uno scale up e il successivo.
-    # Deve essere abbastanza lungo da permettere al balancer MongoDB
-    # di iniziare a redistribuire i chunk prima del prossimo controllo.
-    # Default: 300s (5 min). In produzione considera 600-900s.
     SCALE_COOLDOWN_SECONDS = int(os.getenv("SCALE_COOLDOWN_SECONDS", "300"))
 
-    # Set dei nomi shard in fase di creazione (anti-loop)
     shards_in_progress = set()
 
-    # Timestamp dell ultimo scale up eseguito con successo (0 = mai)
     last_scale_time = 0
 
-    # ── Conversione storage string → bytes ───────────────────────────
+    # Aliases conversion
     def parse_storage_to_bytes(storage_str):
         storage_str = storage_str.strip()
         if storage_str.endswith("Gi"):
@@ -52,7 +45,7 @@ data:
             return int(storage_str[:-2]) * 1024
         return int(storage_str)
 
-    # ── Helper Kubernetes ────────────────────────────────────────────
+    # Helper Kubernetes 
     def get_k8s_clients():
         k8s_config.load_incluster_config()
         apps_v1 = k8s_client.AppsV1Api()
@@ -188,7 +181,7 @@ data:
         log.error("Timeout attesa pod " + shard_name)
         return False
 
-    # ── Helper MongoDB ───────────────────────────────────────────────
+    # Helper MongoDB 
     def get_mongos_client():
         uri = "mongodb://" + MONGOS_HOST + ":" + str(MONGOS_PORT) + "/"
         return MongoClient(uri, serverSelectionTimeoutMS=5000)
@@ -293,16 +286,15 @@ data:
             )
             stats = mc.get_database(DATABASE_NAME).command("dbStats", 1)
             mc.close()
-            # dataSize = dimensione logica dei dati
-            # storageSize = spazio effettivo su disco (include padding)
-            # Usiamo storageSize per confrontarci con il limite fisico del PVC
+            # dataSize = data logic size.
+            # storageSize = current space consumed(includes padding)
             data_size = stats.get("dataSize", 0)
             return data_size
         except Exception as e:
             log.warning("dbStats fallito su " + shard_name + ": " + str(e))
             return None
 
-    # ── Creazione nuovo shard (orchestrazione completa) ──────────────
+    # Shard creation
     def provision_new_shard(shard_name):
         log.info("=== Avvio provisioning " + shard_name + " ===")
 
@@ -331,7 +323,7 @@ data:
         log.info("Il balancer MongoDB redistribuira i chunk automaticamente")
         return True
 
-    # ── Loop principale ──────────────────────────────────────────────
+    # Loop 
     def evaluate_scaling():
         global shards_in_progress, last_scale_time
 
@@ -349,11 +341,6 @@ data:
 
         log.info("Shard attivi: " + str(current_shards))
 
-        # Raccoglie la dimensione di ogni shard e calcola la media del cluster.
-        # Usare la MEDIA invece del massimo evita di creare nuovi shard mentre
-        # il balancer sta ancora redistribuendo dati da uno shard sovraccarico:
-        # la media scende man mano che il bilanciamento procede, mentre il
-        # massimo resta alto fino al completamento della migrazione dei chunk.
         threshold_mb = round(SCALE_UP_THRESHOLD_BYTES / (1024 * 1024), 2)
         sizes = {}
         for shard_name in current_shards:

@@ -10,19 +10,19 @@ metadata:
   name: mongodb-autoscaler-role
   namespace: default
 rules:
-  # StatefulSet: legge quelli esistenti e ne crea di nuovi per i nuovi shard
+  # StatefulSet: reads existing ones and creates new ones for new shards.
   - apiGroups: ["apps"]
     resources: ["statefulsets"]
     verbs: ["get", "list", "watch", "create", "patch", "update"]
-  # Service: crea i Headless Service per ogni nuovo shard
+  # Service: creates new Headless Service for new shards.
   - apiGroups: [""]
     resources: ["services"]
     verbs: ["get", "list", "watch", "create"]
-  # Pod: attende che i pod dei nuovi shard siano Ready
+  # Pod: waits for new pods to be ready.
   - apiGroups: [""]
     resources: ["pods"]
     verbs: ["get", "list", "watch"]
-  # PVC: lettura per monitoraggio (scale down non gestito)
+  # PVC: scan read
   - apiGroups: [""]
     resources: ["persistentvolumeclaims"]
     verbs: ["get", "list"]

@@ -25,38 +25,28 @@ spec:
               pip install pymongo kubernetes --quiet && \
               python /scripts/autoscaler.py
           env:
-            # Connessione mongos — router principale del cluster shardato
             - name: MONGOS_HOST
               value: "mongos.default.svc.cluster.local"
             - name: MONGOS_PORT
               value: "27017"
-            # Porta dei singoli shard (shardsvr)
+            # shard port
             - name: MONGO_PORT
               value: "27018"
-            # Database applicativo da monitorare
             - name: DATABASE_NAME
               value: "roddit"
-            # Namespace Kubernetes
             - name: NAMESPACE
               value: "default"
-            # Soglia di storage: 50% di 500Mi = 262144000 bytes (250Mi) 30720
-            # Quando uno shard supera questa soglia, viene creato un nuovo shard
             - name: SCALE_UP_THRESHOLD_BYTES
               value: "10485760"
             - name: SCALE_COOLDOWN_SECONDS
-              value: "300"   # 5 minuti — durante il test abbassalo a 120
-            # Storage allocato per ogni pod dei nuovi shard (deve coincidere
-            # con il volumeClaimTemplate del mongodb-shard.yaml)
+              value: "300"
+            # Pod storage (= to volumeClaimTemplate in mongodb-shard.yaml)
             - name: STORAGE_PER_POD
               value: "500Mi"
-            # Numero massimo di shard creabili automaticamente
             - name: MAX_SHARDS
               value: "5"
-            # Numero di membri (Primary + Secondary) per ogni nuovo shard
             - name: MEMBERS_PER_SHARD
               value: "3"
-            # Intervallo di polling in secondi
-            # 60s e' appropriato per metriche di storage (cambiano lentamente)
             - name: POLL_INTERVAL
               value: "60"
           resources:

@@ -4,7 +4,7 @@ metadata:
   name: mongodb-exporter
   namespace: default
   labels:
-    release: my-release   # deve matchare il serviceMonitorSelector del tuo Prometheus
+    release: my-release
 spec:
   selector:
     matchLabels:

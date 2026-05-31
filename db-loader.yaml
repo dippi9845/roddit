@@ -18,7 +18,6 @@ spec:
           mongosh --host mongos --port 27017 --eval "
             db = db.getSiblingDB('roddit');
 
-            // Conta i documenti gia presenti per evitare duplicate key
             var existing = db.users.countDocuments();
             print('Documenti esistenti: ' + existing);
 

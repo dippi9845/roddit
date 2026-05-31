@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: flask-app-service
   labels:
-    app: flask # Fondamentale per il passaggio successivo
+    app: flask
 spec:
   selector:
     app: flask

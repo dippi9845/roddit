@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb-autoscaler
+  namespace: default
+  labels:
+    app: mongodb-autoscaler
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb-autoscaler
+  template:
+    metadata:
+      labels:
+        app: mongodb-autoscaler
+    spec:
+      serviceAccountName: mongodb-autoscaler
+      containers:
+        - name: autoscaler
+          image: python:3.11-slim
+          command: ["sh", "-c"]
+          args:
+            - |
+              pip install pymongo kubernetes --quiet && \
+              python /scripts/autoscaler.py
+          env:
+            - name: MONGOS_HOST
+              value: "mongos.default.svc.cluster.local"
+            - name: MONGOS_PORT
+              value: "27017"
+            # shard port
+            - name: MONGO_PORT
+              value: "27018"
+            - name: DATABASE_NAME
+              value: "roddit"
+            - name: NAMESPACE
+              value: "default"
+            - name: SCALE_UP_THRESHOLD_BYTES
+              value: "10485760"
+            - name: SCALE_COOLDOWN_SECONDS
+              value: "300"
+            # Pod storage (= to volumeClaimTemplate in mongodb-shard.yaml)
+            - name: STORAGE_PER_POD
+              value: "500Mi"
+            - name: MAX_SHARDS
+              value: "5"
+            - name: MEMBERS_PER_SHARD
+              value: "3"
+            - name: POLL_INTERVAL
+              value: "60"
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "100m"
+              memory: "128Mi"
+          volumeMounts:
+            - name: script
+              mountPath: /scripts
+      volumes:
+        - name: script
+          configMap:
+            name: mongodb-autoscaler-script

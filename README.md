@@ -33,7 +33,7 @@ Install the prometheus/grafana stack
 helm install my-release prometheus-community/kube-prometheus-stack
 ```
 
-Creates a new namespace and installs chaos-mesh in it.
+Creates a new namespace and installs chaos-mesh stack in it.
 ```
 helm install chaos-mesh chaos-mesh/chaos-mesh -n chaos-mesh --create-namespace --set chaosDaemon.runtime=containerd --set chaosDaemon.socketPath=/run/containerd/containerd.sock --version 2.6.3
 ```
@@ -103,6 +103,8 @@ Set up the port-forwarding for visualizing chaos mesh dashboard from web browser
 ```
 kubectl port-forward -n chaos-mesh svc/chaos-dashboard 2333:2333
 ```
+Once the port forwarding is enabled you can login on the Chaos-Mesh dashboard using the token
+obtained with the previous command and as service account chaos-admin.
 
 Enable metrics-server to allow hpa
 ```
@@ -140,5 +142,5 @@ kubectl logs -f deployment/mongodb-autoscaler
 ```
 for both chaos-pod-termination-flask.yaml and chaos-pod-termination-mongos.yaml
 ```
-kubectl get pods -w (for chaos-pod-termination.yaml)
+kubectl get pods -w
 ```

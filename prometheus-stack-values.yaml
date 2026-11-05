@@ -1,0 +1,86 @@
+# values.yaml per: helm install my-release prometheus-community/kube-prometheus-stack -f prometheus-stack-values.yaml
+#
+# Obiettivo: tenere l'intero stack di monitoring entro ~700-900Mi di RAM totale,
+# adatto a un ambiente didattico locale su minikube con budget di memoria ristretto.
+# Il chart di default NON impone limiti su Prometheus (vedi prometheus-community/helm-charts#3401),
+# quindi senza questo file Prometheus puo' consumare tutta la RAM che il nodo gli lascia.
+
+# --- Prometheus server ---
+prometheus:
+  prometheusSpec:
+    retention: 6h              # in locale/didattico non serve conservare giorni di metriche
+    retentionSize: "256MB"
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "400Mi"
+    # Niente PVC dedicato: usa storage effimero del pod, evita di occupare altro spazio disco
+    # (accettabile per un progetto didattico dove i dati non devono sopravvivere ai restart)
+
+# --- Grafana ---
+grafana:
+  resources:
+    requests:
+      cpu: "50m"
+      memory: "128Mi"
+    limits:
+      cpu: "300m"
+      memory: "320Mi"
+  sidecar:
+    resources:
+      requests:
+        cpu: "10m"
+        memory: "32Mi"
+      limits:
+        cpu: "100m"
+        memory: "128Mi"
+  persistence:
+    enabled: false
+  defaultDashboardsEnabled: false   # niente dashboard K8s predefinite: meno RAM in avvio e UI pulita per la tua demo
+
+# --- Alertmanager: disabilitato, non serve per una demo didattica senza notifiche reali ---
+alertmanager:
+  enabled: false
+
+# --- kube-state-metrics ---
+kube-state-metrics:
+  resources:
+    requests:
+      cpu: "20m"
+      memory: "50Mi"
+    limits:
+      cpu: "100m"
+      memory: "100Mi"
+
+# --- node-exporter (DaemonSet, 1 pod su minikube single-node) ---
+prometheus-node-exporter:
+  resources:
+    requests:
+      cpu: "10m"
+      memory: "20Mi"
+    limits:
+      cpu: "50m"
+      memory: "50Mi"
+
+# --- prometheus-operator ---
+prometheusOperator:
+  resources:
+    requests:
+      cpu: "50m"
+      memory: "100Mi"
+    limits:
+      cpu: "200m"
+      memory: "200Mi"
+
+# Disabilita i target di monitoraggio dei componenti control-plane che minikube
+# spesso non espone comunque (evita errori di scraping continui nei log, non impattano
+# molto sulla RAM ma sono rumore inutile su un cluster locale a singolo nodo)
+kubeControllerManager:
+  enabled: false
+kubeEtcd:
+  enabled: false
+kubeScheduler:
+  enabled: false

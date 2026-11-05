@@ -11,6 +11,7 @@ Firstly we start kubernetes
 ```
 minikube start --container-runtime=containerd
 ```
+minikube start --memory=6144 --cpus=4 --container-runtime=containerd
 
 Install helm with admin privileges
 ```
@@ -30,12 +31,12 @@ helm repo update
 
 Install the prometheus/grafana stack
 ```
-helm install my-release prometheus-community/kube-prometheus-stack
+helm install my-release prometheus-community/kube-prometheus-stack -f prometheus-stack-values.yaml
 ```
 
 Creates a new namespace and installs chaos-mesh stack in it.
 ```
-helm install chaos-mesh chaos-mesh/chaos-mesh -n chaos-mesh --create-namespace --set chaosDaemon.runtime=containerd --set chaosDaemon.socketPath=/run/containerd/containerd.sock --version 2.6.3
+helm install chaos-mesh chaos-mesh/chaos-mesh -n chaos-mesh --create-namespace --set chaosDaemon.runtime=containerd --set chaosDaemon.socketPath=/run/containerd/containerd.sock --set chaosDaemon.resources.requests.memory=128Mi --set chaosDaemon.resources.limits.memory=256Mi --set controllerManager.resources.requests.memory=128Mi --set controllerManager.resources.limits.memory=256Mi --version 2.6.3
 ```
 
 We create the mongosb shard and autoscaler

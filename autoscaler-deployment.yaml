@@ -22,7 +22,7 @@ spec:
           command: ["sh", "-c"]
           args:
             - |
-              pip install pymongo kubernetes --quiet && \
+              pip install pymongo "kubernetes==36.0.3" --quiet && \
               python /scripts/autoscaler.py
           env:
             - name: MONGOS_HOST
@@ -37,12 +37,12 @@ spec:
             - name: NAMESPACE
               value: "default"
             - name: SCALE_UP_THRESHOLD_BYTES
-              value: "10485760"
+              value: "13100000"
             - name: SCALE_COOLDOWN_SECONDS
-              value: "300"
+              value: "420"
             # Pod storage (= to volumeClaimTemplate in mongodb-shard.yaml)
             - name: STORAGE_PER_POD
-              value: "500Mi"
+              value: "200Mi"
             - name: MAX_SHARDS
               value: "5"
             - name: MEMBERS_PER_SHARD
@@ -52,10 +52,10 @@ spec:
           resources:
             requests:
               cpu: "50m"
-              memory: "64Mi"
+              memory: "256Mi"
             limits:
               cpu: "100m"
-              memory: "128Mi"
+              memory: "512Mi"
           volumeMounts:
             - name: script
               mountPath: /scripts

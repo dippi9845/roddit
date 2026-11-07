@@ -37,14 +37,12 @@ spec:
           - name: data
             mountPath: /data/configdb
         readinessProbe:
-          exec:
-            command:
-              - mongosh
-              - "--port=27019"
-              - "--eval"
-              - "db.adminCommand('ping')"
+          tcpSocket:
+            port: 27019
           initialDelaySeconds: 5
           periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 6
   volumeClaimTemplates:
   - metadata:
       name: data
@@ -52,7 +50,7 @@ spec:
       accessModes: ["ReadWriteOnce"]
       resources:
         requests:
-          storage: 5Gi
+          storage: 200Mi
 ---
 apiVersion: batch/v1
 kind: Job

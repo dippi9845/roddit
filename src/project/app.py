@@ -354,11 +354,12 @@ def ajax_login():
             print("Invalid form")
             return False, None
         
-        user_id = str(get_user_id(request.form['email'], request.form['password']))
+        user_id = get_user_id(request.form['email'], request.form['password'])
         if not user_id:
             print("Invalid credentials")
             return False, None
         
+        user_id = str(user_id)
         create_session(user_id)
         response = make_response()
         if 'remember' in request.form:

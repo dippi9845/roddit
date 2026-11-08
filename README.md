@@ -11,7 +11,6 @@ Firstly we start kubernetes
 ```
 minikube start --container-runtime=containerd
 ```
-minikube start --memory=6144 --cpus=4 --container-runtime=containerd
 
 Install helm with admin privileges
 ```
@@ -31,7 +30,7 @@ helm repo update
 
 Install the prometheus/grafana stack
 ```
-helm install my-release prometheus-community/kube-prometheus-stack -f prometheus-stack-values.yaml
+helm install my-release prometheus-community/kube-prometheus-stack
 ```
 
 Creates a new namespace and installs chaos-mesh stack in it.

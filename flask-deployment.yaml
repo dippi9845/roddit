@@ -15,7 +15,7 @@ spec:
       containers:
       - name: flask
         image: dippi9845/flask-app:1.1
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         ports:
         - containerPort: 5000
         resources:

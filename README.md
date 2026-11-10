@@ -92,6 +92,19 @@ $pass = kubectl get secret my-release-grafana -o jsonpath="{.data.admin-password
 [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($pass))
 ```
 
+Attribute to specify in the query field to create the grafana dashboard:
+```
+flask_http_request_total
+```
+
+To see where is the location of a specific created account in a given shard pool:
+```
+foreach ($p in "shard1-0","shard1-1","shard1-2","shard2-0","shard2-1","shard2-2","shard3-0","shard3-1","shard3-2") {
+  Write-Host "== $p"
+  kubectl exec $p -- mongosh "mongodb://localhost:27018/roddit?directConnection=true&readPreference=secondaryPreferred" --quiet --eval "print(db.hello().isWritablePrimary ? 'PRIMARY' : 'SECONDARY'); printjson(db.users.find({Nickname:'<account nickname>'}).toArray())"
+}
+```
+
 Creation of local admin user to interact with chaos mesh dashboard
 ```
 kubectl create serviceaccount chaos-admin -n chaos-mesh
